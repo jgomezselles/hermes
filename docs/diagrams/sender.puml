@@ -1,0 +1,17 @@
+@startuml
+participant sender
+participant "sender::timer" as timer
+participant client
+control promise
+sender -> timer: setup(initial time)
+...
+timer -> sender: send
+alt "continue_sending() == true"
+    sender -> timer: setup(new calculated time)
+    note over timer: Send will be called again\nafter calculated time
+    sender -> client: send
+else
+    sender -> promise: signal
+    note over promise: all threads are signaled\nand the process finishes
+end
+@enduml

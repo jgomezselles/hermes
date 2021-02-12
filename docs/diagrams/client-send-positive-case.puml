@@ -1,0 +1,22 @@
+@startuml
+client -> script_queue: get_next_script
+
+script_queue -> client: script
+
+client -> script: get_next_request
+script -> client: request
+
+participant stats
+client -> client: get_session
+client -> session: submit
+note over session: http2 request/response
+client -> stats: increase_sent
+note over client: send method ends
+== Asynchronous thread ==
+session -> client: on_response
+client -> script: validate_answer
+script -> client: ok
+
+client -> stats: add_measurements
+client -> script_queue: enqueue_script
+@enduml

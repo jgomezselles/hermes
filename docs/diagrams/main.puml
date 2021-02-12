@@ -1,0 +1,15 @@
+@startuml
+start
+:Capture command\nline options;
+:Parse script;
+:Create worker threads;
+:Create stats-collecting\nthreads;
+:Create client worker thread;
+:Setup Stats object;
+:Setup Client object;
+note right: Execution of threads starts
+:Setup Sender object;
+:Wait for promise;
+:Wait for threads to finish;
+stop
+@enduml

@@ -1,0 +1,10 @@
+target_sources(unit-test
+PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/script_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/json_object_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/json_element_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/response_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/message_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/action_builder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/range_builder.cpp
+)

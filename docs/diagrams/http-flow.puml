@@ -1,0 +1,13 @@
+@startuml
+client -> server: Open TCP connection
+server -> client: Accept
+
+== TCP Connection ==
+
+
+note over client: GET / HTTP/1.1\nHost: whatever.com
+client -> server: Send HTTP message
+
+note over server: HTTP/1.1 200 OK\n<!DOCTYPE>...
+server -> client: HTTP answer
+@enduml

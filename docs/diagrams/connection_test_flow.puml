@@ -1,0 +1,17 @@
+@startuml
+(*) --> "Startup server (localhost, 8080)" as u3
+--> ===B2===
+===B2=== --> "Error in client connection to (localhost, 9090)" as u4
+===B2=== --> "Error in client connection to (localhostus, 8080)" as u5
+===B2=== --> "Successful client connection to (localhost, 8080)" as u6
+u4 --> ===B3===
+u5 --> ===B3===
+u6 --> ===B4===
+===B3=== --> "Successful connection closed" as u7
+===B4=== --> "Successful connection closed" as u7
+===B4=== --> "Unexpected server-side connection closed" as u8
+u7 -down-> ===B5===
+u8 -down-> ===B5===
+===B5=== -down-> (*)
+
+@enduml

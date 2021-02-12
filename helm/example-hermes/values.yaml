@@ -1,0 +1,11 @@
+global:
+  istio:
+    sidecar:
+      inject: false
+
+hermes:
+  script:
+    cm: traffic-script-cm
+  image:
+    repository: hermes_prod
+    tag: 0.1.0

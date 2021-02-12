@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.hermes.name }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.hermes.name }}
+    helm.sh/chart: {{ template "hermes.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hermes.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "hermes.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        sidecar.istio.io/inject: {{ .Values.global.istio.sidecar.inject | default false | quote }}
+
+    spec:
+      volumes:
+        - name: {{ .Values.script.cm }}-volume
+          configMap:
+             name: {{ .Values.script.cm }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "-cx"]
+          args:
+            - sleep 365d;
+          volumeMounts:
+            - name: {{ .Values.script.cm }}-volume
+              mountPath: "/etc/scripts/"
+              readOnly: true

@@ -1,0 +1,14 @@
+@startuml
+
+client -> server: GET /clients/1654
+server -> client: { "id":1654, "client": "Juan", "plan": "silver", "consumed": 992837, "limit_reach": false }
+
+client -> server: GET /plans/silver
+server -> client: { "plan": "silver", "datacap": 999999}
+
+client -> client: calcular_datos_consumidos()
+
+client -> server: POST /clients/1654 \n {"consumed": 101102}
+server -> client: { "id":1654, "client": "Juan", "plan": "silver", "consumed": 101102, "limit_reach": true }
+
+@enduml

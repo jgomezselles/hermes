@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "example-cm" #{{ .Values.hermes.script.cm }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  traffic.json: |
+    {
+      "dns": "my-dns",
+      "port": "8080",
+      "timeout": 5000,
+      "ranges": {
+       "range_1": {
+          "min": 0,
+          "max": 999999
+        }
+       },
+      "flow": [
+        "post1",
+        "get1",
+        "put1",
+        "delete1"
+      ],
+      "messages": {
+        "post1": {
+          "method": "POST",
+          "url": "url/example/path/id-<range_1>",
+          "body": {
+            "field1": "id-<range_1>-suffix",
+            "field2": "some_stuff",
+            "field3": {"sub_field1": 0, "subfield2": "some_string" }
+          },
+          "response": {
+            "code": 200
+          },
+          "save_from_answer": {
+            "name": "meta",
+            "path": "/$meta",
+            "value_type": "object"
+          }
+        },
+        "get1": {
+          "method": "GET",
+          "url": "url/example/path?id=id-<range_1>",
+          "body": {
+          },
+          "response": {
+            "code": 200
+          },
+          "save_from_answer": {
+            "name": "my_identifier",
+            "path": "/path_expected/in/body",
+            "value_type": "object"
+          }
+        },
+        "put1": {
+          "method": "PUT",
+          "url": "url/example/path/id-<range_1>",
+          "body": {
+            "some_key": 1
+          },
+          "response": {
+            "code": 200
+          },
+          "add_from_saved_to_body": {
+            "name": "my_identifier",
+            "path": "/path_to_include/in/body",
+            "value_type": "object"
+          }
+        },
+        "delete1": {
+          "method": "DELETE",
+          "url": "url/example/path/id-<range_1>",
+          "body": {
+          },
+          "response": {
+            "code": 200
+          }
+        },
+      }
+    }
+
+

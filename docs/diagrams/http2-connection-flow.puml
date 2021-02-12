@@ -1,0 +1,8 @@
+@startuml
+== TCP Connection ==
+server -> client: Flow 1 - Data 
+server -> client: Flow 3 - Headers 
+server -> client: Flow 3 - Data 
+server -> client: Flow 1 - Data
+client -> server: Flow 5 - Headers
+@enduml

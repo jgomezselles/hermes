@@ -1,0 +1,21 @@
+#ifndef HERMES_CLIENT_H
+#define HERMES_CLIENT_H
+
+namespace http2_client
+{
+class client
+{
+public:
+    virtual ~client() {}
+
+    virtual void send() = 0;
+
+    virtual bool has_finished() const = 0;
+
+    virtual void close_window() = 0;
+
+    virtual bool is_connected() const = 0;
+};
+}  // namespace http2_client
+
+#endif

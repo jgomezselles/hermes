@@ -1,0 +1,18 @@
+**/*.orig
+.cproject
+.project
+.vscode
+build
+.idea
+cmake-build-*
+
+#document files
+images
+document.aux
+document.dvi
+document.fdb_latexmk
+document.fls
+document.log
+document.out.ps
+document.pdf
+document.toc
