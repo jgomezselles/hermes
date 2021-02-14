@@ -40,7 +40,7 @@ The idea is simple:
 
 * Reference hermes in your chart under .Values.hermes.image repository and tag.
 * Define a config map for your traffic definition (script) and reference it
-in your values with the name you gave it under .Values.hermes.script.cm
+in your values with the name you gave it under `.Values.hermes.script.cm`
 
 But what is inside that ConfigMap? Your script (traffic) definition.
 
