@@ -74,4 +74,12 @@ The compiled `unit-test` executable can be found under `/code/build/ut/unit-test
 
 Check the [docs](/docs/) for more information about the project
 
-[1]: https://gerrit.ericsson.se/#/settings/http-password
+# License
+
+The Software implemented in this repository is distributed under MIT license,
+as stated in the [LICENSE](/LICENSE) file. It makes use of some
+[boost C++ library](https://www.boost.org/doc/libs/1_67_0/) functionalities,
+which have their own [license](https://www.boost.org/LICENSE_1_0.txt).
+Hermes core functionality is based on [nghttp2](https://nghttp2.org/), and
+json handling is done with [rapidjson](https://rapidjson.org/), both under
+MIT license.
