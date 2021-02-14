@@ -1,8 +1,3 @@
-hermes
-======================
-
-[[_TOC_]]
-
 # What is hermes?
 
 Hermes is an http/2 traffic generator written in C++ able to send multiplexed
