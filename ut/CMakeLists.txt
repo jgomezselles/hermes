@@ -12,7 +12,6 @@ PRIVATE
         boost_thread
         boost_filesystem
         boost_system
-        boost_regex
         ssl
         crypto
         dl
