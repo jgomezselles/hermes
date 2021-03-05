@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <libgen.h>
 
 #include "client_impl.hh"
 #include "connection.hh"
