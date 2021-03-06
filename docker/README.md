@@ -13,6 +13,6 @@ To do so, execute, from the root directory of your local repository, the
 following commands:
 
 ```bash
-docker build -f docker/base/Dockerfile . -t hermes_base:0.0.1
-docker build -f docker/Dockerfile . -t hermes:0.0.1
+docker build -f docker/base/Dockerfile . -t jgomezselles/hermes_base:0.0.1 # You may want to skip this one, and just pull it!
+docker build -f docker/Dockerfile . -t jgomezselles/hermes:<your_favorite_tag>
 ```
