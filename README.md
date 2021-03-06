@@ -162,38 +162,31 @@ This means the cumulative statistics between print-periods [pn, pn+1] for all pn
 
 ## Building
 
-Use hermes' docker images to build and run the project.
-Please check on how to generate the docker environment images under [Environment Documentation](/env/README.md).
+Use hermes' docker images to build and run the project. Information on how to generate
+hermes and hermes_base docker images under [docker folder](/docker/README.md).
 
 Alternatively, you could always do it in your local machine by reproducing the
-steps in the scripts and Dockerfiles.
+steps in both Dockerfiles.
 
 In any case, the supported way of building and testing the hermes is via Dockerfiles.
 This is because in that way, builds are reproducible and maintaineble.
 
 ## Format
 
-To format the code we use `clang-format` (currently version 7), to run `clang-format`you can either install it in
+To format the code, `clang-format` is used (currently version 7), to run `clang-format`you can either install it in
 your machine or use `hermes_base`. In both cases, you may run (from the repository root):
 
 ```bash
 find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
 ```
 
-In any case, `build.sh` runs the formatting directly.
 ## Run Hermes
 
 Just run the generated binary and see the options available
 
 ```bash
-docker run --rm hermes_prod:0.1.0 -h
+docker run --rm hermes_prod:0.1.0 /hermes/hermes -h
 ```
-
-While developing you can use:
-```bash
-./devrun.sh build/src/hermes -h
-```
-
 ## Testing
 
 After generating or downloading the images following the [Docker Documentation](/docker/README.md),
@@ -204,7 +197,7 @@ use the following command to compile and/or run the unitary tests.
 ## Run unit tests TODO
 
 ```bash
-docker run --rm -it --entrypoint=bash -v "${PWD}":/code hermes_build
+docker run --rm -it --entrypoint=bash -v "${PWD}":/code hermes_base
 ```
 The compiled `unit-test` executable can be found under `/code/build/ut/unit-test`
 
