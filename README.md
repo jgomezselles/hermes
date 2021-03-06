@@ -185,7 +185,7 @@ find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=fi
 Just run the generated binary and see the options available
 
 ```bash
-docker run --rm hermes_prod:0.1.0 /hermes/hermes -h
+docker run --rm jgomezselles/hermes:0.0.1 /hermes/hermes -h
 ```
 ## Testing
 
@@ -197,7 +197,7 @@ use the following command to compile and/or run the unitary tests.
 ## Run unit tests TODO
 
 ```bash
-docker run --rm -it --entrypoint=bash -v "${PWD}":/code hermes_base
+docker run --rm -it --entrypoint=bash -v "${PWD}":/code jgomezselles/hermes_base:0.0.1
 ```
 The compiled `unit-test` executable can be found under `/code/build/ut/unit-test`
 
