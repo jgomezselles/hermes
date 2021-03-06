@@ -209,5 +209,5 @@ as stated in the [LICENSE](/LICENSE) file. It makes use of some
 which have their own [license](https://www.boost.org/LICENSE_1_0.txt).
 Hermes core functionality is based on [nghttp2](https://nghttp2.org/), and
 json handling is done with [rapidjson](https://rapidjson.org/), both under
-MIT license.
-> TODO: Add googletest License
+MIT license. Tests are done with [Googletest](https://github.com/google/googletest),
+which is published under [BSD 3-Clause License](https://github.com/google/googletest/blob/master/LICENSE).
