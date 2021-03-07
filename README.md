@@ -71,49 +71,9 @@ At the end of the day a typical use is:
 
 Hermes results, console and file outputs are explained [here](doc/hermes_output.md).
 
-# Dev information
+# Developing & testing hermes
 
-## Building
-
-Use hermes' docker images to build and run the project. Information on how to generate
-hermes and hermes_base docker images under [docker folder](/docker/README.md).
-
-Alternatively, you could always do it in your local machine by reproducing the
-steps in both Dockerfiles.
-
-In any case, the supported way of building and testing the hermes is via Dockerfiles.
-This is because in that way, builds are reproducible and maintaineble.
-
-## Format
-
-To format the code, `clang-format` is used (currently version 7), to run `clang-format`you can either install it in
-your machine or use `hermes_base`. In both cases, you may run (from the repository root):
-
-```bash
-find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
-```
-
-## Run Hermes
-
-Just run the generated binary and see the options available
-
-```bash
-docker run --rm hermes_prod:0.1.0 /hermes/hermes -h
-```
-## Testing
-
-After generating or downloading the images following the [Docker Documentation](/docker/README.md),
-use the following command to compile and/or run the unitary tests.
-
-## Compile unit tests TODO
-
-## Run unit tests TODO
-
-```bash
-docker run --rm -it --entrypoint=bash -v "${PWD}":/code hermes_base
-```
-The compiled `unit-test` executable can be found under `/code/build/ut/unit-test`
-
+Take a look to hermes [dev info](doc/dev_info.md) here.
 # License
 
 The Software implemented in this repository is distributed under MIT license,
