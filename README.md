@@ -73,7 +73,7 @@ Hermes results, console and file outputs are explained [here](doc/hermes_output.
 
 # Developing & testing hermes
 
-Take a look to hermes [dev info](doc/dev_info.md) here.
+Take a look to hermes dev info [here](doc/dev_info.md).
 # License
 
 The Software implemented in this repository is distributed under MIT license,
