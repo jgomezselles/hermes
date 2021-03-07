@@ -1,6 +1,3 @@
-#ifndef UT_HTTP2_CLIENT_CONNECTION_CPP
-#define UT_HTTP2_CLIENT_CONNECTION_CPP
-
 #include "connection.hh"
 
 #include <gtest/gtest.h>
@@ -111,4 +108,3 @@ TEST_F(connection_test, close_connection)
     ASSERT_EQ(connection::status::CLOSED, c.get_status());
 }
 }  // namespace http2_client
-#endif

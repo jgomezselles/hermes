@@ -1,5 +1,4 @@
-#ifndef HERMES_JSON_OBJECT_BUILDER_H
-#define HERMES_JSON_OBJECT_BUILDER_H
+#pragma once
 
 #include <functional>
 #include <map>
@@ -27,5 +26,3 @@ protected:
                             std::function<std::string()> retriever);
 };
 }  // namespace ut_helpers
-
-#endif

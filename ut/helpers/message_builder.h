@@ -1,5 +1,4 @@
-#ifndef HERMES_MESSAGE_BUILDER_H
-#define HERMES_MESSAGE_BUILDER_H
+#pragma once
 
 #include <optional>
 
@@ -24,5 +23,3 @@ private:
     void default_values();
 };
 }  // namespace ut_helpers
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HERMES_CLIENT_H
-#define HERMES_CLIENT_H
+#pragma once
 
 namespace http2_client
 {
@@ -17,5 +16,3 @@ public:
     virtual bool is_connected() const = 0;
 };
 }  // namespace http2_client
-
-#endif

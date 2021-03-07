@@ -1,5 +1,4 @@
-#ifndef HERMES_SCRIPT_SCTRUCTS_H
-#define HERMES_SCRIPT_SCTRUCTS_H
+#pragma once
 
 #include <boost/optional.hpp>
 #include <deque>
@@ -36,4 +35,3 @@ struct server_info
     std::string port;
 };
 }  // namespace traffic
-#endif

@@ -1,5 +1,4 @@
-#ifndef HERMES_ACTION_BUILDER_H
-#define HERMES_ACTION_BUILDER_H
+#pragma once
 
 #include "json_object_builder.h"
 
@@ -15,5 +14,3 @@ public:
     action_builder &value_type(const std::optional<std::string> &value_type);
 };
 }  // namespace ut_helpers
-
-#endif

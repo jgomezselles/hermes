@@ -1,5 +1,4 @@
-#ifndef HERMES_TIMER_H
-#define HERMES_TIMER_H
+#pragma once
 
 #include <boost/system/error_code.hpp>
 #include <chrono>
@@ -19,5 +18,3 @@ public:
     virtual std::size_t expires_after(const duration_us expiry_time) = 0;
 };
 }  // namespace engine
-
-#endif

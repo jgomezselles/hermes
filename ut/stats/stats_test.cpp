@@ -1,6 +1,3 @@
-#ifndef UT_STATS_STATS_TEST_CPP
-#define UT_STATS_STATS_TEST_CPP
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -9,10 +6,25 @@
 #include <map>
 #include <sstream>
 
-#include "stats_sut.cpp"
+#include "stats.hpp"
 
 namespace stats
 {
+
+class stats_sut : public stats
+{
+public:
+    stats_sut(boost::asio::io_context& io_ctx, const int print_period,
+              const std::string& output_file_name, const std::vector<std::string>& msg_names)
+        : stats(io_ctx, print_period, output_file_name, msg_names){};
+
+    const snapshot& get_total_snap() const { return total_snap; }
+
+    const snapshot& get_partial_snap() const { return partial_snap; }
+
+    const std::map<std::string, snapshot>& get_msg_snaps() const { return msg_snaps; }
+};
+
 class stats_test : public ::testing::TestWithParam<int>
 {
 public:
@@ -514,5 +526,3 @@ TEST_P(stats_test, add_client_error_id_non_existant)
     EXPECT_THROW(sut.add_client_error("non-existent", 0), std::exception);
 }
 }  // namespace stats
-
-#endif
