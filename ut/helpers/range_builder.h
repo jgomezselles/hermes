@@ -1,5 +1,4 @@
-#ifndef HERMES_RANGE_BUILDER_H
-#define HERMES_RANGE_BUILDER_H
+#pragma once
 
 #include <optional>
 
@@ -17,5 +16,3 @@ public:
     range_builder &max(const std::optional<int> &max);
 };
 }  // namespace ut_helpers
-
-#endif

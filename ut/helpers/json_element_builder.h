@@ -1,5 +1,4 @@
-#ifndef HERMES_JSON_ELEMENT_BUILDER_H
-#define HERMES_JSON_ELEMENT_BUILDER_H
+#pragma once
 
 #include <string>
 
@@ -17,5 +16,3 @@ protected:
     std::string name;
 };
 }  // namespace ut_helpers
-
-#endif

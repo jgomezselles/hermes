@@ -1,5 +1,4 @@
-#ifndef HERMES_JSON_READER_H
-#define HERMES_JSON_READER_H
+#pragma once
 
 #include <iostream>
 
@@ -73,5 +72,3 @@ void
 json_reader::set<json_reader>(const std::string& path, const json_reader& value);
 
 }  // namespace traffic
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HERMES_SCRIPT_BUILDER_H
-#define HERMES_SCRIPT_BUILDER_H
+#pragma once
 
 #include <functional>
 #include <map>
@@ -29,5 +28,3 @@ private:
 };
 
 }  // namespace ut_helpers
-
-#endif

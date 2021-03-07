@@ -1,5 +1,4 @@
-#ifndef HERMES_SCRIPT_READER_HPP
-#define HERMES_SCRIPT_READER_HPP
+#pragma once
 
 #include "json_reader.hpp"
 
@@ -29,4 +28,3 @@ private:
 };
 
 }  // namespace traffic
-#endif

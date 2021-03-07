@@ -1,5 +1,4 @@
-#ifndef HERMES_TIMER_IMPL_H
-#define HERMES_TIMER_IMPL_H
+#pragma once
 
 #include <boost/asio.hpp>
 
@@ -21,5 +20,3 @@ private:
 };
 
 }  // namespace engine
-
-#endif

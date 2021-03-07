@@ -1,7 +1,4 @@
-#ifndef SRC_HTTP2_CLIENT_CONNECTION_HH_
-#define SRC_HTTP2_CLIENT_CONNECTION_HH_
-
-/// External includes
+#pragma once
 
 #include <nghttp2/asio_http2_client.h>
 
@@ -76,5 +73,3 @@ private:
 };
 
 }  // namespace http2_client
-
-#endif /* SRC_HTTP2_CLIENT_CONNECTION_HH_ */

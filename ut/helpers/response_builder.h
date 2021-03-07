@@ -1,5 +1,4 @@
-#ifndef HERMES_RESPONSE_BUILDER_H
-#define HERMES_RESPONSE_BUILDER_H
+#pragma once
 
 #include <optional>
 
@@ -13,5 +12,3 @@ public:
     response_builder(const std::optional<int>& code);
 };
 }  // namespace ut_helpers
-
-#endif
