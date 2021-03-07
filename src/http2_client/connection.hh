@@ -51,22 +51,23 @@ public:
     connection& operator=(connection&& o) = delete;
 
     nghttp2::asio_http2::client::session& get_session() { return session; };
-    const status& get_status() const { return status; };
+    const status& get_status() const { return connection_status; };
     bool wait_to_be_connected();
     void close();
+
+    bool wait_for_status(const std::chrono::duration<int, std::milli>& max_time, const status& st);
 
 private:
     void close_impl();
     void notify_close();
 
-private:
     /// ASIO attributes
     boost::asio::io_service io_service;
     boost::asio::io_service::work svc_work;
     nghttp2::asio_http2::client::session session;
 
     /// Class attributes
-    status status;
+    status connection_status;
 
     /// Concurrency attributes
     std::mutex mtx;
