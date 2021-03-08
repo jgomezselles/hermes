@@ -22,29 +22,25 @@ message_builder::message_builder(int sequence_number)
     default_values();
 }
 
-message_builder &
-message_builder::method(const std::optional<std::string> &method)
+message_builder &message_builder::method(const std::optional<std::string> &method)
 {
     manipulate_string("method", method);
     return *this;
 }
 
-message_builder &
-message_builder::response(const std::optional<std::string> &response)
+message_builder &message_builder::response(const std::optional<std::string> &response)
 {
     manipulate_object("response", response);
     return *this;
 }
 
-message_builder &
-message_builder::body(const std::optional<std::string> &body)
+message_builder &message_builder::body(const std::optional<std::string> &body)
 {
     manipulate_object("body", body);
     return *this;
 }
 
-void
-message_builder::default_values()
+void message_builder::default_values()
 {
     method("GET");
     response(response_builder(200).build());
@@ -52,22 +48,19 @@ message_builder::default_values()
     url("/v1/test");
 }
 
-message_builder &
-message_builder::url(const std::optional<std::string> &url)
+message_builder &message_builder::url(const std::optional<std::string> &url)
 {
     manipulate_string("url", url);
     return *this;
 }
 
-message_builder &
-message_builder::sfa(const std::optional<std::string> &sfa)
+message_builder &message_builder::sfa(const std::optional<std::string> &sfa)
 {
     manipulate_object("save_from_answer", sfa);
     return *this;
 }
 
-message_builder &
-message_builder::atb(const std::optional<std::string> &atb)
+message_builder &message_builder::atb(const std::optional<std::string> &atb)
 {
     manipulate_object("add_from_saved_to_body", atb);
     return *this;

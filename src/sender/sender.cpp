@@ -17,8 +17,7 @@ sender::sender(std::unique_ptr<engine::timer> &&t, std::unique_ptr<http2_client:
     timer->async_wait(boost::bind(&sender::send, this));
 }
 
-bool
-sender::still_in_window()
+bool sender::still_in_window()
 {
     int seconds_since_start = duration_cast<seconds>(steady_clock::now() - params->init_time)
                                   .count();  // pass this one to microseconds
@@ -31,14 +30,12 @@ sender::still_in_window()
     return in_window;
 }
 
-bool
-sender::continue_sending()
+bool sender::continue_sending()
 {
     return still_in_window() || !client->has_finished();
 }
 
-void
-sender::send()
+void sender::send()
 {
     if (continue_sending())
     {

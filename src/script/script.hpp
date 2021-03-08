@@ -1,11 +1,9 @@
 #include <iostream>
-
 #include <utility>
 #include <vector>
 
-#include "script_sctructs.hpp"
-
 #include "json_reader.hpp"
+#include "script_sctructs.hpp"
 
 #pragma once
 

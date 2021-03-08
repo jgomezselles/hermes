@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <nghttp2/asio_http2_client.h>
 #include <syslog.h>
 
@@ -8,7 +9,6 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
-#include <libgen.h>
 
 #include "client_impl.hh"
 #include "connection.hh"
@@ -38,8 +38,7 @@ const int default_stats_print_period{10};
 const std::string default_traffic_path{"/etc/scripts/traffic.json"};
 const std::string default_output_file{"hermes.out"};
 
-static void
-usage(int rc)
+static void usage(int rc)
 {
     syslog(LOG_INFO,
            "C++ Traffic Generator. Usage:  %s [options] \n"
@@ -56,8 +55,7 @@ usage(int rc)
     exit(rc);
 }
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     progname = basename(argv[0]);
     openlog(progname, LOG_CONS | LOG_PERROR, LOG_LOCAL1);

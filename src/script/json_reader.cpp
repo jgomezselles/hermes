@@ -6,8 +6,7 @@
 
 namespace traffic
 {
-void
-json_reader::parse(const std::string& json_str, const std::string& schema_str)
+void json_reader::parse(const std::string& json_str, const std::string& schema_str)
 {
     if (document.Parse(json_str.c_str()).HasParseError())
     {
@@ -52,8 +51,7 @@ json_reader::json_reader(const rapidjson::Value* value)
     document.CopyFrom(*value, document.GetAllocator());
 }
 
-void
-swap(json_reader& first, json_reader& second)
+void swap(json_reader& first, json_reader& second)
 {
     first.document.Swap(second.document);
 }
@@ -63,16 +61,14 @@ json_reader::json_reader(const json_reader& other)
     document.CopyFrom(other.document, document.GetAllocator());
 }
 
-json_reader&
-json_reader::operator=(json_reader other)
+json_reader& json_reader::operator=(json_reader other)
 {
     swap(*this, other);
     return *this;
 }
 
 template <>
-json_reader
-json_reader::get_value<json_reader>(const std::string& path)
+json_reader json_reader::get_value<json_reader>(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value && value->GetType() == rapidjson::kObjectType)
@@ -84,8 +80,7 @@ json_reader::get_value<json_reader>(const std::string& path)
 }
 
 template <>
-int
-json_reader::get_value<int>(const std::string& path)
+int json_reader::get_value<int>(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value && value->GetType() == rapidjson::kNumberType)
@@ -97,8 +92,7 @@ json_reader::get_value<int>(const std::string& path)
 }
 
 template <>
-std::string
-json_reader::get_value<std::string>(const std::string& path)
+std::string json_reader::get_value<std::string>(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value && value->GetType() == rapidjson::kStringType)
@@ -110,8 +104,7 @@ json_reader::get_value<std::string>(const std::string& path)
 }
 
 template <>
-std::vector<std::string>
-json_reader::get_value<std::vector<std::string>>(const std::string& path)
+std::vector<std::string> json_reader::get_value<std::vector<std::string>>(const std::string& path)
 {
     const auto value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value && value->GetType() == rapidjson::kArrayType)
@@ -132,8 +125,7 @@ json_reader::get_value<std::vector<std::string>>(const std::string& path)
     throw std::logic_error("No value set in " + path);
 }
 
-std::vector<std::string>
-json_reader::get_attributes()
+std::vector<std::string> json_reader::get_attributes()
 {
     if (!document.IsObject())
     {
@@ -149,8 +141,7 @@ json_reader::get_attributes()
     return attrs;
 }
 
-std::string
-json_reader::get_json_as_string(const std::string& path)
+std::string json_reader::get_json_as_string(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value)
@@ -168,8 +159,7 @@ json_reader::get_json_as_string(const std::string& path)
     throw std::logic_error("No value set in " + path);
 }
 
-std::string
-json_reader::as_string()
+std::string json_reader::as_string()
 {
     rapidjson::StringBuffer buffer;
     buffer.Clear();
@@ -179,8 +169,7 @@ json_reader::as_string()
 }
 
 template <>
-void
-json_reader::set<int>(const std::string& path, const int& value)
+void json_reader::set<int>(const std::string& path, const int& value)
 {
     rapidjson::Pointer(path.c_str()).Create(document);
     auto* val = rapidjson::Pointer(path.c_str()).Get(document);
@@ -194,8 +183,7 @@ json_reader::set<int>(const std::string& path, const int& value)
 }
 
 template <>
-void
-json_reader::set<std::string>(const std::string& path, const std::string& value)
+void json_reader::set<std::string>(const std::string& path, const std::string& value)
 {
     rapidjson::Pointer(path.c_str()).Create(document);
     auto* val = rapidjson::Pointer(path.c_str()).Get(document);
@@ -209,8 +197,7 @@ json_reader::set<std::string>(const std::string& path, const std::string& value)
 }
 
 template <>
-void
-json_reader::set<json_reader>(const std::string& path, const json_reader& value)
+void json_reader::set<json_reader>(const std::string& path, const json_reader& value)
 {
     rapidjson::Pointer(path.c_str()).Create(document);
     auto* val = rapidjson::Pointer(path.c_str()).Get(document);
@@ -223,8 +210,7 @@ json_reader::set<json_reader>(const std::string& path, const json_reader& value)
     throw std::logic_error("Error setting object under " + path);
 }
 
-bool
-json_reader::is_present(const std::string& path)
+bool json_reader::is_present(const std::string& path)
 {
     return rapidjson::Pointer(path.c_str()).Get(document) != nullptr;
 }

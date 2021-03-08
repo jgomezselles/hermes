@@ -9,8 +9,7 @@
 
 namespace ut_helpers
 {
-std::string
-json_element_builder::build() const
+std::string json_element_builder::build() const
 {
     return '"' + name + '"' + ":" + json_object_builder::build();
 }

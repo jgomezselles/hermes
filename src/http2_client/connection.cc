@@ -58,20 +58,17 @@ void connection::close()
 bool connection::wait_to_be_connected()
 {
     std::unique_lock<std::mutex> lock(mtx);
-    status_change_cond_var.wait_for(lock, std::chrono::duration<int, std::milli>(2000), [&] {
-        return (connection_status != status::NOT_OPEN);
-    });
+    status_change_cond_var.wait_for(lock, std::chrono::duration<int, std::milli>(2000),
+                                    [&] { return (connection_status != status::NOT_OPEN); });
     return (connection_status == status::OPEN);
 }
 
 bool connection::wait_for_status(const std::chrono::duration<int, std::milli>& max_time,
-                                 const  status& st)
+                                 const status& st)
 {
     std::unique_lock<std::mutex> lock(mtx);
-    return status_change_cond_var.wait_for(lock, max_time, [this, &st]
-    {
-        return connection_status == st;
-    });
+    return status_change_cond_var.wait_for(lock, max_time,
+                                           [this, &st] { return connection_status == st; });
 }
 
 }  // namespace http2_client

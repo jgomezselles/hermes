@@ -1,7 +1,5 @@
 #include "script.hpp"
 
-#include "script_reader.hpp"
-
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 #include <deque>
@@ -9,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+
+#include "script_reader.hpp"
 
 namespace traffic
 {
@@ -29,8 +29,7 @@ script::script(std::istream& input)
     this->build(input);
 }
 
-void
-script::build(std::istream& file)
+void script::build(std::istream& file)
 {
     script_reader jr{file};
     ranges = jr.build_ranges();
@@ -39,8 +38,7 @@ script::build(std::istream& file)
     timeout_ms = jr.build_timeout();
 }
 
-const std::vector<std::string>
-script::get_message_names() const
+const std::vector<std::string> script::get_message_names() const
 {
     std::vector<std::string> res;
     for (const auto& m : messages)
@@ -51,8 +49,7 @@ script::get_message_names() const
     return res;
 }
 
-bool
-script::save_from_answer(const std::string& answer, const msg_modifier& sfa)
+bool script::save_from_answer(const std::string& answer, const msg_modifier& sfa)
 {
     try
     {
@@ -77,8 +74,7 @@ script::save_from_answer(const std::string& answer, const msg_modifier& sfa)
     return true;
 }
 
-bool
-script::add_to_request(const msg_modifier& atb, message& m)
+bool script::add_to_request(const msg_modifier& atb, message& m)
 {
     json_reader modified_body(m.body, "{}");
 
@@ -105,8 +101,7 @@ script::add_to_request(const msg_modifier& atb, message& m)
     return true;
 }
 
-bool
-script::process_next(const std::string& last_answer)
+bool script::process_next(const std::string& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
     const auto& last_msg = messages.front();
@@ -132,20 +127,17 @@ script::process_next(const std::string& last_answer)
     return true;
 }
 
-bool
-script::validate_answer(const answer_type& last_answer) const
+bool script::validate_answer(const answer_type& last_answer) const
 {
     return last_answer.first == messages.front().pass_code;
 }
 
-const bool
-script::post_process(const answer_type& last_answer)
+const bool script::post_process(const answer_type& last_answer)
 {
     return !is_last() && process_next(last_answer.second);
 }
 
-void
-script::parse_ranges(const std::map<std::string, int64_t>& current)
+void script::parse_ranges(const std::map<std::string, int64_t>& current)
 {
     for (const auto& c : current)
     {

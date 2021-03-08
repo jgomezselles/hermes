@@ -1,0 +1,25 @@
+---
+BasedOnStyle: Google
+IndentWidth:  4
+---
+
+Language: Cpp
+AlignAfterOpenBracket: Align
+AlignOperands: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+BreakBeforeBraces: Allman
+ColumnLimit: 100
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+AccessModifierOffset: -4
+SpaceInEmptyParentheses: false
+SpacesInParentheses: false
+SpacesInAngles: false
+UseTab: Never
