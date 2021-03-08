@@ -42,15 +42,13 @@ client_impl::client_impl(std::shared_ptr<stats::stats> st, boost::asio::io_conte
     }
 }
 
-std::string
-client_impl::get_uri(const std::string& uri_path)
+std::string client_impl::get_uri(const std::string& uri_path)
 {
     return "http://" + host + ":" + port + "/" + uri_path;
 }
 
-void
-client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
-                            const std::string& msg_name)
+void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
+                                 const std::string& msg_name)
 {
     std::lock_guard<std::mutex> guard(control->mtx);
     if (control->answered)
@@ -62,9 +60,8 @@ client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
     queue.cancel_script();
 }
 
-void
-client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
-                                      const std::string& msg_name)
+void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
+                                           const std::string& msg_name)
 {
     if (control->mtx.try_lock())
     {
@@ -78,9 +75,8 @@ client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& contr
     }
 }
 
-void
-client_impl::on_timeout(const boost::system::error_code& e, std::shared_ptr<race_control> control,
-                        std::string msg_name)
+void client_impl::on_timeout(const boost::system::error_code& e,
+                             std::shared_ptr<race_control> control, std::string msg_name)
 {
     if (e.value() == 0)
     {
@@ -92,8 +88,7 @@ client_impl::on_timeout(const boost::system::error_code& e, std::shared_ptr<race
     }
 }
 
-request
-client_impl::get_next_request(const traffic::script& s)
+request client_impl::get_next_request(const traffic::script& s)
 {
     std::string body = s.get_next_body();
     header_value type = {"application/json", false};
@@ -104,8 +99,7 @@ client_impl::get_next_request(const traffic::script& s)
                    s.get_next_msg_name()};
 }
 
-void
-client_impl::open_new_connection()
+void client_impl::open_new_connection()
 {
     if (!mtx.try_lock())
     {
@@ -125,8 +119,7 @@ client_impl::open_new_connection()
     mtx.unlock();
 }
 
-void
-client_impl::send()
+void client_impl::send()
 {
     auto script_opt = queue.get_next_script();
     if (!script_opt.is_initialized())

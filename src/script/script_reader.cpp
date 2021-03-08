@@ -1,4 +1,5 @@
 #include "script_reader.hpp"
+
 #include "script_schema.hpp"
 
 namespace traffic
@@ -9,8 +10,7 @@ script_reader::script_reader(const std::string &json) : json_reader(json, ::scri
 
 script_reader::script_reader(json_reader &&other) : json_reader(std::move(other)) {}
 
-range_type
-script_reader::build_ranges()
+range_type script_reader::build_ranges()
 {
     range_type ranges_to_build;
 
@@ -37,8 +37,7 @@ script_reader::build_ranges()
     return ranges_to_build;
 }
 
-std::deque<message>
-script_reader::build_messages()
+std::deque<message> script_reader::build_messages()
 {
     std::deque<message> messages_to_build;
 
@@ -59,8 +58,7 @@ script_reader::build_messages()
     return messages_to_build;
 }
 
-message
-script_reader::build_message(const std::string &m)
+message script_reader::build_message(const std::string &m)
 {
     message parsed_message;
     parsed_message.id = m;
@@ -85,8 +83,7 @@ script_reader::build_message(const std::string &m)
     return parsed_message;
 }
 
-msg_modifier
-script_reader::build_message_modifier()
+msg_modifier script_reader::build_message_modifier()
 {
     msg_modifier mm;
     mm.name = get_value<std::string>("/name");
@@ -95,8 +92,7 @@ script_reader::build_message_modifier()
     return mm;
 }
 
-server_info
-script_reader::build_server_info()
+server_info script_reader::build_server_info()
 {
     server_info server;
     server.dns = get_value<std::string>("/dns");
@@ -104,8 +100,7 @@ script_reader::build_server_info()
     return server;
 }
 
-int
-script_reader::build_timeout()
+int script_reader::build_timeout()
 {
     return get_value<int>("/timeout");
 }

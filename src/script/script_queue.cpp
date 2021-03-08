@@ -4,8 +4,7 @@
 
 namespace traffic
 {
-void
-script_queue::update_currents_in_range(const range_type& ranges)
+void script_queue::update_currents_in_range(const range_type& ranges)
 {
     for (const auto& range : ranges)
     {
@@ -23,8 +22,7 @@ script_queue::update_currents_in_range(const range_type& ranges)
     }
 }
 
-boost::optional<script>
-script_queue::get_next_script()
+boost::optional<script> script_queue::get_next_script()
 {
     write_lock wr_lock(rw_mutex);
     if (!scripts.empty())
@@ -46,8 +44,7 @@ script_queue::get_next_script()
     return boost::none;
 }
 
-void
-script_queue::enqueue_script(script s, const answer_type& last_answer)
+void script_queue::enqueue_script(script s, const answer_type& last_answer)
 {
     if (!s.post_process(last_answer))
     {

@@ -24,7 +24,8 @@ public:
 
         if (server->listen_and_serve(server_error_code, server_host, server_port, true))
         {
-            fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(), server_port.c_str());
+            fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
+                    server_port.c_str());
         }
 
         server_started = true;
@@ -43,10 +44,7 @@ public:
         server_started = false;
     }
 
-    void SetUp() override
-    {
-        start_server();
-    };
+    void SetUp() override { start_server(); };
 
     void TearDown() override
     {
@@ -82,7 +80,7 @@ TEST_F(connection_test, wrong_port)
 
     const std::string expected_output{"Error in connection to localhost:" + wrong_port +
                                       " Message: Connection refused\n"};
-    ASSERT_EQ(expected_output,  testing::internal::GetCapturedStderr());
+    ASSERT_EQ(expected_output, testing::internal::GetCapturedStderr());
 }
 
 TEST_F(connection_test, connection_is_lost_because_of_the_server)

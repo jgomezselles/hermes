@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "script_sctructs.hpp"
 #include "rapidjson/document.h"
+#include "script_sctructs.hpp"
 
 namespace traffic
 {
@@ -44,31 +44,24 @@ private:
 };
 
 template <>
-json_reader
-json_reader::get_value<json_reader>(const std::string& path);
+json_reader json_reader::get_value<json_reader>(const std::string& path);
 
 template <>
-int
-json_reader::get_value<int>(const std::string& path);
+int json_reader::get_value<int>(const std::string& path);
 
 template <>
-std::string
-json_reader::get_value<std::string>(const std::string& path);
+std::string json_reader::get_value<std::string>(const std::string& path);
 
 template <>
-std::vector<std::string>
-json_reader::get_value<std::vector<std::string>>(const std::string& path);
+std::vector<std::string> json_reader::get_value<std::vector<std::string>>(const std::string& path);
 
 template <>
-void
-json_reader::set<int>(const std::string& path, const int& value);
+void json_reader::set<int>(const std::string& path, const int& value);
 
 template <>
-void
-json_reader::set<std::string>(const std::string& path, const std::string& value);
+void json_reader::set<std::string>(const std::string& path, const std::string& value);
 
 template <>
-void
-json_reader::set<json_reader>(const std::string& path, const json_reader& value);
+void json_reader::set<json_reader>(const std::string& path, const json_reader& value);
 
 }  // namespace traffic

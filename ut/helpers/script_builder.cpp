@@ -16,52 +16,45 @@ script_builder::script_builder()
     ranges(std::vector<std::string>{range_builder().build()});
 }
 
-script_builder &
-script_builder::dns(const std::optional<std::string> &dns)
+script_builder &script_builder::dns(const std::optional<std::string> &dns)
 {
     manipulate_string("dns", dns);
     return *this;
 }
 
-script_builder &
-script_builder::port(const std::optional<std::string> &port)
+script_builder &script_builder::port(const std::optional<std::string> &port)
 {
     manipulate_string("port", port);
     return *this;
 }
 
-script_builder &
-script_builder::timeout(const std::optional<int> &timeout)
+script_builder &script_builder::timeout(const std::optional<int> &timeout)
 {
     manipulate_int("timeout", timeout);
     return *this;
 }
 
-script_builder &
-script_builder::messages(const std::optional<std::vector<std::string>> &messages)
+script_builder &script_builder::messages(const std::optional<std::vector<std::string>> &messages)
 {
     add_composed_objects("messages", messages);
     return *this;
 }
 
-script_builder &
-script_builder::flow(const std::optional<std::vector<std::string>> &flows)
+script_builder &script_builder::flow(const std::optional<std::vector<std::string>> &flows)
 {
     add_composed_objects("flow", flows, "[]");
     return *this;
 }
 
-script_builder &
-script_builder::ranges(const std::optional<std::vector<std::string>> &ranges)
+script_builder &script_builder::ranges(const std::optional<std::vector<std::string>> &ranges)
 {
     add_composed_objects("ranges", ranges);
     return *this;
 }
 
-void
-script_builder::add_composed_objects(const std::string &key,
-                                     const std::optional<std::vector<std::string>> &elements,
-                                     const char *delimiters)
+void script_builder::add_composed_objects(const std::string &key,
+                                          const std::optional<std::vector<std::string>> &elements,
+                                          const char *delimiters)
 {
     manipulate_element(key, elements.has_value(), [&elements, &delimiters]() {
         std::stringstream building;

@@ -1,3 +1,5 @@
+#include "stats.hpp"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -6,11 +8,8 @@
 #include <map>
 #include <sstream>
 
-#include "stats.hpp"
-
 namespace stats
 {
-
 class stats_sut : public stats
 {
 public:

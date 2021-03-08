@@ -61,8 +61,7 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
     timer.async_wait(boost::bind(&stats::print, this));
 }
 
-void
-stats::write_headers(std::fstream& fs)
+void stats::write_headers(std::fstream& fs)
 {
     auto print_time = system_clock::to_time_t(system_clock::now());
     fs << "Traffic started at:  " << std::ctime(&print_time) << std::endl
@@ -77,8 +76,7 @@ stats::write_headers(std::fstream& fs)
        << std::endl;
 }
 
-void
-stats::print_headers()
+void stats::print_headers()
 {
     std::cout << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Sent/s"
               << std::right << std::setw(10) << "Recv/s" <<
@@ -91,8 +89,7 @@ stats::print_headers()
               << "Timeouts" << std::endl;
 }
 
-void
-stats::update_rcs(snapshot& snap, const int code, const bool is_error)
+void stats::update_rcs(snapshot& snap, const int code, const bool is_error)
 {
     auto& rcs = is_error ? snap.response_codes_nok : snap.response_codes_ok;
     auto previous_rc = rcs.find(code);
@@ -106,8 +103,7 @@ stats::update_rcs(snapshot& snap, const int code, const bool is_error)
     }
 }
 
-void
-stats::update_rts(snapshot& snap, const int64_t elapsed_time)
+void stats::update_rts(snapshot& snap, const int64_t elapsed_time)
 {
     if (snap.responded_ok > 1)
     {
@@ -130,16 +126,14 @@ stats::update_rts(snapshot& snap, const int64_t elapsed_time)
         snap.max_rt = elapsed_time;
     }
 }
-void
-stats::add_measurement(snapshot& snap, const int64_t elapsed_time, const int code)
+void stats::add_measurement(snapshot& snap, const int64_t elapsed_time, const int code)
 {
     ++snap.responded_ok;
     update_rts(snap, elapsed_time);
     update_rcs(snap, code, false);
 }
 
-void
-stats::add_measurement(const std::string& id, const int64_t elapsed_time, const int code)
+void stats::add_measurement(const std::string& id, const int64_t elapsed_time, const int code)
 {
     write_lock wr_lock(rw_mutex);
     add_measurement(total_snap, elapsed_time, code);
@@ -147,8 +141,7 @@ stats::add_measurement(const std::string& id, const int64_t elapsed_time, const 
     add_measurement(msg_snaps.at(id), elapsed_time, code);
 }
 
-void
-stats::increase_sent(const std::string& id)
+void stats::increase_sent(const std::string& id)
 {
     write_lock wr_lock(rw_mutex);
     ++total_snap.sent;
@@ -156,8 +149,7 @@ stats::increase_sent(const std::string& id)
     ++msg_snaps.at(id).sent;
 }
 
-void
-stats::add_timeout(const std::string& id)
+void stats::add_timeout(const std::string& id)
 {
     write_lock wr_lock(rw_mutex);
     ++total_snap.timed_out;
@@ -165,8 +157,7 @@ stats::add_timeout(const std::string& id)
     ++msg_snaps.at(id).timed_out;
 }
 
-void
-stats::add_error(const std::string& id, const int e)
+void stats::add_error(const std::string& id, const int e)
 {
     write_lock wr_lock(rw_mutex);
     update_rcs(total_snap, e, true);
@@ -174,8 +165,7 @@ stats::add_error(const std::string& id, const int e)
     update_rcs(msg_snaps.at(id), e, true);
 }
 
-void
-stats::add_client_error(const std::string& id, const int e)
+void stats::add_client_error(const std::string& id, const int e)
 {
     write_lock wr_lock(rw_mutex);
     ++total_snap.sent;
@@ -186,8 +176,7 @@ stats::add_client_error(const std::string& id, const int e)
     update_rcs(msg_snaps.at(id), e, true);
 }
 
-void
-stats::print_snapshot(const snapshot& snap) const
+void stats::print_snapshot(const snapshot& snap) const
 {
     float partial_time = duration_cast<milliseconds>(steady_clock::now() - snap.init_time).count();
     if (partial_time == 0)
@@ -221,9 +210,8 @@ stats::print_snapshot(const snapshot& snap) const
               << snap.timed_out << std::endl;
 }
 
-void
-stats::write_snapshot(const snapshot& snap, std::fstream& fs,
-                      const time_point<steady_clock>& init_time) const
+void stats::write_snapshot(const snapshot& snap, std::fstream& fs,
+                           const time_point<steady_clock>& init_time) const
 {
     float partial_time = duration_cast<milliseconds>(steady_clock::now() - snap.init_time).count();
     if (partial_time == 0)
@@ -256,8 +244,7 @@ stats::write_snapshot(const snapshot& snap, std::fstream& fs,
        << snap.timed_out << std::endl;
 }
 
-void
-stats::write_errors() const
+void stats::write_errors() const
 {
     std::fstream err_file;
     err_file.open(err_filename, std::fstream::app);
@@ -272,8 +259,7 @@ stats::write_errors() const
     err_file.close();
 }
 
-void
-stats::do_print()
+void stats::do_print()
 {
     write_lock wr_lck(rw_mutex);
     std::fstream partials_file;
@@ -301,8 +287,7 @@ stats::do_print()
     partial_snap = snapshot();
 }
 
-void
-stats::print()
+void stats::print()
 {
     if (!cancel)
     {
@@ -328,8 +313,7 @@ stats::print()
     do_print();
 }
 
-void
-stats::end()
+void stats::end()
 {
     std::cerr << "Execution finished. Printing stats..." << std::endl;
     cancel = true;
