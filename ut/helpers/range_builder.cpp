@@ -1,10 +1,10 @@
-#include "range_builder.h"
+#include "range_builder.hpp"
 
 #include <functional>
 #include <map>
 #include <string>
 
-#include "json_element_builder.h"
+#include "json_element_builder.hpp"
 
 namespace ut_helpers
 {

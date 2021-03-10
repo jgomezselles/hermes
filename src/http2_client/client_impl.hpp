@@ -7,7 +7,7 @@
 #pragma once
 
 #include "client.hpp"
-#include "connection.hh"
+#include "connection.hpp"
 #include "script_queue.hpp"
 
 namespace stats

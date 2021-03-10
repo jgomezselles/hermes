@@ -1,11 +1,11 @@
-#include "json_element_builder.h"
+#include "json_element_builder.hpp"
 
 #include <functional>
 #include <map>
 #include <sstream>
 #include <string>
 
-#include "json_object_builder.h"
+#include "json_object_builder.hpp"
 
 namespace ut_helpers
 {

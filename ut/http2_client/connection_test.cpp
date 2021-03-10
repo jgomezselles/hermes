@@ -1,4 +1,4 @@
-#include "connection.hh"
+#include "connection.hpp"
 
 #include <gtest/gtest.h>
 #include <nghttp2/asio_http2_server.h>

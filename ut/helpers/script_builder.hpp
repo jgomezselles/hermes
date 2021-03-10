@@ -5,7 +5,7 @@
 #include <sstream>
 #include <vector>
 
-#include "json_object_builder.h"
+#include "json_object_builder.hpp"
 
 namespace ut_helpers
 {

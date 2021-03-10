@@ -1,4 +1,4 @@
-#include "response_builder.h"
+#include "response_builder.hpp"
 
 #include <functional>
 #include <map>

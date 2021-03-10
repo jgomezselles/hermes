@@ -2,7 +2,7 @@
 
 #include <boost/bind.hpp>
 
-#include "client_impl.hh"
+#include "client_impl.hpp"
 #include "params.hpp"
 #include "timer.hpp"
 

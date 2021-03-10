@@ -7,14 +7,14 @@
 #include <map>
 #include <sstream>
 
-#include "action_builder.h"
-#include "json_element_builder.h"
-#include "json_object_builder.h"
-#include "message_builder.h"
-#include "range_builder.h"
-#include "response_builder.h"
+#include "action_builder.hpp"
+#include "json_element_builder.hpp"
+#include "json_object_builder.hpp"
+#include "message_builder.hpp"
+#include "range_builder.hpp"
+#include "response_builder.hpp"
 #include "script.hpp"
-#include "script_builder.h"
+#include "script_builder.hpp"
 
 class script_queue_sut : public traffic::script_queue
 {

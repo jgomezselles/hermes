@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "json_object_builder.h"
+#include "json_object_builder.hpp"
 
 namespace ut_helpers
 {
