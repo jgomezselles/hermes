@@ -1,4 +1,4 @@
-#include "client_impl.hh"
+#include "client_impl.hpp"
 
 #include <nghttp2/asio_http2_client.h>
 #include <syslog.h>
@@ -14,7 +14,7 @@
 #include <shared_mutex>
 #include <utility>
 
-#include "connection.hh"
+#include "connection.hpp"
 #include "script.hpp"
 #include "script_queue.hpp"
 #include "stats.hpp"

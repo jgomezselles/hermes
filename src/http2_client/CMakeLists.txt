@@ -1,7 +1,7 @@
 add_library(hermes-http2-client
 STATIC
-    client_impl.cc
-    connection.cc
+    client_impl.cpp
+    connection.cpp
 )
 
 target_include_directories(hermes-http2-client

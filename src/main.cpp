@@ -10,8 +10,8 @@
 #include <iostream>
 #include <thread>
 
-#include "client_impl.hh"
-#include "connection.hh"
+#include "client_impl.hpp"
+#include "connection.hpp"
 #include "params.hpp"
 #include "script.hpp"
 #include "script_queue.hpp"

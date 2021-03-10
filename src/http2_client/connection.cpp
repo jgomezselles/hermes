@@ -1,4 +1,4 @@
-#include "connection.hh"
+#include "connection.hpp"
 
 #include <boost/asio/ip/tcp.hpp>
 #include <iostream>

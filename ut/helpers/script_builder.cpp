@@ -1,8 +1,8 @@
-#include "script_builder.h"
+#include "script_builder.hpp"
 
-#include "json_element_builder.h"
-#include "message_builder.h"
-#include "range_builder.h"
+#include "json_element_builder.hpp"
+#include "message_builder.hpp"
+#include "range_builder.hpp"
 
 namespace ut_helpers
 {
