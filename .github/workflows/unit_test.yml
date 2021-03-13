@@ -1,0 +1,13 @@
+name: Unit tests
+on: [push]
+jobs:
+  build:
+    name: Compile and run unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build code and unit tests
+      uses: docker://jgomezselles/hermes_base:0.0.1
+      with:
+        args: mkdir build && cd build && cmake .. && make
