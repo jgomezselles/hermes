@@ -10,4 +10,4 @@ jobs:
     - name: Build code and unit tests
       uses: docker://jgomezselles/hermes_base:0.0.1
       with:
-        args: cmake . -B build && make -j -D build && ./build/ut/unit-test
+        args: set -x; cmake . -B build; make -j -D build && ./build/ut/unit-test
