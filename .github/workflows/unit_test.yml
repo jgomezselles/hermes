@@ -10,4 +10,4 @@ jobs:
     - name: Build code and unit tests
       uses: docker://jgomezselles/hermes_base:0.0.1
       with:
-        args: mkdir build && cd build && cmake .. && make
+        args: cd build && cmake .. && make
