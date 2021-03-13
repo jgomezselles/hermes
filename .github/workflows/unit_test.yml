@@ -4,10 +4,12 @@ jobs:
   build:
     name: Compile and run unit tests
     runs-on: ubuntu-latest
+    container:
+      image: jgomezselles/hermes_base:0.0.1
+      options: "--entrypoint sh"
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build code and unit tests
-      uses: docker://jgomezselles/hermes_base:0.0.1
-      with:
-        args: cmake . -B build; make -j -C build
+    - run: cmake . -B build
+    - run: make -j -C build
+    - run: ./build/ut/unit-test
