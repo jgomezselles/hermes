@@ -7,4 +7,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
-    - run: expr length + "$(git diff)" ">" 0
+    - run: expr length + "$(git diff)" "==" 0
