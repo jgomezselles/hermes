@@ -1,18 +1,11 @@
-name: clang-format Check
+name: clang-format check
 on: [push]
 jobs:
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        path:
-          - 'src'
-          - 'ut'
     steps:
     - uses: actions/checkout@v2
-    - name: Run clang-format style check for C/C++ programs.
-      uses: jidicula/clang-format-action@v3.2.0
-      with:
-        clang-format-version: '11'
-        check-path: ${{ matrix.path }}
+    - name: Run clang-format style check
+    - run: find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
+    - run: expr length + "$(git diff)" ">" 0
