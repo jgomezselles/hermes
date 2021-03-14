@@ -1,3 +1,4 @@
+[![Unit tests](https://github.com/jgomezselles/hermes/actions/workflows/unit_test.yml/badge.svg?branch=main&event=push)](https://github.com/jgomezselles/hermes/actions/workflows/unit_test.yml)
 # What is hermes?
 
 Hermes is an http/2 traffic generator written in C++ able to send multiplexed
