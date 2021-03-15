@@ -1,0 +1,25 @@
+name: CI
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  formatting-check:
+    name: Check code format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
+    - run: expr length + "$(git diff)" "==" 0
+  compile-and-unit-tests:
+    name: Compile and run unit tests
+    runs-on: ubuntu-latest
+    container:
+      image: jgomezselles/hermes_base:0.0.1
+      options: "--entrypoint sh"
+    steps:
+    - uses: actions/checkout@v2
+    - run: cmake . -B build
+    - run: make -j -C build
+    - run: ./build/ut/unit-test
