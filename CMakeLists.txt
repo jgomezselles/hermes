@@ -11,9 +11,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/")
 project(hermes LANGUAGES CXX)
 
 ###
-# Set the build type
-include(hermes_build_system)
-set_cmake_build_type()
+# Print the build type
 message( STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}" )
 
 ###
