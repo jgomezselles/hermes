@@ -3,10 +3,6 @@
 cmake_minimum_required (VERSION 3.5.1)
 
 ###
-# Add hermer module path to cmake module path
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/")
-
-###
 # Set the project name
 project(hermes LANGUAGES CXX)
 
