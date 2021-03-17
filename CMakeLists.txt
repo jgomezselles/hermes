@@ -36,21 +36,3 @@ link_libraries(
 
 add_subdirectory(src)
 add_subdirectory(ut)
-
-##########
-# Staging
-##########
-add_custom_target(staging)
-add_dependencies(staging hermes)
-
-add_custom_command(
-TARGET staging POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/staging/bin
-
-    COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_BINARY_DIR}/src/hermes
-        ${CMAKE_SOURCE_DIR}/staging/bin/hermes
-
-    COMMAND STAGING_AREA=${CMAKE_SOURCE_DIR}/staging mkstaging
-        ${CMAKE_SOURCE_DIR}/staging/bin/hermes
-)
