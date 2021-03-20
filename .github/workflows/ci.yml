@@ -24,10 +24,11 @@ jobs:
     - uses: actions/checkout@v2
     - run: cmake . -B build
     - run: make -j -C build
-    - run:  apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
-    - run: lcov -i --capture --directory "${{ github.workspace }}/build/src/" --output-file base-coverage.info --no-external --directory "${{ github.workspace }}/" --exclude '*/ut/*'
+    - run: apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
+    - run: echo ${PWD}
+    - run: lcov -i --capture --directory "${PWD}/build/src/" --output-file base-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
     - run: ./build/ut/unit-test
-    - run: lcov --capture --directory "${{ github.workspace }}/build/src/" --output-file test-coverage.info --no-external --directory "${{ github.workspace }}/" --exclude '*/ut/*'
+    - run: lcov --capture --directory "${PWD}/build/src/" --output-file test-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
     - run: lcov -a base-coverage.info  -a test-coverage.info  -o total-coverage.info
 
     - name: Coveralls
