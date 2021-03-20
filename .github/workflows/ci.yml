@@ -22,7 +22,7 @@ jobs:
       options: "--entrypoint sh"
     steps:
     - uses: actions/checkout@v2
-    - run: cmake . -B build
+    - run: cmake -B build  -DCMAKE_BUILD_TYPE=Debug .
     - run: make -j -C build
     - run: apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
     - run: echo ${PWD}
