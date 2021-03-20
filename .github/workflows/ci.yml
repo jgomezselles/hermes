@@ -11,9 +11,12 @@ jobs:
   formatting-check:
     name: Check code format
     runs-on: ubuntu-latest
+
     steps:
+
     - name: Checkout hermes repo
       uses: actions/checkout@v2
+
     - name: Run clang format
       run: |
           find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
@@ -25,17 +28,32 @@ jobs:
     container:
       image: jgomezselles/hermes_base:0.0.1
       options: "--entrypoint sh"
-    steps:
-    - uses: actions/checkout@v2
-    - run: cmake -B build  -DCMAKE_BUILD_TYPE=Debug .
-    - run: make -j -C build
-    - run: apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
-    - run: lcov -i --capture --directory "${PWD}/build/src/" --output-file base-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
-    - run: ./build/ut/unit-test
-    - run: lcov --capture --directory "${PWD}/build/src/" --output-file test-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
-    - run: lcov -a base-coverage.info  -a test-coverage.info  -o total-coverage.info
 
-    - name: Coveralls
+    steps:
+
+    - name: Checkout hermes repo
+      uses: actions/checkout@v2
+
+    - name: Run cmake with debug and coverage flags
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug .
+
+    - name: Compile code and unit tests
+      run: make -j -C build
+
+    - name: Install and setup lcov base
+      run: |
+          apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
+          lcov -i --capture --directory "${PWD}/build/src/" --output-file base-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
+
+    - name: Run unit tests
+      run: ./build/ut/unit-test
+
+    - name: Capture and merge coverage info
+      run: |
+          lcov --capture --directory "${PWD}/build/src/" --output-file test-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
+          lcov -a base-coverage.info  -a test-coverage.info  -o total-coverage.info
+
+    - name: Upload coverage to Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
