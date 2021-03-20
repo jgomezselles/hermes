@@ -7,13 +7,18 @@ on:
   pull_request:
 
 jobs:
+
   formatting-check:
     name: Check code format
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
-    - run: expr length + "$(git diff)" "==" 0
+    - name: Checkout hermes repo
+      uses: actions/checkout@v2
+    - name: Run clang format
+      run: |
+          find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
+          git diff --exit-code
+
   compile-and-unit-tests:
     name: Compile and run unit tests
     runs-on: ubuntu-latest
@@ -25,7 +30,6 @@ jobs:
     - run: cmake -B build  -DCMAKE_BUILD_TYPE=Debug .
     - run: make -j -C build
     - run: apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
-    - run: echo ${PWD}
     - run: lcov -i --capture --directory "${PWD}/build/src/" --output-file base-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
     - run: ./build/ut/unit-test
     - run: lcov --capture --directory "${PWD}/build/src/" --output-file test-coverage.info --no-external --directory "${PWD}/" --exclude '*/ut/*'
