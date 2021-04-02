@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ .Values.serverMock.name }}:{{ .Values.serverMock.service.port }}']
+      args: ['{{ .Values.serverMock.name }}:{{ .Values.serverMock.service.port }}//url/example/path/test']
   restartPolicy: Never
