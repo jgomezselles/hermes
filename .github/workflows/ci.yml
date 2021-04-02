@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
 
+env:
+  COMMIT_ID: $(git rev-parse --short "$GITHUB_SHA")
+
 jobs:
 
   formatting-check:
@@ -57,3 +60,28 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: total-coverage.info
+
+  build-release-image:
+    name: Build hermes release image and push it to artifacts
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: jgomezselles/hermes:${{ COMMIT_ID }}
+          outputs: type=docker,dest=/tmp/hermes-image-${{ COMMIT_ID }}.tar
+      -
+        name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: hermes-image-${{ COMMIT_ID }}
+          path: /tmp/hermes-image-${{ COMMIT_ID }}.tar
