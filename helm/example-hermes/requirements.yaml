@@ -1,5 +1,0 @@
-dependencies:
-
-  - name: hermes
-    version: 0.1.0
-    repository: file://../hermes

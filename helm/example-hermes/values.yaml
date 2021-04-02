@@ -1,11 +1,20 @@
-global:
-  istio:
-    sidecar:
-      inject: false
+serverMock:
+  name: server-mock
+  replicaCount: 1
+  image:
+    repository: jgomezselles/server-mock
+    pullPolicy: Never
+    tag: "local"
+  podAnnotations:
+    sidecar.istio.io/inject: "true"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources: {}
 
 hermes:
   script:
     cm: traffic-script-cm
   image:
-    repository: hermes_prod
-    tag: 0.1.0
+    repository: jgomezselles/hermes
+    tag: 0.0.1

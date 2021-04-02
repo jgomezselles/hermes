@@ -1,4 +1,11 @@
-apiVersion: v1
-description: Example to deploy Hermes with a traffic configmap
+apiVersion: v2
 name: example-hermes
+description: Example integrating hermes with a server mock.
+type: application
 version: 0.0.1
+appVersion: "0.0.1"
+
+dependencies:
+  - name: hermes
+    version: 0.0.1
+    repository: file://../hermes
