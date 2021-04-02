@@ -81,7 +81,7 @@ easily how hermes works.
 
 ## Container to Container example
 
-1. Build and run a server-mock container by following [these instructions](docker/Readme.md#server-mock).
+1. Build and run a server-mock container by following [these instructions](docker/README.md#server-mock).
 2. Attach to a docker container running a `jgomezselles/hermes` image, and create a script file
 like the one located in the helm [example](helm/example-hermes/templates/traffic.script.yaml).
 3. Run hermes providing the path to your new script:
@@ -91,7 +91,7 @@ like the one located in the helm [example](helm/example-hermes/templates/traffic
 
 ## hermes in kubernetes example
 
-1. Build (but not run) a server-mock by following [these instructions](docker/Readme.md#server-mock).
+1. Build (but not run) a server-mock by following [these instructions](docker/README.md#server-mock).
 2. Update the example-hermes helm chart dependencies, and install the chart:
 ```bash
 helm dep update helm/example-hermes
