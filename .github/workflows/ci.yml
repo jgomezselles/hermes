@@ -90,6 +90,7 @@ jobs:
           path: /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
 
   build-server-mock-image:
+    name: Build server-mock image and push it to artifacts
     runs-on: ubuntu-latest
     env:
       COMMIT_ID: ${{ github.sha }}
@@ -159,6 +160,23 @@ jobs:
       name: Try the cluster !
       run: kubectl get pods -A
     -
-      name: Try helm
+      name: Update example-hermes dependencies
       run: |
-        helm version
+        helm dep update helm/example-hermes
+    -
+      name: Install example-hermes
+      run: |
+        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/ --wait --timeout 30s
+    -
+      name: Run helm tests
+      run: |
+        helm test hermes-example-${{ env.COMMIT_ID }}
+    -
+      name: Retrieve hermes pod name
+      run: |
+        HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}")
+    -
+      name: Run hermes
+      run: |
+        kubectl exec ${HERMES_POD} -- hermes/hermes -p1 -t10 -r1000
+
