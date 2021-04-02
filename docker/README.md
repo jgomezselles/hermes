@@ -29,7 +29,7 @@ repository:
 docker build -f docker/server-mock/Dockerfile . -t jgomezselles/server-mock:local
 ```
 
-It will copy and build the code from [h2server.go](ft/h2server.go), so you may later execute it
+It will copy and build the code from [h2server.go](../ft/h2server.go), so you may later execute it
 by running:
 
 ```bash
