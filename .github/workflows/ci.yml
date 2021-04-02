@@ -63,7 +63,11 @@ jobs:
   build-release-image:
     name: Build hermes release image and push it to artifacts
     runs-on: ubuntu-latest
+
     steps:
+      - 
+        name: Set commit id
+        run: echo COMMIT_ID=${github.sha::7} >> $GITHUB_ENV
       -
         name: Checkout
         uses: actions/checkout@v2
