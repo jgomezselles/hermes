@@ -80,8 +80,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./hermes/
-          file: ./hermes/Dockerfile
+          context: .
+          file: ./Dockerfile
           tags: jgomezselles/hermes:${{ env.COMMIT_ID }}
           outputs: type=docker,dest=/tmp/hermes-image-${{ env.COMMIT_ID }}.tar
       -
