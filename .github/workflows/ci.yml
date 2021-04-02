@@ -9,10 +9,9 @@ on:
 jobs:
 
   formatting-check:
-    needs: build-release-image
+    if: ${{ false }}  # disable for now
     name: Check code format
     runs-on: ubuntu-latest
-
     steps:
     -
       name: Checkout hermes repo
@@ -24,7 +23,7 @@ jobs:
           git diff --exit-code
 
   compile-and-unit-tests:
-    needs: build-release-image
+    if: ${{ false }}  # disable for now
     name: Compile and run unit tests
     runs-on: ubuntu-latest
     container:
