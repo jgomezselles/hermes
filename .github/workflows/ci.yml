@@ -169,7 +169,7 @@ jobs:
     -
       name: Install example-hermes
       run: |
-        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/ --wait --timeout 30s
+        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMok.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
     -
       name: Run helm tests
       run: |
@@ -182,4 +182,3 @@ jobs:
       name: Run hermes
       run: |
         kubectl exec ${HERMES_POD} -- hermes/hermes -p1 -t10 -r1000
-
