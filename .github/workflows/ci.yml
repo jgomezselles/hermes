@@ -171,11 +171,11 @@ jobs:
     -
       name: Template example-hermes
       run: |
-        helm template helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 300s
+        helm template helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }}
     -
       name: Install example-hermes
       run: |
-        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
+        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 300s
     -
       name: Run helm tests
       run: |
