@@ -6,9 +6,6 @@ on:
       - main
   pull_request:
 
-env:
-  COMMIT_ID: $(git rev-parse --short "$GITHUB_SHA")
-
 jobs:
 
   formatting-check:
@@ -77,11 +74,11 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          tags: jgomezselles/hermes:${{ env.COMMIT_ID }}
-          outputs: type=docker,dest=/tmp/hermes-image-${{ env.COMMIT_ID }}.tar
+          tags: jgomezselles/hermes:${{ GITHUB_SHA::7 }}
+          outputs: type=docker,dest=/tmp/hermes-image-${{ GITHUB_SHA::7 }}.tar
       -
         name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hermes-image-${{ env.COMMIT_ID }}
-          path: /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
+          name: hermes-image-${{ GITHUB_SHA::7 }}
+          path: /tmp/hermes-image-${{ GITHUB_SHA::7 }}.tar
