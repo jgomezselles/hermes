@@ -76,6 +76,21 @@ Hermes results, console and file outputs are explained [here](doc/hermes_output.
 # Developing & testing hermes
 
 Take a look to hermes dev info [here](doc/dev_info.md).
+
+# Examples
+
+This repository provides a server-mock implementation which enables you to test and taste
+easily how hermes works.
+
+## Container to Container example
+
+1. Build and run a server-mock by following [these instructions](docker/Readme.md#server-mock).
+2. Attach to a docker container running a `jgomezselles/hermes` image, and create a script file
+like the one located in the helm [example](helm/example-hermes/templates/traffic.script.yaml).
+3. Run hermes providing the path to your new script:
+```bash
+./hermes -r2400 -p1 -t3600 -f <path/to/script.json>
+```
 # License
 
 The Software implemented in this repository is distributed under MIT license,
