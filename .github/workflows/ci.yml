@@ -155,14 +155,6 @@ jobs:
       run: |
         docker load --input /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
     -
-      name: Update example-hermes dependencies
-      run: |
-        helm dep update helm/example-hermes
-    -
-      name: Template example-hermes
-      run: |
-        helm template helm/example-hermes/  --set serverMok.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
-    -
       name: Check images
       run: |
         docker images
@@ -174,9 +166,17 @@ jobs:
       name: Try the cluster !
       run: kubectl get pods -A
     -
+      name: Update example-hermes dependencies
+      run: |
+        helm dep update helm/example-hermes
+    -
+      name: Template example-hermes
+      run: |
+        helm template helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
+    -
       name: Install example-hermes
       run: |
-        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMok.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
+        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
     -
       name: Run helm tests
       run: |
