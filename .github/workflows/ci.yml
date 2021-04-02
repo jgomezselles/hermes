@@ -22,7 +22,6 @@ jobs:
           git diff --exit-code
 
   compile-and-unit-tests:
-    if: ${{ false }}  # disable for now
     name: Compile and run unit tests
     runs-on: ubuntu-latest
     container:
