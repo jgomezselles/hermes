@@ -23,23 +23,9 @@ Hermes aims to be a low footprint and easy to use but high-performance general u
 
 # How can you use it?
 
-Hermes docker image and chart will be available soon so you may integrate it in
-your regular helm chart deployments by just adding a few artifacts.
-
-## hermes integration (work in progress)
-The idea is simple:
-
-* Add it to your requirements:
-    * Repo: (coming soon)
-    * Name: hermes
-    * Version: 0.1.0
-    * Image: (coming soon)
-
-* Reference hermes in your chart under .Values.hermes.image repository and tag.
-* Define a config map for your traffic definition (script) and reference it
-in your values with the name you gave it under `.Values.hermes.script.cm`
-
-But what is inside that ConfigMap? Your [traffic script](doc/traffic_script.md) definition.
+Hermes may be used standalone (check the [releases](https://github.com/jgomezselles/hermes/releases)!),
+from a [docker container](#container-to-container-example), or as part of a kubernetes
+[deployment](#hermes-in-kubernetes-example).
 
 ## Executing hermes
 
@@ -73,9 +59,20 @@ At the end of the day a typical use is:
 
 Hermes results, console and file outputs are explained [here](doc/hermes_output.md).
 
-# Developing & testing hermes
+## hermes helm chart integration
+The idea is simple:
 
-Take a look to hermes dev info [here](doc/dev_info.md).
+* Add it to your `Chart.yaml` dependencies.
+* Reference hermes in your chart under `.Values.hermes.image` `repository` and `tag`.
+* Define a config map for your traffic definition (script) and reference it
+in your values with the name you gave it under `.Values.hermes.script.cm`
+
+But what is inside that ConfigMap? Your [traffic script](doc/traffic_script.md) definition.
+
+And that's it!
+
+If you have some doubts, take a look at the [example-hermes](helm/example-hermes)
+helm chart, or the following examples. 
 
 # Examples
 
@@ -84,13 +81,34 @@ easily how hermes works.
 
 ## Container to Container example
 
-1. Build and run a server-mock by following [these instructions](docker/Readme.md#server-mock).
+1. Build and run a server-mock container by following [these instructions](docker/Readme.md#server-mock).
 2. Attach to a docker container running a `jgomezselles/hermes` image, and create a script file
 like the one located in the helm [example](helm/example-hermes/templates/traffic.script.yaml).
 3. Run hermes providing the path to your new script:
 ```bash
 ./hermes -r2400 -p1 -t3600 -f <path/to/script.json>
 ```
+
+## hermes in kubernetes example
+
+1. Build (but not run) a server-mock by following [these instructions](docker/Readme.md#server-mock).
+2. Update the example-hermes helm chart dependencies, and install the chart:
+```bash
+helm dep update helm/example-hermes
+helm install example-hermes helm/example-hermes
+```
+3. Run hermes
+```bash
+kubectl exec <hermes-pod> -c hermes -- /hermes/hermes -p1 -t10 -r1000
+```
+
+> The server-mock prints every received request to the console, so you can check the received requests
+> by inspecting the logs: ` kubectl logs <server-mock-pod>`
+
+# Developing & testing hermes
+
+Take a look to hermes dev info [here](doc/dev_info.md).
+
 # License
 
 The Software implemented in this repository is distributed under MIT license,
