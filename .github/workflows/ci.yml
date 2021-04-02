@@ -74,11 +74,11 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          tags: jgomezselles/hermes:${{ GITHUB_SHA }}
-          outputs: type=docker,dest=/tmp/hermes-image-${{ GITHUB_SHA }}.tar
+          tags: jgomezselles/hermes:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/hermes-image-${{ github.sha }}.tar
       -
         name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hermes-image-${{ GITHUB_SHA }}
-          path: /tmp/hermes-image-${{ GITHUB_SHA }}.tar
+          name: hermes-image-${{ github.sha }}
+          path: /tmp/hermes-image-${{ github.sha }}.tar
