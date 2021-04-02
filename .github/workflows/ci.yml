@@ -170,6 +170,10 @@ jobs:
       run: |
         helm dep update helm/example-hermes
     -
+      name: Check images
+      run: |
+        docker images
+    -
       name: Install example-hermes
       run: |
         helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMok.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout 30s
