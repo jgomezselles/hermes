@@ -65,7 +65,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       COMMIT_ID: ${{ github.sha }}
-
     steps:
       - 
         name: Set commit id
@@ -90,3 +89,32 @@ jobs:
         with:
           name: hermes-image-${{ env.COMMIT_ID }}
           path: /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
+
+  build-server-mock-image:
+    runs-on: ubuntu-latest
+    env:
+      COMMIT_ID: ${{ github.sha }}
+    steps:
+      - 
+        name: Set commit id
+        run: echo COMMIT_ID=${COMMIT_ID::7} >> $GITHUB_ENV
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/server-mock/Dockerfile
+          tags: jgomezselles/server-mock:${{ env.COMMIT_ID }}
+          outputs: type=docker,dest=/tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
+      -
+        name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-mock-image-${{ env.COMMIT_ID }}
+          path: /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
