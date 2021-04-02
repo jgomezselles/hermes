@@ -81,7 +81,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker/Dockerfile
           tags: jgomezselles/hermes:${{ env.COMMIT_ID }}
           outputs: type=docker,dest=/tmp/hermes-image-${{ env.COMMIT_ID }}.tar
       -
