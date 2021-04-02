@@ -77,11 +77,11 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          tags: jgomezselles/hermes:${{ COMMIT_ID }}
-          outputs: type=docker,dest=/tmp/hermes-image-${{ COMMIT_ID }}.tar
+          tags: jgomezselles/hermes:${COMMIT_ID}
+          outputs: type=docker,dest=/tmp/hermes-image-${COMMIT_ID}.tar
       -
         name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hermes-image-${{ COMMIT_ID }}
-          path: /tmp/hermes-image-${{ COMMIT_ID }}.tar
+          name: hermes-image-${COMMIT_ID}
+          path: /tmp/hermes-image-${COMMIT_ID}.tar
