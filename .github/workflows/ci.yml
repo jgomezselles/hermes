@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-    - name: Checkout hermes repo
+    -
+      name: Checkout hermes repo
       uses: actions/checkout@v2
-
-    - name: Run clang format
+    -
+      name: Run clang format
       run: |
           find . -regex '.*\.\(cpp\|hpp\|cc\|cxx\|h\|c\|hh\)' -exec clang-format -style=file -i {} \;
           git diff --exit-code
@@ -28,32 +28,31 @@ jobs:
     container:
       image: jgomezselles/hermes_base:0.0.1
       options: "--entrypoint sh"
-
     steps:
-
-    - name: Checkout hermes repo
+    - 
+      name: Checkout hermes repo
       uses: actions/checkout@v2
-
-    - name: Run cmake with debug and coverage flags
+    - 
+      name: Run cmake with debug and coverage flags
       run: cmake -B build -DCMAKE_BUILD_TYPE=Debug .
-
-    - name: Compile code and unit tests
+    - 
+      name: Compile code and unit tests
       run: make -j -C build
-
-    - name: Install and setup lcov base
+    -
+      name: Install and setup lcov base
       run: |
           apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
           lcov -i --capture --directory "./build/src/" --output-file base-coverage.info --no-external --directory "./" --exclude '*/ut/*'
-
-    - name: Run unit tests
+    -
+      name: Run unit tests
       run: ./build/ut/unit-test
-
-    - name: Capture and merge coverage info
+    -
+      name: Capture and merge coverage info
       run: |
           lcov --capture --directory "./build/src/" --output-file test-coverage.info --no-external --directory "./" --exclude '*/ut/*'
           lcov -a base-coverage.info  -a test-coverage.info  -o total-coverage.info
-
-    - name: Upload coverage to Coveralls
+    -
+      name: Upload coverage to Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
