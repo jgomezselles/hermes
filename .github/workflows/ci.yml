@@ -122,13 +122,15 @@ jobs:
   test-example-hermes:
     needs: [ build-release-image, build-server-mock-image]
     runs-on: ubuntu-latest
+    env:
+      COMMIT_ID: ${{ github.sha }}
     steps:
     -
       name: Checkout
       uses: actions/checkout@v2
     -
-      name: Set commit id
-      run: echo COMMIT_ID=${${{ github.sha }}::7} >> $GITHUB_ENV
+      name: Trim commit id
+      run: echo COMMIT_ID=${COMMIT_ID::7} >> $GITHUB_ENV
     -
       name: Install KinD
       uses: engineerd/setup-kind@v0.5.0
