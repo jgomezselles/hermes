@@ -185,7 +185,7 @@ jobs:
     -
       name: Check pods
       run: |
-        kubectl describe pod ${HERMES_POD}
+        kubectl describe pod $(HERMES_POD)
     -
       name: Run helm tests
       run: |
@@ -193,4 +193,4 @@ jobs:
     -
       name: Run hermes
       run: |
-        kubectl exec ${HERMES_POD} -- hermes/hermes -p1 -t10 -r1000
+        kubectl exec $(HERMES_POD) -- hermes/hermes -p1 -t10 -r1000
