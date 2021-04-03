@@ -125,8 +125,8 @@ jobs:
 
     steps:
     -
-        name: Checkout
-        uses: actions/checkout@v2
+      name: Checkout
+      uses: actions/checkout@v2
     -
       name: Set commit id
       run: echo COMMIT_ID=${COMMIT_ID::7} >> $GITHUB_ENV
@@ -158,9 +158,8 @@ jobs:
       run: |
         docker images
     -
-      name: start minikube
-      id: minikube
-      uses: medyagh/setup-minikube@master
+      name: Install KinD
+      uses: engineerd/setup-kind@v0.5.0
     -
       name: Try the cluster !
       run: kubectl get pods -A
