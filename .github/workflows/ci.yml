@@ -142,23 +142,20 @@ jobs:
         name: server-mock-image-${{ env.COMMIT_ID }}
         path: /tmp
     -
-      name: Load server-mock image
-      run: |
-        docker load --input /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
-    -
       name: Download hermes image
       uses: actions/download-artifact@v2
       with:
         name: hermes-image-${{ env.COMMIT_ID }}
         path: /tmp
     -
-      name: Load hermes image
+      name: Load images to KinD
       run: |
-        docker load --input /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
+        kind load image-archive /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar jgomezselles/server-mock:${{ env.COMMIT_ID }} --name kind
+        kind load image-archive /tmp/hermes-image-${{ env.COMMIT_ID }}.tar jgomezselles/hermes:${{ env.COMMIT_ID }} --name kind
     -
       name: Check images
       run: |
-        docker images
+        docker exec kind-control-plane crictl images
     -
       name: Try the cluster !
       run: kubectl get pods -A
@@ -172,11 +169,11 @@ jobs:
     -
       name: Template example-hermes
       run: |
-        helm template helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }}
+        helm template helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --set hermes.image.pullPolicy=Never
     -
       name: Install example-hermes
       run: |
-        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --wait --timeout=30s
+        helm install hermes-example-${{ env.COMMIT_ID }} helm/example-hermes/  --set serverMock.image.tag=${{ env.COMMIT_ID }} --set hermes.image.tag=${{ env.COMMIT_ID }} --set hermes.image.pullPolicy=Never --wait --timeout=30s
     -
       name: Check pods
       run: |
