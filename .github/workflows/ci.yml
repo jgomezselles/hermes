@@ -86,6 +86,7 @@ jobs:
         with:
           name: hermes-image-${{ env.COMMIT_ID }}
           path: /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
+          retention-days: 1
 
   build-server-mock-image:
     name: Build server-mock image and push it to artifacts
@@ -116,6 +117,7 @@ jobs:
         with:
           name: server-mock-image-${{ env.COMMIT_ID }}
           path: /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
+          retention-days: 1
 
   test-example-hermes:
     needs: [ build-release-image, build-server-mock-image]
