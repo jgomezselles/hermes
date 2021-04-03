@@ -122,9 +122,6 @@ jobs:
   test-example-hermes:
     needs: [ build-release-image, build-server-mock-image]
     runs-on: ubuntu-latest
-    env:
-      COMMIT_ID: ${{ github.sha }}
-
     steps:
     -
       name: Checkout
@@ -181,11 +178,11 @@ jobs:
     -
       name: Retrieve hermes pod name
       run: |
-        HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}")
+        echo HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}") >> $GITHUB_ENV
     -
       name: Check pods
       run: |
-        kubectl describe pod $(HERMES_POD)
+        kubectl describe pod ${{ env.HERMES_POD }}
     -
       name: Run helm tests
       run: |
@@ -193,4 +190,4 @@ jobs:
     -
       name: Run hermes
       run: |
-        kubectl exec $(HERMES_POD) -- hermes/hermes -p1 -t10 -r1000
+        kubectl exec ${{ env.HERMES_POD }} -- hermes/hermes -p1 -t10 -r1000
