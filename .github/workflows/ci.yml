@@ -152,15 +152,11 @@ jobs:
         kind load image-archive /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar jgomezselles/server-mock:${{ env.COMMIT_ID }} --name kind
         kind load image-archive /tmp/hermes-image-${{ env.COMMIT_ID }}.tar jgomezselles/hermes:${{ env.COMMIT_ID }} --name kind
     -
-      name: Check images
+      name: Check previous steps
       run: |
         docker exec kind-control-plane crictl images
-    -
-      name: Try the cluster !
-      run: kubectl get pods -A
-    -
-      name: Check k8s versions
-      run: kubectl version
+        kubectl get pods -A
+        kubectl version
     -
       name: Update example-hermes dependencies
       run: |
@@ -176,15 +172,7 @@ jobs:
     -
       name: Check pods
       run: |
-        kubectl get pods -A
-    -
-      name: Retrieve hermes pod name
-      run: |
-        echo HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}") >> $GITHUB_ENV
-    -
-      name: Check pods
-      run: |
-        kubectl describe pod ${{ env.HERMES_POD }}
+        kubectl describe pods
     -
       name: Run helm tests
       run: |
@@ -192,4 +180,5 @@ jobs:
     -
       name: Run hermes
       run: |
+        HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}")
         kubectl exec ${{ env.HERMES_POD }} -- hermes/hermes -p1 -t10 -r1000
