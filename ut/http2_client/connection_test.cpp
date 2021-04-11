@@ -4,8 +4,6 @@
 #include <nghttp2/asio_http2_server.h>
 
 #include <boost/system/error_code.hpp>
-#include <chrono>
-#include <thread>
 
 using namespace std::chrono_literals;
 
