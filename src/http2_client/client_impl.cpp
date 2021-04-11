@@ -26,7 +26,7 @@ using namespace std::chrono;
 
 namespace http2_client
 {
-client_impl::client_impl(std::shared_ptr<stats::stats> st, boost::asio::io_context& io_ctx,
+client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_context& io_ctx,
                          const traffic::script& s)
     : stats(std::move(st)),
       io_ctx(io_ctx),
