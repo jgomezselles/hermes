@@ -6,6 +6,8 @@
 #include <mutex>
 #include <shared_mutex>
 
+#include "stats if.hpp"
+
 #pragma once
 
 namespace config
@@ -43,7 +45,7 @@ struct snapshot
     time_point<steady_clock> init_time{steady_clock::now()};
 };
 
-class stats
+class stats : public stats_if
 {
 public:
     stats(boost::asio::io_context& io_ctx, const int print_period,
