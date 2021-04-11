@@ -12,7 +12,7 @@
 
 namespace stats
 {
-class stats;
+class stats_if;
 }
 
 namespace http2_client
@@ -45,7 +45,7 @@ public:
         DELETE
     };
 
-    client_impl(std::shared_ptr<stats::stats> stats, boost::asio::io_context& io_ctx,
+    client_impl(std::shared_ptr<stats::stats_if> stats, boost::asio::io_context& io_ctx,
                 const traffic::script& s);
 
     virtual ~client_impl() {}
@@ -68,7 +68,7 @@ private:
     void on_timeout(const boost::system::error_code& e, std::shared_ptr<race_control> control,
                     std::string msg_name);
 
-    std::shared_ptr<stats::stats> stats;
+    std::shared_ptr<stats::stats_if> stats;
     boost::asio::io_context& io_ctx;
     traffic::script_queue queue;
     std::string host;
