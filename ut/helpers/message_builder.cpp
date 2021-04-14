@@ -45,7 +45,7 @@ void message_builder::default_values()
     method("GET");
     response(response_builder(200).build());
     body("{}");
-    url("/v1/test");
+    url("v1/test");
 }
 
 message_builder &message_builder::url(const std::optional<std::string> &url)
