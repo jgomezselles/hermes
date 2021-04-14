@@ -6,7 +6,6 @@
 
 namespace traffic
 {
-
 class script;
 
 class script_queue_if
