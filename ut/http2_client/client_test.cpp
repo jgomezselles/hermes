@@ -9,8 +9,8 @@
 
 #include "client_impl.hpp"
 #include "script_builder.hpp"
-#include "stats_if.hpp"
 #include "script_queue_if.hpp"
+#include "stats_if.hpp"
 
 using namespace std::chrono_literals;
 namespace ba = boost::asio;
@@ -33,7 +33,7 @@ class script_queue_mock : public traffic::script_queue_if
 {
 public:
     MOCK_METHOD0(get_next_script, boost::optional<traffic::script>());
-    MOCK_METHOD2(enqueue_script, void(traffic::script, const traffic::answer_type&));
+    MOCK_METHOD2(enqueue_script, void(traffic::script, const traffic::answer_type &));
     MOCK_METHOD0(cancel_script, void());
     MOCK_CONST_METHOD0(has_pending_scripts, bool());
     MOCK_METHOD0(close_window, void());
@@ -87,10 +87,7 @@ public:
         server_started = false;
     }
 
-    void SetUp() override
-    {
-        start_server();
-    };
+    void SetUp() override { start_server(); };
 
     void TearDown() override
     {
@@ -126,7 +123,7 @@ TEST_F(client_test, my_first_test)
     auto stats = std::make_shared<stats_mock>();
 
     EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
-    EXPECT_CALL(*stats, add_measurement("test1" ,_ ,200)).Times(1);
+    EXPECT_CALL(*stats, add_measurement("test1", _, 200)).Times(1);
 
     auto queue = std::make_unique<script_queue_mock>();
 

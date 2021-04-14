@@ -4,8 +4,8 @@
 #include <shared_mutex>
 #include <utility>
 
-#include "script_queue_if.hpp"
 #include "script.hpp"
+#include "script_queue_if.hpp"
 
 #pragma once
 

@@ -59,7 +59,7 @@ public:
     void end();
 
     void increase_sent(const std::string& id) override;
-    void add_measurement(const std::string& id, const int64_t elapsed_time, const int code) override;
+    void add_measurement(const std::string& id, const int64_t time, const int code) override;
     void add_timeout(const std::string& id) override;
     void add_error(const std::string& id, const int e) override;
     void add_client_error(const std::string& id, const int e) override;
