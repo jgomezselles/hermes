@@ -99,24 +99,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    // Reconnections make some messages not to be processed. Wait a max time
-    // till shutdown and show that some messages were lost.
-    // Doc:
-    // ->Roadmap (backlog)
-    // ->Readme
-    // ->stats doc
-    // ->options doc
-    // ->script doc
-
-    // UT
-    // Pipeline
-    // stdev
-    // Schema validation/message and percent of validation.
-    // Clean main
-    // TODOs
-    // AOTS
-    // Prometheus client in stats? Prometheus sidecar?
-
     boost::optional<traffic::script> the_script;
     try
     {
