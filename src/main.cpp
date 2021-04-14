@@ -171,8 +171,9 @@ int main(int argc, char* argv[])
     /******************************************************************
      * CLIENT
      ******************************************************************/
-    auto client =
-        std::make_unique<http2_client::client_impl>(stats, client_io_ctx, the_script.get());
+    auto q  = std::make_unique<traffic::script_queue>(the_script.get());
+    auto client = std::make_unique<http2_client::client_impl>(
+            stats, client_io_ctx, std::move(q), the_script->get_server_dns(), the_script->get_server_port());
     if (!client->is_connected())
     {
         std::cerr << "Terminating application. Error connecting server." << std::endl;

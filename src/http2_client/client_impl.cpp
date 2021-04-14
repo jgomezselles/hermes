@@ -26,14 +26,17 @@ using namespace std::chrono;
 
 namespace http2_client
 {
-client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_context& io_ctx,
-                         const traffic::script& s)
+client_impl::client_impl(std::shared_ptr<stats::stats_if> st,
+                         boost::asio::io_context& io_ctx,
+                         std::unique_ptr<traffic::script_queue_if> q,
+                         const std::string& h,
+                         const std::string& p)
     : stats(std::move(st)),
       io_ctx(io_ctx),
-      queue(s),
-      host(s.get_server_dns()),
-      port(s.get_server_port()),
-      conn(std::make_unique<connection>(s.get_server_dns(), s.get_server_port())),
+      queue(std::move(q)),
+      host(h),
+      port(p),
+      conn(std::make_unique<connection>(h, p)),
       mtx()
 {
     if (!conn->wait_to_be_connected())
@@ -57,7 +60,7 @@ void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
     }
     control->timed_out = true;
     stats->add_timeout(msg_name);
-    queue.cancel_script();
+    queue->cancel_script();
 }
 
 void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
@@ -69,7 +72,7 @@ void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& 
         {
             control->timed_out = true;
             stats->add_error(msg_name, 469);
-            queue.cancel_script();
+            queue->cancel_script();
         }
         control->mtx.unlock();
     }
@@ -121,7 +124,7 @@ void client_impl::open_new_connection()
 
 void client_impl::send()
 {
-    auto script_opt = queue.get_next_script();
+    auto script_opt = queue->get_next_script();
     if (!script_opt.is_initialized())
     {
         return;
@@ -132,7 +135,7 @@ void client_impl::send()
     if (!is_connected())
     {
         stats->add_client_error(req.name, 466);
-        queue.cancel_script();
+        queue->cancel_script();
         open_new_connection();
         return;
     }
@@ -140,7 +143,7 @@ void client_impl::send()
     if (!mtx.try_lock_shared())
     {
         stats->add_client_error(req.name, 467);
-        queue.cancel_script();
+        queue->cancel_script();
         return;
     }
 
@@ -154,10 +157,9 @@ void client_impl::send()
             std::cerr << "Error submitting. Closing connection:" << ec.message() << std::endl;
             conn->close();
             stats->add_client_error(req.name, 468);
-            queue.cancel_script();
+            queue->cancel_script();
             return;
         }
-
         stats->increase_sent(req.name);
 
         auto ctrl = std::make_shared<race_control>();
@@ -194,12 +196,12 @@ void client_impl::send()
                         if (valid_answer)
                         {
                             stats->add_measurement(req.name, elapsed_time, res.status_code());
-                            queue.enqueue_script(script, ans);
+                            queue->enqueue_script(script, ans);
                         }
                         else
                         {
                             stats->add_error(req.name, res.status_code());
-                            queue.cancel_script();
+                            queue->cancel_script();
                         }
                     }
                 });
