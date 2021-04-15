@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "client_impl.hpp"
+#include "message_builder.hpp"
 #include "script_builder.hpp"
 #include "script_queue_if.hpp"
 #include "stats_if.hpp"
@@ -66,6 +67,13 @@ public:
                            res.end();
                        });
 
+        server->handle("/v1/test_timeout",
+                       [](const ng::server::request &req, const ng::server::response &res) {
+                           std::this_thread::sleep_for(750ms);
+                           res.write_head(200);
+                           res.end();
+                       });
+
         if (server->listen_and_serve(server_error_code, server_host, server_port, true))
         {
             fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
@@ -115,13 +123,27 @@ ACTION_P(SetFuture, prom)
     prom->set_value();
 };
 
-TEST_F(client_test, my_first_test)
+TEST_F(client_test, ConnectToServer)
 {
-    std::promise<void> prom;
-    std::future<void> fut = prom.get_future();
-
     auto stats = std::make_shared<stats_mock>();
+    auto queue = std::make_unique<script_queue_mock>();
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
 
+    ASSERT_TRUE(client.is_connected());
+}
+
+TEST_F(client_test, ErrorConnectingToServer)
+{
+    auto stats = std::make_shared<stats_mock>();
+    auto queue = std::make_unique<script_queue_mock>();
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), "wrong_host", server_port);
+
+    ASSERT_FALSE(client.is_connected());
+}
+
+TEST_F(client_test, SendMessage)
+{
+    auto stats = std::make_shared<stats_mock>();
     EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
     EXPECT_CALL(*stats, add_measurement("test1", _, 200)).Times(1);
 
@@ -134,11 +156,80 @@ TEST_F(client_test, my_first_test)
 
     boost::optional<traffic::script> script(json_stream);
     traffic::answer_type ans = std::make_pair(200, "");
-
+    std::promise<void> prom;
+    std::future<void> fut = prom.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
     EXPECT_CALL(*queue, enqueue_script(_, ans)).Times(1).WillOnce(SetFuture(&prom));
 
     auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_TRUE(client.is_connected());
+
+    client.send();
+
+    ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
+}
+
+TEST_F(client_test, TimeoutInAnswer)
+{
+    auto stats = std::make_shared<stats_mock>();
+    EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
+    EXPECT_CALL(*stats, add_timeout("test1")).Times(1);
+
+    auto queue = std::make_unique<script_queue_mock>();
+
+    ut_helpers::script_builder script_builder;
+    script_builder.dns(server_host)
+        .port(server_port)
+        .timeout(500)
+        .messages(std::vector<std::string>{
+            ut_helpers::message_builder(1).url("v1/test_timeout").build()});
+
+    std::stringstream json_stream;
+    json_stream << script_builder.build();
+    boost::optional<traffic::script> script(json_stream);
+
+    std::promise<void> prom;
+    std::future<void> fut = prom.get_future();
+    EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
+    EXPECT_CALL(*queue, cancel_script()).Times(1).WillOnce(SetFuture(&prom));
+
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_TRUE(client.is_connected());
+
+    client.send();
+
+    ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
+}
+
+TEST_F(client_test, WrongCodeInAnswer)
+{
+    auto stats = std::make_shared<stats_mock>();
+    EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
+    EXPECT_CALL(*stats, add_error("test1", 404)).Times(1);
+
+    auto queue = std::make_unique<script_queue_mock>();
+
+    ut_helpers::script_builder script_builder;
+    script_builder.dns(server_host)
+        .port(server_port)
+        .messages(
+            std::vector<std::string>{ut_helpers::message_builder(1).url("v1/wrong_url").build()});
+
+    std::stringstream json_stream;
+    json_stream << script_builder.build();
+    boost::optional<traffic::script> script(json_stream);
+
+    std::promise<void> prom;
+    std::future<void> fut = prom.get_future();
+    EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
+    EXPECT_CALL(*queue, cancel_script()).Times(1).WillOnce(SetFuture(&prom));
+
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_TRUE(client.is_connected());
+
     client.send();
 
     ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
