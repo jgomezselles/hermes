@@ -273,4 +273,60 @@ TEST_F(client_test, WrongCodeInAnswer)
     ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
 }
 
+TEST_F(client_test, ServerDisconnectionTriggersReconnectionInNextMessage)
+{
+    // This test tries to send a message 3 times.
+    // 1) There's no connection, so error is added and script in queue cancelled.
+    //    A connection is then triggered but unsuccessful.
+    // 2) After server is respawned, the same happens, but this time the reconnection occurs.
+    // 3) Message is sent successfully
+
+    auto stats = std::make_shared<stats_mock>();
+    EXPECT_CALL(*stats, add_client_error("test1", _)).Times(2);
+    EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
+    EXPECT_CALL(*stats, add_measurement("test1", _, 200)).Times(1);
+
+    auto queue = std::make_unique<script_queue_mock>();
+
+    ut_helpers::script_builder script_builder;
+    script_builder.dns(server_host).port(server_port);
+    std::stringstream json_stream;
+    json_stream << script_builder.build();
+
+    boost::optional<traffic::script> script(json_stream);
+    traffic::answer_type ans = std::make_pair(200, response_body);
+    std::promise<void> prom1, prom2;
+    std::future<void> fut1 = prom1.get_future(), fut2 = prom2.get_future();
+    EXPECT_CALL(*queue, get_next_script()).Times(3).WillRepeatedly(Return(script));
+    EXPECT_CALL(*queue, cancel_script()).Times(2).WillOnce(SetFuture(&prom1)).WillOnce(Return());
+    EXPECT_CALL(*queue, enqueue_script(_, ans)).Times(1).WillOnce(SetFuture(&prom2));
+
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_TRUE(client.is_connected());
+
+    stop_server();
+
+    client.send();
+    ASSERT_EQ(fut1.wait_for(1s), std::future_status::ready);
+    ASSERT_FALSE(client.is_connected());
+
+    start_server();
+
+    std::condition_variable cv;
+    std::mutex mtx;
+
+    auto wait_for_connection = [&cv, &mtx](client_impl &c) {
+        std::unique_lock lock(mtx);
+        return cv.wait_for(lock, 2s, [&c] { return c.is_connected(); });
+    };
+
+    client.send();
+
+    ASSERT_TRUE(wait_for_connection(client));
+
+    client.send();
+    ASSERT_EQ(fut2.wait_for(1s), std::future_status::ready);
+}
+
 }  // namespace http2_client
