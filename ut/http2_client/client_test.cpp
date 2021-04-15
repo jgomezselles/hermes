@@ -123,6 +123,30 @@ ACTION_P(SetFuture, prom)
     prom->set_value();
 };
 
+TEST_F(client_test, HasFinishedTrueWhenQueueEmpty)
+{
+
+    auto stats = std::make_shared<stats_mock>();
+    auto queue = std::make_unique<script_queue_mock>();
+    EXPECT_CALL(*queue, has_pending_scripts()).Times(1).WillOnce(Return(false));
+
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_TRUE(client.has_finished());
+}
+
+TEST_F(client_test, HasFinishedFalseWhenQueueIsNotEmpty)
+{
+
+    auto stats = std::make_shared<stats_mock>();
+    auto queue = std::make_unique<script_queue_mock>();
+    EXPECT_CALL(*queue, has_pending_scripts()).Times(1).WillOnce(Return(true));
+
+    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+
+    ASSERT_FALSE(client.has_finished());
+}
+
 TEST_F(client_test, ConnectToServer)
 {
     auto stats = std::make_shared<stats_mock>();
