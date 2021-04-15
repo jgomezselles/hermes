@@ -62,9 +62,9 @@ public:
 
         server = std::make_unique<ng::server::http2>();
         server->handle("/v1/test",
-                       [](const ng::server::request &req, const ng::server::response &res) {
+                       [this](const ng::server::request &req, const ng::server::response &res) {
                            res.write_head(200);
-                           res.end();
+                           res.end(response_body);
                        });
 
         server->handle("/v1/test_timeout",
@@ -116,6 +116,8 @@ protected:
     ba::io_context client_io_ctx;
     ba::executor_work_guard<ba::io_context::executor_type> client_io_ctx_guard;
     std::thread client_worker;
+
+    std::string response_body{"Example"};
 };
 
 ACTION_P(SetFuture, prom)
@@ -191,7 +193,7 @@ TEST_F(client_test, SendMessage)
     json_stream << script_builder.build();
 
     boost::optional<traffic::script> script(json_stream);
-    traffic::answer_type ans = std::make_pair(200, "");
+    traffic::answer_type ans = std::make_pair(200, response_body);
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
