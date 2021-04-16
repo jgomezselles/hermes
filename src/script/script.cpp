@@ -21,12 +21,12 @@ script::script(const std::string& path)
                                " not found."
                                "Terminating application.");
     }
-    this->build(json_file);
+    build(json_file);
 }
 
 script::script(std::istream& input)
 {
-    this->build(input);
+    build(input);
 }
 
 void script::build(std::istream& file)
