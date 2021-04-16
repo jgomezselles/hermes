@@ -85,8 +85,8 @@ TEST_F(connection_test, connection_is_lost_because_of_the_server)
 {
     connection c(server_host, server_port);
 
-    EXPECT_TRUE(c.wait_to_be_connected());
-    EXPECT_EQ(connection::status::OPEN, c.get_status());
+    ASSERT_TRUE(c.wait_to_be_connected());
+    ASSERT_EQ(connection::status::OPEN, c.get_status());
     stop_server();
     ASSERT_TRUE(c.wait_for_status(100ms, connection::status::CLOSED));
 }
@@ -95,9 +95,14 @@ TEST_F(connection_test, close_connection)
 {
     connection c(server_host, server_port);
 
-    EXPECT_TRUE(c.wait_to_be_connected());
-    EXPECT_EQ(connection::status::OPEN, c.get_status());
+    ASSERT_TRUE(c.wait_to_be_connected());
+    ASSERT_EQ(connection::status::OPEN, c.get_status());
 
+    // This test is unstable due to, despite the efforts on checking the status,
+    // the connection is not ready. Closing a connection which is not fully open
+    // ends up in the nghttp2 client in the following error:
+    // Assertion failed: !inside_callback_ (asio_client_session_impl.cc: enter_callback: 611)
+    std::this_thread::sleep_for(100ms);
     c.close();
 
     ASSERT_FALSE(c.wait_to_be_connected());
