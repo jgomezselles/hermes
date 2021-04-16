@@ -76,7 +76,7 @@ void stats::write_headers(std::fstream& fs)
        << std::endl;
 }
 
-void stats::print_headers()
+void stats::print_headers() const
 {
     std::cout << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Sent/s"
               << std::right << std::setw(10) << "Recv/s" <<
