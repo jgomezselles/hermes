@@ -70,7 +70,7 @@ protected:
                         const time_point<steady_clock>& init_time) const;
     void write_errors() const;
 
-    void print_headers();
+    void print_headers() const;
     void print_snapshot(const snapshot& snap) const;
     void do_print();
 
