@@ -123,9 +123,6 @@ TEST_P(stats_test, increase_sent_existent_id)
 
 TEST_P(stats_test, increase_sent_non_existent_id_exception)
 {
-    // SETUP
-    // EXEC
-    // ASSERT
     EXPECT_THROW(sut.increase_sent("non-existent"), std::exception);
 }
 
@@ -317,9 +314,6 @@ TEST_P(stats_test, add_timeout_ok)
 
 TEST_P(stats_test, add_timeout_id_non_existent)
 {
-    // SETUP
-    // EXEC
-    // ASSERT
     EXPECT_THROW(sut.add_timeout("non-existent"), std::exception);
 }
 
@@ -418,9 +412,6 @@ TEST_P(stats_test, add_error_updates_existent_error)
 
 TEST_P(stats_test, add_error_id_non_existant)
 {
-    // SETUP
-    // EXEC
-    // ASSERT
     EXPECT_THROW(sut.add_error("non-existent", 0), std::exception);
 }
 
@@ -519,9 +510,6 @@ TEST_P(stats_test, add_client_error_updates_existent_error)
 
 TEST_P(stats_test, add_client_error_id_non_existant)
 {
-    // SETUP
-    // EXEC
-    // ASSERT
     EXPECT_THROW(sut.add_client_error("non-existent", 0), std::exception);
 }
 }  // namespace stats
