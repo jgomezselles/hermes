@@ -307,7 +307,7 @@ TEST_F(client_test, ServerDisconnectionTriggersReconnectionInNextMessage)
 
     stop_server();
 
-    //The server sometimes gets too much time to be down, making the test unstable.
+    // The server sometimes gets too much time to be down, making the test unstable.
     std::this_thread::sleep_for(500ms);
 
     client.send();
