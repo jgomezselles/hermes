@@ -307,6 +307,9 @@ TEST_F(client_test, ServerDisconnectionTriggersReconnectionInNextMessage)
 
     stop_server();
 
+    //The server sometimes gets too much time to be down, making the test unstable.
+    std::this_thread::sleep_for(500ms);
+
     client.send();
     ASSERT_EQ(fut1.wait_for(1s), std::future_status::ready);
     ASSERT_FALSE(client.is_connected());
