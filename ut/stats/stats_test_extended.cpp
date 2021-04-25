@@ -81,18 +81,17 @@ public:
         return lines;
     }
 
-    std::string formatted_output(const float time, const int sent, const int ok, const int rt, const int nok, const int timeout)
+    std::string formatted_output(const float time, const int sent, const int ok, const int rt,
+                                 const int nok, const int timeout)
     {
         std::stringstream ss;
         ss << std::left << std::setw(10) << time << std::right << std::setw(10)
-           << float(sent) / time << std::right << std::setw(10)
-           << float(ok) / time << std::right << std::setw(15)
-           << rt << std::right << std::setw(15) << rt
-           << std::right << std::setw(15) << rt <<
+           << float(sent) / time << std::right << std::setw(10) << float(ok) / time << std::right
+           << std::setw(15) << rt << std::right << std::setw(15) << rt << std::right
+           << std::setw(15) << rt <<
 
-            std::right << std::setw(15) << sent << std::right << std::setw(15) << ok
-           << std::right << std::setw(15) << nok << std::right << std::setw(15)
-           << timeout;
+            std::right << std::setw(15) << sent << std::right << std::setw(15) << ok << std::right
+           << std::setw(15) << nok << std::right << std::setw(15) << timeout;
 
         return ss.str();
     }
@@ -100,7 +99,7 @@ public:
     float extract_real_time_from_line(const std::string& line)
     {
         std::string time;
-        std::getline(std::stringstream(line), time,' ');
+        std::getline(std::stringstream(line), time, ' ');
         return atof(time.c_str());
     }
 
