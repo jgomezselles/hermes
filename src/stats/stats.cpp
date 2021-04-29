@@ -64,8 +64,8 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
     errors_file.open(err_filename, std::fstream::out);
     auto print_time = system_clock::to_time_t(system_clock::now());
     errors_file << "Traffic started at:  " << std::ctime(&print_time) << std::endl
-                << std::left << std::setw(10) << "Time (ms)" << std::right << std::setw(10)
-                << "Code" << std::right << std::setw(10) << "Count" << std::endl;
+                << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Code"
+                << std::right << std::setw(10) << "Count" << std::endl;
     errors_file.close();
 
     print_headers();
@@ -216,8 +216,8 @@ void stats::write_errors() const
 
     for (const auto& code : total_snap.response_codes_nok)
     {
-        err_file << std::left << std::setw(10) << time << std::right << std::setw(10) << code.first
-                 << std::right << std::setw(10) << code.second << std::endl;
+        err_file << std::left << std::setw(10) << time * 0.001 << std::right << std::setw(10)
+                 << code.first << std::right << std::setw(10) << code.second << std::endl;
     }
     err_file.close();
 }
