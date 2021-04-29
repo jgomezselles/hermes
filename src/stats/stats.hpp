@@ -65,6 +65,7 @@ public:
     void add_client_error(const std::string& id, const int e) override;
 
 protected:
+    static std::string create_headers_str();
     void write_headers(std::fstream& fs);
     void write_snapshot(const snapshot& snap, std::fstream& fs,
                         const time_point<steady_clock>& init_time) const;
@@ -93,5 +94,7 @@ protected:
     std::map<std::string, snapshot> msg_snaps;
 
     mutable mutex_type rw_mutex;
+
+    const std::string stats_headers;
 };
 }  // namespace stats
