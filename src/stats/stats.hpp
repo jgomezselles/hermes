@@ -2,6 +2,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <chrono>
+#include <iostream>
 #include <map>
 #include <mutex>
 #include <shared_mutex>
@@ -67,12 +68,10 @@ public:
 protected:
     static std::string create_headers_str();
     void write_headers(std::fstream& fs);
-    void write_snapshot(const snapshot& snap, std::fstream& fs,
-                        const time_point<steady_clock>& init_time) const;
     void write_errors() const;
-
     void print_headers() const;
-    void print_snapshot(const snapshot& snap) const;
+    void print_snapshot(const snapshot& snap, const time_point<steady_clock>& init_time,
+                        std::ostream& out = std::cout) const;
     void do_print();
 
     void update_rcs(snapshot& snap, const int code, const bool is_error);
