@@ -13,6 +13,19 @@ using namespace std::chrono;
 
 namespace stats
 {
+std::string stats::create_headers_str()
+{
+    std::stringstream h;
+    h << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Sent/s"
+      << std::right << std::setw(10) << "Recv/s" << std::right << std::setw(15) << "RT (ms)"
+      << std::right << std::setw(15) << "minRT (ms)" << std::right << std::setw(15) << "maxRT (ms)"
+      << std::right << std::setw(15) << "Sent" << std::right << std::setw(15) << "Success"
+      << std::right << std::setw(15) << "Errors" << std::right << std::setw(15) << "Timeouts"
+      << std::endl;
+
+    return h.str();
+}
+
 stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& output_file_name,
              const std::vector<std::string>& msg_names)
     : timer(io_ctx),
@@ -24,7 +37,8 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
       partial_filename(output_file_name + ".partial"),
       err_filename(output_file_name + ".err"),
       total_snap(),
-      partial_snap()
+      partial_snap(),
+      stats_headers(create_headers_str())
 {
     for (const auto& name : msg_names)
     {
@@ -64,29 +78,12 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
 void stats::write_headers(std::fstream& fs)
 {
     auto print_time = system_clock::to_time_t(system_clock::now());
-    fs << "Traffic started at:  " << std::ctime(&print_time) << std::endl
-       << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Sent/s"
-       << std::right << std::setw(10) << "Recv/s" <<
-
-        std::right << std::setw(15) << "RT (ms)" << std::right << std::setw(15) << "minRT (ms)"
-       << std::right << std::setw(15) << "maxRT (ms)" <<
-
-        std::right << std::setw(15) << "Sent" << std::right << std::setw(15) << "Success"
-       << std::right << std::setw(15) << "Errors" << std::right << std::setw(15) << "Timeouts"
-       << std::endl;
+    fs << "Traffic started at:  " << std::ctime(&print_time) << std::endl << stats_headers;
 }
 
 void stats::print_headers() const
 {
-    std::cout << std::left << std::setw(10) << "Time (s)" << std::right << std::setw(10) << "Sent/s"
-              << std::right << std::setw(10) << "Recv/s" <<
-
-        std::right << std::setw(15) << "RT (ms)" << std::right << std::setw(15) << "minRT (ms)"
-              << std::right << std::setw(15) << "maxRT (ms)" <<
-
-        std::right << std::setw(15) << "Sent" << std::right << std::setw(15) << "Success"
-              << std::right << std::setw(15) << "Errors" << std::right << std::setw(15)
-              << "Timeouts" << std::endl;
+    std::cout << stats_headers;
 }
 
 void stats::update_rcs(snapshot& snap, const int code, const bool is_error)
