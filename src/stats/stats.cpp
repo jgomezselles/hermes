@@ -173,13 +173,17 @@ void stats::add_client_error(const std::string& id, const int e)
     update_rcs(msg_snaps.at(id), e, true);
 }
 
-void stats::print_snapshot(const snapshot& snap) const
+void stats::print_snapshot(const snapshot& snap, const time_point<steady_clock>& init_time,
+                           std::ostream& out) const
 {
-    float partial_time = duration_cast<milliseconds>(steady_clock::now() - snap.init_time).count();
+    const auto now = steady_clock::now();
+    float partial_time = duration_cast<milliseconds>(now - snap.init_time).count();
     if (partial_time == 0)
     {
         return;
     }
+
+    float total_time = duration_cast<milliseconds>(now - init_time).count();
 
     int64_t counter_ok{0};
     for (const auto& code : snap.response_codes_ok)
@@ -193,52 +197,14 @@ void stats::print_snapshot(const snapshot& snap) const
         counter_nok += code.second;
     }
 
-    std::cout << std::fixed << std::left << std::setw(10) << std::setprecision(1)
-              << partial_time * 0.001 << std::right << std::setw(10)
-              << float(snap.sent) / partial_time * 1000. << std::right << std::setw(10)
-              << float(snap.responded_ok) / partial_time * 1000. <<
-
-        std::right << std::setw(15) << std::setprecision(3) << snap.avg_rt / 1000. << std::right
-              << std::setw(15) << snap.min_rt / 1000. << std::right << std::setw(15)
-              << snap.max_rt / 1000. <<
-
-        std::right << std::setw(15) << snap.sent << std::right << std::setw(15) << counter_ok
-              << std::right << std::setw(15) << counter_nok << std::right << std::setw(15)
-              << snap.timed_out << std::endl;
-}
-
-void stats::write_snapshot(const snapshot& snap, std::fstream& fs,
-                           const time_point<steady_clock>& init_time) const
-{
-    float partial_time = duration_cast<milliseconds>(steady_clock::now() - snap.init_time).count();
-    if (partial_time == 0)
-    {
-        return;
-    }
-
-    float total_time = duration_cast<milliseconds>(steady_clock::now() - init_time).count();
-
-    int64_t counter_ok{0};
-    for (const auto& code : snap.response_codes_ok)
-    {
-        counter_ok += code.second;
-    }
-
-    int64_t counter_nok{0};
-    for (const auto& code : snap.response_codes_nok)
-    {
-        counter_nok += code.second;
-    }
-
-    fs << std::left << std::setw(10) << total_time * 0.001 << std::right << std::setw(10)
-       << float(snap.sent) / partial_time * 1000. << std::right << std::setw(10)
-       << float(snap.responded_ok) / partial_time * 1000. << std::right << std::setw(15)
-       << snap.avg_rt / 1000. << std::right << std::setw(15) << snap.min_rt / 1000. << std::right
-       << std::setw(15) << snap.max_rt / 1000. <<
-
-        std::right << std::setw(15) << snap.sent << std::right << std::setw(15) << counter_ok
-       << std::right << std::setw(15) << counter_nok << std::right << std::setw(15)
-       << snap.timed_out << std::endl;
+    out << std::fixed << std::left << std::setw(10) << std::setprecision(1) << total_time * 0.001
+        << std::right << std::setw(10) << float(snap.sent) / partial_time * 1000. << std::right
+        << std::setw(10) << float(snap.responded_ok) / partial_time * 1000. << std::right
+        << std::setw(15) << std::setprecision(3) << snap.avg_rt / 1000. << std::right
+        << std::setw(15) << snap.min_rt / 1000. << std::right << std::setw(15)
+        << snap.max_rt / 1000. << std::right << std::setw(15) << snap.sent << std::right
+        << std::setw(15) << counter_ok << std::right << std::setw(15) << counter_nok << std::right
+        << std::setw(15) << snap.timed_out << std::endl;
 }
 
 void stats::write_errors() const
@@ -261,25 +227,25 @@ void stats::do_print()
     write_lock wr_lck(rw_mutex);
     std::fstream partials_file;
     partials_file.open(partial_filename, std::fstream::app);
-    write_snapshot(partial_snap, partials_file, total_snap.init_time);
+    print_snapshot(partial_snap, total_snap.init_time, partials_file);
     partials_file.close();
 
     std::fstream accum_file;
     accum_file.open(accum_filename, std::fstream::app);
-    write_snapshot(total_snap, accum_file, total_snap.init_time);
+    print_snapshot(total_snap, total_snap.init_time, accum_file);
     accum_file.close();
 
     for (const auto& msg_snap : msg_snaps)
     {
         std::fstream msg_file;
         msg_file.open(file_prefix + "." + msg_snap.first, std::fstream::app);
-        write_snapshot(msg_snap.second, msg_file, total_snap.init_time);
+        print_snapshot(msg_snap.second, total_snap.init_time, msg_file);
         msg_file.close();
     }
 
     write_errors();
 
-    print_snapshot(total_snap);
+    print_snapshot(total_snap, total_snap.init_time);
 
     partial_snap = snapshot();
 }
@@ -302,7 +268,7 @@ void stats::print()
         for (const auto& msg_snap : msg_snaps)
         {
             std::cout << ">>>" + msg_snap.first + "<<<" << std::endl;
-            print_snapshot(msg_snap.second);
+            print_snapshot(msg_snap.second, total_snap.init_time);
         }
         std::cout << ">>>Total<<<" << std::endl;
     }
