@@ -81,26 +81,45 @@ public:
         return lines;
     }
 
-    std::string formatted_output(const float time, const int sent, const int ok, const int rt,
-                                 const int nok, const int timeout)
+    std::vector<float> extract_fields_from_line(const std::string& line)
     {
-        std::stringstream ss;
-        ss << std::left << std::setw(10) << time << std::right << std::setw(10)
-           << float(sent) / time << std::right << std::setw(10) << float(ok) / time << std::right
-           << std::setw(15) << rt << std::right << std::setw(15) << rt << std::right
-           << std::setw(15) << rt <<
-
-            std::right << std::setw(15) << sent << std::right << std::setw(15) << ok << std::right
-           << std::setw(15) << nok << std::right << std::setw(15) << timeout;
-
-        return ss.str();
+        auto ss = std::stringstream(line);
+        std::string f_str;
+        std::vector<float> numbers;
+        while (std::getline(ss, f_str, ' '))
+        {
+            if (f_str.size() && f_str != " ")
+            {
+                numbers.push_back(atof(f_str.c_str()));
+            }
+        }
+        return numbers;
     }
 
-    float extract_real_time_from_line(const std::string& line)
+    void validate_fields(const std::string& line, const std::vector<float> expected)
     {
-        std::string time;
-        std::getline(std::stringstream(line), time, ' ');
-        return atof(time.c_str());
+        auto numbers = extract_fields_from_line(line);
+        ASSERT_EQ(numbers.size(), expected.size());
+
+        for (unsigned int i = 0; i < expected.size(); ++i)
+        {
+            ASSERT_LE(fabs(expected.at(i) - numbers.at(i)), 0.15);
+        }
+    }
+
+    void simulate_responses()
+    {
+        for (int i{0}; i < 10; ++i)
+        {
+            sut.increase_sent("msg1");
+            sut.add_measurement("msg1", 1000, 200);
+
+            sut.increase_sent("msg2");
+            sut.add_error("msg2", 500);
+
+            sut.increase_sent("msg3");
+            sut.add_timeout("msg3");
+        }
     }
 
 protected:
@@ -127,33 +146,56 @@ TEST_F(stats_test_extended, PrintHeaders)
 
 TEST_F(stats_test_extended, PrintAndWrite)
 {
-    // This "uber-test" covers everything because it needs one second.
-    for (int i{0}; i < 10; ++i)
-    {
-        sut.increase_sent("msg1");
-        sut.add_measurement("msg1", 1000, 200);
-
-        sut.increase_sent("msg2");
-        sut.add_error("msg2", 500);
-
-        sut.increase_sent("msg3");
-        sut.add_timeout("msg3");
-    }
-
+    simulate_responses();
     testing::internal::CaptureStdout();
     std::this_thread::sleep_for(1.1s);
-    std::string expected_cout =
-        "1.0             30.0      10.0          1.000          1.000          1.000             "
-        "30             10             10             10";
-    ASSERT_EQ(testing::internal::GetCapturedStdout(), expected_cout + "\n");
+    validate_fields(testing::internal::GetCapturedStdout(), {1, 30, 10, 1, 1, 1, 30, 10, 10, 10});
 
+    simulate_responses();
+    testing::internal::CaptureStdout();
+    std::this_thread::sleep_for(1.1s);
+    validate_fields(testing::internal::GetCapturedStdout(), {2, 30, 10, 1, 1, 1, 60, 20, 20, 20});
+
+    // accum
     const auto accum_content = read_file("stats_test_extended.accum");
     ASSERT_FALSE(accum_content.empty());
     ASSERT_EQ(expected_headers, accum_content.at(1));
+    validate_fields(accum_content.at(2), {1, 30, 10, 1, 1, 1, 30, 10, 10, 10});
+    validate_fields(accum_content.at(3), {2, 30, 10, 1, 1, 1, 60, 20, 20, 20});
 
-    auto time_from_file = extract_real_time_from_line(accum_content.at(2));
+    // partial
+    const auto partial_content = read_file("stats_test_extended.partial");
+    ASSERT_FALSE(partial_content.empty());
+    ASSERT_EQ(expected_headers, partial_content.at(1));
+    validate_fields(partial_content.at(2), {1, 30, 10, 1, 1, 1, 30, 10, 10, 10});
+    validate_fields(partial_content.at(3), {2, 30, 10, 1, 1, 1, 30, 10, 10, 10});
 
-    ASSERT_EQ(formatted_output(time_from_file, 30, 10, 1, 10, 10), accum_content.at(2));
+    // msg1
+    const auto msg1_content = read_file("stats_test_extended.msg1");
+    ASSERT_FALSE(msg1_content.empty());
+    ASSERT_EQ(expected_headers, msg1_content.at(1));
+    validate_fields(msg1_content.at(2), {1, 10, 10, 1, 1, 1, 10, 10, 0, 0});
+    validate_fields(msg1_content.at(3), {2, 10, 10, 1, 1, 1, 20, 20, 0, 0});
+
+    // msg2
+    const auto msg2_content = read_file("stats_test_extended.msg2");
+    ASSERT_FALSE(msg2_content.empty());
+    ASSERT_EQ(expected_headers, msg2_content.at(1));
+    validate_fields(msg2_content.at(2), {1, 10, 0, 0, 0, 0, 10, 0, 10, 0});
+    validate_fields(msg2_content.at(3), {2, 10, 0, 0, 0, 0, 20, 0, 20, 0});
+
+    // msg3
+    const auto msg3_content = read_file("stats_test_extended.msg3");
+    ASSERT_FALSE(msg3_content.empty());
+    ASSERT_EQ(expected_headers, msg3_content.at(1));
+    validate_fields(msg3_content.at(2), {1, 10, 0, 0, 0, 0, 10, 0, 0, 10});
+    validate_fields(msg3_content.at(3), {2, 10, 0, 0, 0, 0, 20, 0, 0, 20});
+
+    // err
+    const auto err_content = read_file("stats_test_extended.err");
+    ASSERT_FALSE(err_content.empty());
+    validate_fields(err_content.at(2), {1, 500, 10});
+    validate_fields(err_content.at(3), {2, 500, 20});
 }
 
 }  // namespace stats
