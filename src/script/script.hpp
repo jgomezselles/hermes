@@ -26,6 +26,7 @@ public:
     const range_type& get_ranges() const { return ranges; };
     const std::string& get_server_dns() const { return server.dns; };
     const std::string& get_server_port() const { return server.port; };
+    const bool is_server_secure() const { return server.secure; };
     const int get_timeout_ms() const { return timeout_ms; };
 
     const bool post_process(const answer_type& last_answer);

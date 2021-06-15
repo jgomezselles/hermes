@@ -33,5 +33,6 @@ struct server_info
 {
     std::string dns;
     std::string port;
+    bool secure;
 };
 }  // namespace traffic
