@@ -50,6 +50,9 @@ template <>
 int json_reader::get_value<int>(const std::string& path);
 
 template <>
+bool json_reader::get_value<bool>(const std::string& path);
+
+template <>
 std::string json_reader::get_value<std::string>(const std::string& path);
 
 template <>

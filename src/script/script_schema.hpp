@@ -24,6 +24,9 @@ const std::string schema = R"(
     "port": {
       "type": "string"
     },
+    "secure": {
+      "type": "boolean"
+    },
     "timeout": {
       "type": "integer"
     },

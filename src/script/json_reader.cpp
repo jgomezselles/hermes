@@ -92,6 +92,19 @@ int json_reader::get_value<int>(const std::string& path)
 }
 
 template <>
+bool json_reader::get_value<bool>(const std::string& path)
+{
+    const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
+    if (value &&
+        (value->GetType() == rapidjson::kFalseType || value->GetType() == rapidjson::kTrueType) )
+    {
+        return value->GetBool();
+    }
+
+    throw std::logic_error("Bool not found in " + path);
+}
+
+template <>
 std::string json_reader::get_value<std::string>(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
