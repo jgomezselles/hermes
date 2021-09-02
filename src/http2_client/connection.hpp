@@ -38,7 +38,7 @@ public:
     };
 
 public:
-    connection(const std::string& host, const std::string& port, bool secure_session = false);
+    connection(const std::string& host, const std::string& port, const bool secure_session = false);
 
     connection(const connection& o) = delete;
     connection(connection&& o) = delete;
@@ -48,7 +48,7 @@ public:
     connection& operator=(const connection& o) = delete;
     connection& operator=(connection&& o) = delete;
 
-    std::shared_ptr<nghttp2::asio_http2::client::session> get_session() { return session; };
+    nghttp2::asio_http2::client::session& get_session() { return session; };
     const status& get_status() const { return connection_status; };
     bool wait_to_be_connected();
     void close();
@@ -62,7 +62,7 @@ private:
     /// ASIO attributes
     boost::asio::io_service io_service;
     boost::asio::io_service::work svc_work;
-    std::shared_ptr<nghttp2::asio_http2::client::session> session;
+    nghttp2::asio_http2::client::session session;
 
     /// Class attributes
     status connection_status;
