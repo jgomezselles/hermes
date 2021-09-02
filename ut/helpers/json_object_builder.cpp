@@ -61,10 +61,10 @@ json_object_builder &json_object_builder::manipulate_int(const std::string &key,
 }
 
 json_object_builder &json_object_builder::manipulate_bool(const std::string &key,
-                                                         const std::optional<bool> &element)
+                                                          const std::optional<bool> &element)
 {
     manipulate_element(key, element.has_value(),
-                       [element]() { return std::to_string(element.value()); });
+                       [element]() { return element.value() ? "true" : "false"; });
     return *this;
 }
 

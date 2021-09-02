@@ -13,7 +13,8 @@ public:
     json_object_builder& manipulate_string(const std::string& key,
                                            const std::optional<std::string>& element);
     json_object_builder& manipulate_int(const std::string& key, const std::optional<int>& element);
-    json_object_builder& manipulate_bool(const std::string& key, const std::optional<bool>& element);
+    json_object_builder& manipulate_bool(const std::string& key,
+                                         const std::optional<bool>& element);
     json_object_builder& manipulate_object(const std::string& key,
                                            const std::optional<std::string>& element);
     json_object_builder& add_element(const std::string& key, const std::string& value);
