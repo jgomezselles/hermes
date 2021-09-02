@@ -28,7 +28,7 @@ namespace http2_client
 {
 client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_context& io_ctx,
                          std::unique_ptr<traffic::script_queue_if> q, const std::string& h,
-                         const std::string& p, bool secure_session)
+                         const std::string& p, const bool secure_session)
     : stats(std::move(st)),
       io_ctx(io_ctx),
       queue(std::move(q)),
@@ -146,11 +146,11 @@ void client_impl::send()
         return;
     }
 
-    auto session = conn->get_session();
-    session->io_service().post([this, script, session, req] {
+    auto& session = conn->get_session();
+    session.io_service().post([this, script, &session, req] {
         boost::system::error_code ec;
         auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
-        auto nghttp_req = session->submit(ec, req.method, req.url, req.body, req.headers);
+        auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
         if (!nghttp_req)
         {
             std::cerr << "Error submitting. Closing connection:" << ec.message() << std::endl;

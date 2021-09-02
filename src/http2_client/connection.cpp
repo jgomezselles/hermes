@@ -6,31 +6,40 @@
 using boost::asio::ip::tcp;
 using nghttp2::asio_http2::client::session;
 
-namespace http2_client
+namespace
 {
-connection::connection(const std::string& h, const std::string& p, bool secure_session)
-    : io_service(),
-      svc_work(boost::asio::io_service::work(io_service)),
-      connection_status(status::NOT_OPEN)
+nghttp2::asio_http2::client::session create_session(boost::asio::io_service& io_service,
+                                                    const std::string& h, const std::string& p,
+                                                    const bool secure_session)
 {
-    if(secure_session)
+    if (secure_session)
     {
         boost::system::error_code ec;
         boost::asio::ssl::context tls_ctx(boost::asio::ssl::context::sslv23);
         tls_ctx.set_default_verify_paths();
         nghttp2::asio_http2::client::configure_tls_context(ec, tls_ctx);
-        session = std::make_shared<nghttp2::asio_http2::client::session>(io_service, tls_ctx, h, p);
-    } else {
-        session = std::make_shared<nghttp2::asio_http2::client::session>(io_service, h, p);
+        return nghttp2::asio_http2::client::session(io_service, tls_ctx, h, p);
     }
 
-    session->on_connect([this, h, p](tcp::resolver::iterator endpoint_it) {
+    return nghttp2::asio_http2::client::session(io_service, h, p);
+}
+}  // namespace
+
+namespace http2_client
+{
+connection::connection(const std::string& h, const std::string& p, bool secure_session)
+    : io_service(),
+      svc_work(boost::asio::io_service::work(io_service)),
+      session(create_session(io_service, h, p, secure_session)),
+      connection_status(status::NOT_OPEN)
+{
+    session.on_connect([this, h, p](tcp::resolver::iterator endpoint_it) {
         std::cerr << "Connected to " << h << ":" << p << std::endl;
         connection_status = status::OPEN;
         status_change_cond_var.notify_one();
     });
 
-    session->on_error([this, h, p](const boost::system::error_code& ec) {
+    session.on_error([this, h, p](const boost::system::error_code& ec) {
         std::cerr << "Error in connection to " << h << ":" << p
                   << " Message: " << ec.message().c_str() << std::endl;
         notify_close();
@@ -50,7 +59,7 @@ connection::~connection()
 
     if (connection_status == status::OPEN)
     {
-        session->shutdown();
+        session.shutdown();
     }
 }
 
@@ -62,7 +71,7 @@ void connection::notify_close()
 
 void connection::close()
 {
-    session->shutdown();
+    session.shutdown();
     notify_close();
 }
 
