@@ -96,7 +96,7 @@ bool json_reader::get_value<bool>(const std::string& path)
 {
     const auto* value = rapidjson::Pointer(path.c_str()).Get(document);
     if (value &&
-        (value->GetType() == rapidjson::kFalseType || value->GetType() == rapidjson::kTrueType) )
+        (value->GetType() == rapidjson::kFalseType || value->GetType() == rapidjson::kTrueType))
     {
         return value->GetBool();
     }
