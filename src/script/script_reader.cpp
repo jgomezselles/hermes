@@ -97,14 +97,7 @@ server_info script_reader::build_server_info()
     server_info server;
     server.dns = get_value<std::string>("/dns");
     server.port = get_value<std::string>("/port");
-
-    if (is_present("/secure"))
-    {
-        server.secure = get_value<bool>("/secure");
-    } else
-    {
-        server.secure = false;
-    }
+    server.secure = is_present("/secure") ? get_value<bool>("/secure") : false;
 
     return server;
 }
