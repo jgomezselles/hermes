@@ -12,9 +12,43 @@ namespace http2_client
 class connection_test : public ::testing::Test
 {
 public:
-    connection_test() : server_host("localhost"), server_port("8080"), server_started(false){};
+    connection_test()
+        : server_host("localhost"), server_port("8080"), server_started(false), is_secure(false){};
 
     void start_server()
+    {
+        boost::system::error_code server_error_code;
+        server = std::make_unique<nghttp2::asio_http2::server::http2>();
+
+        if (is_secure)
+        {
+            boost::system::error_code ec;
+            tlsCtx = std::make_unique<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
+            tlsCtx->use_private_key_file("/usr/local/share/ca-certificates/localhost.key",
+                                         boost::asio::ssl::context::pem);
+            tlsCtx->use_certificate_chain_file("/usr/local/share/ca-certificates/localhost.crt");
+            nghttp2::asio_http2::server::configure_tls_context_easy(ec, *tlsCtx);
+
+            if (server->listen_and_serve(server_error_code, *tlsCtx, server_host, server_port,
+                                         true))
+            {
+                fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
+                        server_port.c_str());
+            }
+        }
+        else
+        {
+            if (server->listen_and_serve(server_error_code, server_host, server_port, true))
+            {
+                fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
+                        server_port.c_str());
+            }
+        }
+
+        server_started = true;
+    }
+
+    void start_secure_server()
     {
         boost::system::error_code server_error_code;
 
@@ -54,24 +88,34 @@ public:
 
 protected:
     std::unique_ptr<nghttp2::asio_http2::server::http2> server;
+    std::unique_ptr<boost::asio::ssl::context> tlsCtx;
     const std::string server_host;
     const std::string server_port;
     bool server_started;
+    bool is_secure;
 };
 
-TEST_F(connection_test, correct_initialization)
+class connection_test_p : public connection_test, public testing::WithParamInterface<bool>
 {
-    connection c(server_host, server_port);
+public:
+    connection_test_p() : connection_test() { is_secure = GetParam(); };
+};
+
+INSTANTIATE_TEST_CASE_P(is_secure, connection_test_p, testing::Values(false, true));
+
+TEST_P(connection_test_p, correct_initialization)
+{
+    connection c(server_host, server_port, GetParam());
     ASSERT_TRUE(c.wait_to_be_connected());
     ASSERT_EQ(connection::status::OPEN, c.get_status());
 }
 
-TEST_F(connection_test, wrong_port)
+TEST_P(connection_test_p, wrong_port)
 {
     testing::internal::CaptureStderr();
 
     const std::string wrong_port = "1234";
-    connection c(server_host, wrong_port);
+    connection c(server_host, wrong_port, GetParam());
 
     ASSERT_FALSE(c.wait_to_be_connected());
     ASSERT_EQ(connection::status::CLOSED, c.get_status());
@@ -81,9 +125,9 @@ TEST_F(connection_test, wrong_port)
     ASSERT_EQ(expected_output, testing::internal::GetCapturedStderr());
 }
 
-TEST_F(connection_test, connection_is_lost_because_of_the_server)
+TEST_P(connection_test_p, connection_is_lost_because_of_the_server)
 {
-    connection c(server_host, server_port);
+    connection c(server_host, server_port, GetParam());
 
     ASSERT_TRUE(c.wait_to_be_connected());
     ASSERT_EQ(connection::status::OPEN, c.get_status());
@@ -91,9 +135,9 @@ TEST_F(connection_test, connection_is_lost_because_of_the_server)
     ASSERT_TRUE(c.wait_for_status(100ms, connection::status::CLOSED));
 }
 
-TEST_F(connection_test, close_connection)
+TEST_P(connection_test_p, close_connection)
 {
-    connection c(server_host, server_port);
+    connection c(server_host, server_port, GetParam());
 
     ASSERT_TRUE(c.wait_to_be_connected());
     ASSERT_EQ(connection::status::OPEN, c.get_status());

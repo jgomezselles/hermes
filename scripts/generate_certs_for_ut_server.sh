@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if test -f "/usr/local/share/ca-certificates/localhost.crt"; then
+    if test -f "/usr/local/share/ca-certificates/localhost.key"; then
+        echo "Certificates found for tests. Skipping their generation."
+        return 0
+    fi
+fi
+
+apk add openssl ca-certificates
+
 # Create the CA
 openssl genrsa -out rootCA.key 4096
 openssl req -x509 -new -nodes -key rootCA.key -subj "/C=ES/ST=es" -sha256 -days 1024 -out rootCA.crt
@@ -19,3 +28,5 @@ openssl x509 -req -in localhost.csr -CA rootCA.crt -CAkey rootCA.key -CAcreatese
 
 # Verify the certificate's content
 openssl x509 -in localhost.crt -text -noout
+
+mv *.crt *.key *.srl *.csr /usr/local/share/ca-certificates/

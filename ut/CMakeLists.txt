@@ -1,3 +1,13 @@
+execute_process(
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/
+        COMMAND ${CMAKE_SOURCE_DIR}/scripts/generate_certs_for_ut_server.sh
+        RESULT_VARIABLE rv
+)
+
+if(NOT rv EQUAL 0)
+    message(WARNING_ERROR " Failed generating certificates. Some tests won't work!")
+endif()
+
 add_executable( unit-test "")
 
 target_link_libraries( unit-test

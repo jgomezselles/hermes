@@ -56,8 +56,25 @@ TEST_F(script_test, MinimumCorrectFile)
     EXPECT_EQ("public-dns", script->get_server_dns());
     EXPECT_EQ("8686", script->get_server_port());
     EXPECT_EQ(2000, script->get_timeout_ms());
+    EXPECT_FALSE(script->is_server_secure());
     EXPECT_THAT(std::vector<std::string>{"test1"},
                 testing::ContainerEq(script->get_message_names()));
+}
+
+TEST_F(script_test, SecureSetToFalse)
+{
+    buildStream(script_builder.secure(false).ranges(std::nullopt).build());
+    std::unique_ptr<traffic::script> script;
+    EXPECT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
+    EXPECT_FALSE(script->is_server_secure());
+}
+
+TEST_F(script_test, SecureSetToTrue)
+{
+    buildStream(script_builder.secure(true).ranges(std::nullopt).build());
+    std::unique_ptr<traffic::script> script;
+    EXPECT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
+    EXPECT_TRUE(script->is_server_secure());
 }
 
 TEST_F(script_test, ValidationErrorNoFlow)
