@@ -17,6 +17,7 @@ public:
     script_builder& dns(const std::optional<std::string>& dns);
     script_builder& port(const std::optional<std::string>& port);
     script_builder& timeout(const std::optional<int>& timeout);
+    script_builder& secure(const std::optional<bool>& secure);
     script_builder& messages(const std::optional<std::vector<std::string>>& messages);
     script_builder& flow(const std::optional<std::vector<std::string>>& flow);
     script_builder& ranges(const std::optional<std::vector<std::string>>& ranges);

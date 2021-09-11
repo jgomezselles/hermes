@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk add build-base cmake wget tar linux-headers openssl-dev libev-dev openssl-libs-static openssl ca-certificates
+RUN apk add build-base cmake wget tar linux-headers openssl-dev libev-dev openssl-libs-static
 
 WORKDIR /code/build
 

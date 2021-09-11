@@ -59,7 +59,6 @@ public:
     void start_server()
     {
         boost::system::error_code server_error_code;
-
         server = std::make_unique<ng::server::http2>();
         server->handle("/v1/test",
                        [this](const ng::server::request &req, const ng::server::response &res) {
@@ -74,10 +73,29 @@ public:
                            res.end();
                        });
 
-        if (server->listen_and_serve(server_error_code, server_host, server_port, true))
+        if (is_secure)
         {
-            fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
-                    server_port.c_str());
+            boost::system::error_code ec;
+            tlsCtx = std::make_unique<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
+            tlsCtx->use_private_key_file("/usr/local/share/ca-certificates/localhost.key",
+                                         boost::asio::ssl::context::pem);
+            tlsCtx->use_certificate_chain_file("/usr/local/share/ca-certificates/localhost.crt");
+            nghttp2::asio_http2::server::configure_tls_context_easy(ec, *tlsCtx);
+
+            if (server->listen_and_serve(server_error_code, *tlsCtx, server_host, server_port,
+                                         true))
+            {
+                fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
+                        server_port.c_str());
+            }
+        }
+        else
+        {
+            if (server->listen_and_serve(server_error_code, server_host, server_port, true))
+            {
+                fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
+                        server_port.c_str());
+            }
         }
 
         server_started = true;
@@ -109,6 +127,7 @@ public:
 
 protected:
     std::unique_ptr<nghttp2::asio_http2::server::http2> server;
+    std::unique_ptr<boost::asio::ssl::context> tlsCtx;
     const std::string server_host;
     const std::string server_port;
     bool server_started;
@@ -118,6 +137,7 @@ protected:
     std::thread client_worker;
 
     std::string response_body{"Example"};
+    bool is_secure;
 };
 
 ACTION_P(SetFuture, prom)
@@ -125,61 +145,74 @@ ACTION_P(SetFuture, prom)
     prom->set_value();
 };
 
-TEST_F(client_test, HasFinishedTrueWhenQueueEmpty)
+class client_test_p : public client_test, public testing::WithParamInterface<bool>
+{
+public:
+    client_test_p() : client_test() { is_secure = GetParam(); };
+};
+
+INSTANTIATE_TEST_CASE_P(is_secure, client_test_p, testing::Values(false, true));
+
+TEST_P(client_test_p, HasFinishedTrueWhenQueueEmpty)
 {
     auto stats = std::make_shared<stats_mock>();
     auto queue = std::make_unique<script_queue_mock>();
     EXPECT_CALL(*queue, has_pending_scripts()).Times(1).WillOnce(Return(false));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
     ASSERT_TRUE(client.has_finished());
 }
 
-TEST_F(client_test, HasFinishedFalseWhenQueueIsNotEmpty)
+TEST_P(client_test_p, HasFinishedFalseWhenQueueIsNotEmpty)
 {
     auto stats = std::make_shared<stats_mock>();
     auto queue = std::make_unique<script_queue_mock>();
     EXPECT_CALL(*queue, has_pending_scripts()).Times(1).WillOnce(Return(true));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
     ASSERT_FALSE(client.has_finished());
 }
 
-TEST_F(client_test, CloseWindowNotifiesQueueToStopQueuing)
+TEST_P(client_test_p, CloseWindowNotifiesQueueToStopQueuing)
 {
     auto stats = std::make_shared<stats_mock>();
     auto queue = std::make_unique<script_queue_mock>();
     EXPECT_CALL(*queue, close_window()).Times(1);
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
     client.close_window();
 }
 
-TEST_F(client_test, ConnectToServer)
+TEST_P(client_test_p, ConnectToServer)
 {
     auto stats = std::make_shared<stats_mock>();
     auto queue = std::make_unique<script_queue_mock>();
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
 }
 
-TEST_F(client_test, ErrorConnectingToServer)
+TEST_P(client_test_p, ErrorConnectingToServer)
 {
     auto stats = std::make_shared<stats_mock>();
     auto queue = std::make_unique<script_queue_mock>();
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), "wrong_host", server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), "wrong_host", server_port, GetParam());
 
     ASSERT_FALSE(client.is_connected());
 }
 
-TEST_F(client_test, SendMessage)
+TEST_P(client_test_p, SendMessage)
 {
     auto stats = std::make_shared<stats_mock>();
     EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
@@ -199,7 +232,8 @@ TEST_F(client_test, SendMessage)
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
     EXPECT_CALL(*queue, enqueue_script(_, ans)).Times(1).WillOnce(SetFuture(&prom));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
 
@@ -208,7 +242,7 @@ TEST_F(client_test, SendMessage)
     ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
 }
 
-TEST_F(client_test, TimeoutInAnswer)
+TEST_P(client_test_p, TimeoutInAnswer)
 {
     auto stats = std::make_shared<stats_mock>();
     EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
@@ -232,7 +266,8 @@ TEST_F(client_test, TimeoutInAnswer)
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
     EXPECT_CALL(*queue, cancel_script()).Times(1).WillOnce(SetFuture(&prom));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
 
@@ -241,7 +276,7 @@ TEST_F(client_test, TimeoutInAnswer)
     ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
 }
 
-TEST_F(client_test, WrongCodeInAnswer)
+TEST_P(client_test_p, WrongCodeInAnswer)
 {
     auto stats = std::make_shared<stats_mock>();
     EXPECT_CALL(*stats, increase_sent("test1")).Times(1);
@@ -264,7 +299,8 @@ TEST_F(client_test, WrongCodeInAnswer)
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
     EXPECT_CALL(*queue, cancel_script()).Times(1).WillOnce(SetFuture(&prom));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
 
@@ -273,7 +309,7 @@ TEST_F(client_test, WrongCodeInAnswer)
     ASSERT_EQ(fut.wait_for(1s), std::future_status::ready);
 }
 
-TEST_F(client_test, ServerDisconnectionTriggersReconnectionInNextMessage)
+TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
 {
     // This test tries to send a message 3 times.
     // 1) There's no connection, so error is added and script in queue cancelled.
@@ -301,7 +337,8 @@ TEST_F(client_test, ServerDisconnectionTriggersReconnectionInNextMessage)
     EXPECT_CALL(*queue, cancel_script()).Times(2).WillOnce(SetFuture(&prom1)).WillOnce(Return());
     EXPECT_CALL(*queue, enqueue_script(_, ans)).Times(1).WillOnce(SetFuture(&prom2));
 
-    auto client = client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port);
+    auto client =
+        client_impl(stats, client_io_ctx, std::move(queue), server_host, server_port, GetParam());
 
     ASSERT_TRUE(client.is_connected());
 

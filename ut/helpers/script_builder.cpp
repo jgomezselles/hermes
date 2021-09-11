@@ -34,6 +34,12 @@ script_builder &script_builder::timeout(const std::optional<int> &timeout)
     return *this;
 }
 
+script_builder &script_builder::secure(const std::optional<bool> &secure)
+{
+    manipulate_bool("secure", secure);
+    return *this;
+}
+
 script_builder &script_builder::messages(const std::optional<std::vector<std::string>> &messages)
 {
     add_composed_objects("messages", messages);
