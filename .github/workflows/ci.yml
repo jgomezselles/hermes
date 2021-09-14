@@ -133,7 +133,10 @@ jobs:
       run: echo COMMIT_ID=${COMMIT_ID::7} >> $GITHUB_ENV
     -
       name: Install KinD
-      uses: engineerd/setup-kind@v0.5.0
+      uses: helm/kind-action@2a525709fd0874b75d7ae842d257981b0e0f557d
+      with:
+        cluster_name: "kind"
+        kubectl_version: "v1.22.1"
     -
       name: Download server-mock
       uses: actions/download-artifact@v2
