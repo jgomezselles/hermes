@@ -25,7 +25,7 @@ jobs:
     name: Compile and run unit tests
     runs-on: ubuntu-latest
     container:
-      image: jgomezselles/hermes_base:0.0.2
+      image: ghcr.io/jgomezselles/hermes_base:0.0.2
       options: "--entrypoint sh"
     steps:
     -
@@ -78,7 +78,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          tags: jgomezselles/hermes:${{ env.COMMIT_ID }}
+          tags: ghcr.io/jgomezselles/hermes:${{ env.COMMIT_ID }}
           outputs: type=docker,dest=/tmp/hermes-image-${{ env.COMMIT_ID }}.tar
       -
         name: Upload artifact
@@ -109,7 +109,7 @@ jobs:
         with:
           context: .
           file: ./docker/server-mock/Dockerfile
-          tags: jgomezselles/server-mock:${{ env.COMMIT_ID }}
+          tags: ghcr.io/jgomezselles/server-mock:${{ env.COMMIT_ID }}
           outputs: type=docker,dest=/tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
       -
         name: Upload artifact
@@ -152,8 +152,8 @@ jobs:
     -
       name: Load images to KinD
       run: |
-        kind load image-archive /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar jgomezselles/server-mock:${{ env.COMMIT_ID }} --name kind
-        kind load image-archive /tmp/hermes-image-${{ env.COMMIT_ID }}.tar jgomezselles/hermes:${{ env.COMMIT_ID }} --name kind
+        kind load image-archive /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar ghcr.io/jgomezselles/server-mock:${{ env.COMMIT_ID }} --name kind
+        kind load image-archive /tmp/hermes-image-${{ env.COMMIT_ID }}.tar ghcr.io/jgomezselles/hermes:${{ env.COMMIT_ID }} --name kind
     -
       name: Check previous steps
       run: |

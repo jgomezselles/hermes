@@ -14,8 +14,8 @@ To do so, execute, from the root directory of your local repository, the
 following commands:
 
 ```bash
-docker build -f docker/base/Dockerfile . -t jgomezselles/hermes_base:0.0.2 # You may want to skip this one, and just pull it!
-docker build -f docker/Dockerfile . -t jgomezselles/hermes:<your_favorite_tag>
+docker build -f docker/base/Dockerfile . -t ghcr.io/jgomezselles/hermes_base:0.0.2 # You may want to skip this one, and just pull it!
+docker build -f docker/Dockerfile . -t ghcr.io/jgomezselles/hermes:<your_favorite_tag>
 ```
 
 ## Server mock
@@ -26,12 +26,12 @@ To build it, just run, from the root of this
 repository:
 
 ```bash
-docker build -f docker/server-mock/Dockerfile . -t jgomezselles/server-mock:local
+docker build -f docker/server-mock/Dockerfile . -t ghcr.io/jgomezselles/server-mock:local
 ```
 
 It will copy and build the code from [h2server.go](../ft/h2server.go), so you may later execute it
 by running:
 
 ```bash
-docker run --rm -it -p 0.0.0.0:8080:8080 jgomezselles/server-mock:local
+docker run --rm -it -p 0.0.0.0:8080:8080 ghcr.io/jgomezselles/server-mock:local
 ```
