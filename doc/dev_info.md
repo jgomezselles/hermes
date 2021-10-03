@@ -16,7 +16,7 @@ This is because in that way, builds are reproducible and maintaineble.
 Build a development image by running, from the root of this repository:
 
 ```bash
-docker run --rm -it -v "${PWD}":/code jgomezselles/hermes_base:0.0.2
+docker run --rm -it -v "${PWD}":/code ghcr.io/jgomezselles/hermes_base:0.0.2
 ```
 
 In this way, you will be sharing your local copy of the repository with the development

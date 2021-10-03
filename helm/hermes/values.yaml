@@ -12,7 +12,7 @@ hermes:
   name: hermes
 
 image:
-  repository: jgomezselles/hermes
+  repository: ghcr.io/jgomezselles/hermes
   tag: 0.0.1
   pullPolicy: IfNotPresent
 

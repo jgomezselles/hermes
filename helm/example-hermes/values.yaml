@@ -2,7 +2,7 @@ serverMock:
   name: server-mock
   replicaCount: 1
   image:
-    repository: jgomezselles/server-mock
+    repository: ghcr.io/jgomezselles/server-mock
     pullPolicy: Never
     tag: "local"
   podAnnotations:
@@ -16,5 +16,5 @@ hermes:
   script:
     cm: traffic-script-cm
   image:
-    repository: jgomezselles/hermes
+    repository: ghcr.io/jgomezselles/hermes
     tag: 0.0.1

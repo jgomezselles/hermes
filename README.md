@@ -82,7 +82,7 @@ easily how hermes works.
 ## Container to Container example
 
 1. Build and run a server-mock container by following [these instructions](docker/README.md#server-mock).
-2. Attach to a docker container running a `jgomezselles/hermes` image, and create a script file
+2. Attach to a docker container running a `ghcr.io/jgomezselles/hermes` image, and create a script file
 like the one located in the helm [example](helm/example-hermes/templates/traffic.script.yaml).
 3. Run hermes providing the path to your new script:
 ```bash
