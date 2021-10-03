@@ -48,21 +48,6 @@ public:
         server_started = true;
     }
 
-    void start_secure_server()
-    {
-        boost::system::error_code server_error_code;
-
-        server = std::make_unique<nghttp2::asio_http2::server::http2>();
-
-        if (server->listen_and_serve(server_error_code, server_host, server_port, true))
-        {
-            fprintf(stderr, "Error starting server in %s:%s", server_host.c_str(),
-                    server_port.c_str());
-        }
-
-        server_started = true;
-    }
-
     void stop_server()
     {
         for (auto& service : server->io_services())

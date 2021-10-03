@@ -1,5 +1,4 @@
 #include <atomic>
-#include <boost/bind.hpp>
 #include <future>
 
 #pragma once

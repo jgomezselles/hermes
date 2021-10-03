@@ -1,4 +1,4 @@
-FROM jgomezselles/hermes_base:0.0.1 as builder
+FROM jgomezselles/hermes_base:0.0.2 as builder
 
 COPY . /code
 

@@ -3,7 +3,7 @@
 #include <syslog.h>
 
 #include <boost/asio/steady_timer.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <chrono>
 #include <exception>
 #include <fstream>
