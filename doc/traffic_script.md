@@ -9,6 +9,7 @@ In brief, what you need is (maybe better to look at example or the schema, **an 
 
 * `dns`: `string` - your server address
 * `port`: `string` - your server port
+* `secure`: `bool` - **Optional**: used to indicate if the connection shall be established using TLS. (Defaults to false if not present).
 * `timeout`: `integer` - the number of ms to wait until non answered requests are considered to be a timeout error
 * `flow`: `array of strings` – the name or id of the messages, in order, that define your traffic. For example: `[“request1”, “request2”]`.
 * `messages`: `json object` – the definition of each one of the messages defined in your `flow`. Every element mentioned under flow, must be defined as an object inside this field, named after its id, with the following content:
