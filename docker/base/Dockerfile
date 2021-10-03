@@ -4,15 +4,15 @@ RUN apk add build-base cmake wget tar linux-headers openssl-dev libev-dev openss
 
 WORKDIR /code/build
 
-RUN set -x && wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0_rc2.tar.gz && \
+RUN set -x && wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz && \
     tar xvf boost* && cd boost* && ./bootstrap.sh && ./b2 -j4 install && cd .. && rm -rf * && set +x
 
 RUN set -x && wget  https://github.com/google/googletest/archive/2fe3bd9.tar.gz -O gtest.tar.gz && \
     tar xvf gtest.tar.gz && cd googletest* && cmake . && make -j4 install && cd .. && rm -rf * && set +x
 
-RUN set -x && wget https://github.com/nghttp2/nghttp2/releases/download/v1.39.2/nghttp2-1.39.2.tar.bz2 && \
-    tar xf nghttp2* && cd nghttp2* && ./configure --enable-asio-lib --disable-shared && make -j4 install && \
-    cd .. && rm -rf * && set +x
+RUN set -x && wget https://github.com/nghttp2/nghttp2/releases/download/v1.45.1/nghttp2-1.45.1.tar.bz2 && \
+    tar xf nghttp2* && cd nghttp2* && ./configure --enable-asio-lib --disable-shared --enable-python-bindings=no && \
+    make -j4 install && cd .. && rm -rf * && set +x
 
 RUN set -x && wget https://github.com/Tencent/rapidjson/archive/4b3d7c2.tar.gz -O rapidjson.tar.gz && \
     tar xf rapidjson.tar.gz && cd rapid* && \

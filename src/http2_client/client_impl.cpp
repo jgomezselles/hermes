@@ -5,7 +5,7 @@
 
 #include <atomic>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/system/error_code.hpp>
 #include <chrono>
 #include <iostream>

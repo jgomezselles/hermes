@@ -1,7 +1,7 @@
 #include "stats.hpp"
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <chrono>
 #include <cmath>
 #include <ctime>

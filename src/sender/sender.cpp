@@ -1,6 +1,6 @@
 #include "sender.hpp"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "client_impl.hpp"
 #include "params.hpp"
