@@ -33,7 +33,7 @@ public:
 class script_queue_mock : public traffic::script_queue_if
 {
 public:
-    MOCK_METHOD0(get_next_script, boost::optional<traffic::script>());
+    MOCK_METHOD0(get_next_script, std::optional<traffic::script>());
     MOCK_METHOD2(enqueue_script, void(traffic::script, const traffic::answer_type &));
     MOCK_METHOD0(cancel_script, void());
     MOCK_CONST_METHOD0(has_pending_scripts, bool());
@@ -225,7 +225,7 @@ TEST_P(client_test_p, SendMessage)
     std::stringstream json_stream;
     json_stream << script_builder.build();
 
-    boost::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json_stream);
     traffic::answer_type ans = std::make_pair(200, response_body);
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -259,7 +259,7 @@ TEST_P(client_test_p, TimeoutInAnswer)
 
     std::stringstream json_stream;
     json_stream << script_builder.build();
-    boost::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json_stream);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -292,7 +292,7 @@ TEST_P(client_test_p, WrongCodeInAnswer)
 
     std::stringstream json_stream;
     json_stream << script_builder.build();
-    boost::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json_stream);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -329,7 +329,7 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
     std::stringstream json_stream;
     json_stream << script_builder.build();
 
-    boost::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json_stream);
     traffic::answer_type ans = std::make_pair(200, response_body);
     std::promise<void> prom1, prom2;
     std::future<void> fut1 = prom1.get_future(), fut2 = prom2.get_future();

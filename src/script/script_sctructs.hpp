@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <deque>
 #include <map>
 
@@ -25,8 +25,8 @@ struct message
     std::string body;
     std::string method;
     int pass_code;
-    boost::optional<msg_modifier> sfa;
-    boost::optional<msg_modifier> atb;
+    std::optional<msg_modifier> sfa;
+    std::optional<msg_modifier> atb;
 };
 
 struct server_info

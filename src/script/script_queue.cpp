@@ -1,6 +1,6 @@
 #include "script_queue.hpp"
 
-#include <iostream>
+#include <optional>
 
 namespace traffic
 {
@@ -22,7 +22,7 @@ void script_queue::update_currents_in_range(const range_type& ranges)
     }
 }
 
-boost::optional<script> script_queue::get_next_script()
+std::optional<script> script_queue::get_next_script()
 {
     write_lock wr_lock(rw_mutex);
     if (!scripts.empty())
@@ -41,7 +41,7 @@ boost::optional<script> script_queue::get_next_script()
         return script_to_start;
     }
 
-    return boost::none;
+    return std::nullopt;
 }
 
 void script_queue::enqueue_script(script s, const answer_type& last_answer)

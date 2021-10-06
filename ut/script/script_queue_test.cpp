@@ -42,7 +42,7 @@ TEST_F(script_queue_test, EnqueueSimpleScriptJustRunOnce)
 {
     setup_queue(script_builder.build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
     EXPECT_FALSE(script_queue->is_window_closed());
 
@@ -53,7 +53,7 @@ TEST_F(script_queue_test, EnqueueSimpleScriptJustRunOnce)
     EXPECT_TRUE(script_queue->is_window_closed());
 
     script_opt = script_queue->get_next_script();
-    ASSERT_FALSE(script_opt.is_initialized());
+    ASSERT_FALSE(script_opt);
 }
 
 TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
@@ -64,14 +64,14 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
                     .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
                     .build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
     EXPECT_FALSE(script_queue->is_window_closed());
 
     script_queue->enqueue_script(script_opt.value(), {200, "OK"});
     EXPECT_TRUE(script_queue->has_pending_scripts());
     script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
     EXPECT_FALSE(script_queue->is_window_closed());
     script_queue->enqueue_script(script_opt.value(), {200, "OK"});
@@ -81,35 +81,35 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
     EXPECT_TRUE(script_queue->is_window_closed());
 
     script_opt = script_queue->get_next_script();
-    ASSERT_FALSE(script_opt.is_initialized());
+    ASSERT_FALSE(script_opt);
 }
 
 TEST_F(script_queue_test, CancelScriptReturnsNoMorePending)
 {
     setup_queue(script_builder.build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
 
     script_queue->cancel_script();
     EXPECT_FALSE(script_queue->has_pending_scripts());
 
     script_opt = script_queue->get_next_script();
-    EXPECT_TRUE(script_opt.is_initialized());
+    EXPECT_TRUE(script_opt);
 }
 
 TEST_F(script_queue_test, CloseWindowReturnsNone)
 {
     setup_queue(script_builder.build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
     EXPECT_FALSE(script_queue->is_window_closed());
 
     script_queue->close_window();
     script_opt = script_queue->get_next_script();
     EXPECT_TRUE(script_queue->has_pending_scripts());
-    EXPECT_FALSE(script_opt.is_initialized());
+    EXPECT_FALSE(script_opt);
     EXPECT_TRUE(script_queue->is_window_closed());
 }
 
@@ -117,7 +117,7 @@ TEST_F(script_queue_test, CloseWindowAndCancelCurrentReturnsNoneAndNoMorePending
 {
     setup_queue(script_builder.build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_TRUE(script_queue->has_pending_scripts());
     EXPECT_FALSE(script_queue->is_window_closed());
 
@@ -127,7 +127,7 @@ TEST_F(script_queue_test, CloseWindowAndCancelCurrentReturnsNoneAndNoMorePending
     EXPECT_FALSE(script_queue->has_pending_scripts());
 
     script_opt = script_queue->get_next_script();
-    EXPECT_FALSE(script_opt.is_initialized());
+    EXPECT_FALSE(script_opt);
     EXPECT_TRUE(script_queue->is_window_closed());
 }
 
@@ -141,7 +141,7 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
             .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
             .build());
     auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_EQ(5, script_queue->get_current("range1"));
 
     // Here you will get a new one, because you did not enqueue the answer!
@@ -160,6 +160,6 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
     EXPECT_EQ(6, script_queue->get_current("range1"));
 
     script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt.is_initialized());
+    ASSERT_TRUE(script_opt);
     EXPECT_EQ(5, script_queue->get_current("range1"));
 }

@@ -3,6 +3,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
+#include <optional>
 
 #include "script.hpp"
 #include "script_queue_if.hpp"
@@ -26,7 +27,7 @@ public:
 
     ~script_queue() = default;
 
-    boost::optional<script> get_next_script() override;
+    std::optional<script> get_next_script() override;
     void enqueue_script(script s, const answer_type& last_answer) override;
     void cancel_script() override { --in_flight; };
     bool has_pending_scripts() const override { return in_flight != 0; };

@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    boost::optional<traffic::script> the_script;
+    std::optional<traffic::script> the_script;
     try
     {
         the_script = traffic::script(traffic_json_path);
@@ -148,12 +148,12 @@ int main(int argc, char* argv[])
     auto params = std::make_shared<config::params>(int(wait_time), duration);
 
     auto stats = std::make_shared<stats::stats>(stats_io_ctx, print_period, output_file,
-                                                the_script.get().get_message_names());
+                                                the_script->get_message_names());
 
     /******************************************************************
      * CLIENT
      ******************************************************************/
-    auto q = std::make_unique<traffic::script_queue>(the_script.get());
+    auto q = std::make_unique<traffic::script_queue>(*the_script);
     auto client = std::make_unique<http2_client::client_impl>(
         stats, client_io_ctx, std::move(q), the_script->get_server_dns(),
         the_script->get_server_port(), the_script->is_server_secure());

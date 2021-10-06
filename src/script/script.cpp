@@ -1,7 +1,7 @@
 #include "script.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <deque>
 #include <exception>
 #include <fstream>
@@ -105,9 +105,9 @@ bool script::process_next(const std::string& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
     const auto& last_msg = messages.front();
-    if (last_msg.sfa.is_initialized())
+    if (last_msg.sfa.has_value())
     {
-        if (!save_from_answer(last_answer, last_msg.sfa.get()))
+        if (!save_from_answer(last_answer, *last_msg.sfa))
         {
             return false;
         }
@@ -116,9 +116,9 @@ bool script::process_next(const std::string& last_answer)
     messages.pop_front();
 
     auto& next_msg = messages.front();
-    if (next_msg.atb.is_initialized())
+    if (next_msg.atb.has_value())
     {
-        if (!add_to_request(next_msg.atb.get(), next_msg))
+        if (!add_to_request(*next_msg.atb, next_msg))
         {
             return false;
         }

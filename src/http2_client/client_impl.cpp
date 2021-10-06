@@ -13,6 +13,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <utility>
+#include <optional>
 
 #include "connection.hpp"
 #include "script.hpp"
@@ -124,11 +125,11 @@ void client_impl::open_new_connection()
 void client_impl::send()
 {
     auto script_opt = queue->get_next_script();
-    if (!script_opt.is_initialized())
+    if (!script_opt.has_value())
     {
         return;
     }
-    auto script = script_opt.get();
+    auto script = *script_opt;
     request req = get_next_request(script);
 
     if (!is_connected())
