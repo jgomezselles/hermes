@@ -1,9 +1,9 @@
 #include <atomic>
 #include <deque>
 #include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <utility>
-#include <optional>
 
 #include "script.hpp"
 #include "script_queue_if.hpp"

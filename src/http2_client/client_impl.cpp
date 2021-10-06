@@ -11,9 +11,9 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <utility>
-#include <optional>
 
 #include "connection.hpp"
 #include "script.hpp"

@@ -1,11 +1,11 @@
 #include "script.hpp"
 
 #include <boost/algorithm/string.hpp>
-#include <optional>
 #include <deque>
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <vector>
 
 #include "script_reader.hpp"
