@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 #include "rapidjson/document.h"
 #include "script_sctructs.hpp"
