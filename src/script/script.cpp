@@ -36,6 +36,7 @@ void script::build(std::istream& file)
     messages = jr.build_messages();
     server = jr.build_server_info();
     timeout_ms = jr.build_timeout();
+    vars = jr.build_variables();
 }
 
 const std::vector<std::string> script::get_message_names() const
@@ -137,17 +138,29 @@ const bool script::post_process(const answer_type& last_answer)
     return !is_last() && process_next(last_answer.second);
 }
 
+void script::replace_in_messages(const std::string& old_str, const std::string& new_str)
+{
+    for (auto& m : messages)
+    {
+        std::string str_to_replace = "<" + old_str + ">";
+        boost::replace_all(m.body, str_to_replace, new_str);
+        boost::replace_all(m.url, str_to_replace, new_str);
+    }
+}
+
 void script::parse_ranges(const std::map<std::string, int64_t>& current)
 {
     for (const auto& c : current)
     {
-        for (auto& m : messages)
-        {
-            std::string str_to_replace = "<" + c.first + ">";
-            boost::replace_all(m.body, str_to_replace, std::to_string(c.second));
-            boost::replace_all(m.url, str_to_replace, std::to_string(c.second));
-        }
+        replace_in_messages(c.first, std::to_string(c.second));
     }
 }
 
+void script::parse_variables()
+{
+    for (const auto& [k, v] : vars)
+    {
+        replace_in_messages(k, v);
+    }
+}
 }  // namespace traffic

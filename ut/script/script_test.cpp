@@ -52,7 +52,7 @@ TEST_F(script_test, MinimumCorrectFile)
 {
     buildStream(script_builder.ranges(std::nullopt).build());
     std::unique_ptr<traffic::script> script;
-    EXPECT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
+    ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_EQ("public-dns", script->get_server_dns());
     EXPECT_EQ("8686", script->get_server_port());
     EXPECT_EQ(2000, script->get_timeout_ms());
@@ -65,7 +65,7 @@ TEST_F(script_test, SecureSetToFalse)
 {
     buildStream(script_builder.secure(false).ranges(std::nullopt).build());
     std::unique_ptr<traffic::script> script;
-    EXPECT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
+    ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_FALSE(script->is_server_secure());
 }
 
@@ -73,7 +73,7 @@ TEST_F(script_test, SecureSetToTrue)
 {
     buildStream(script_builder.secure(true).ranges(std::nullopt).build());
     std::unique_ptr<traffic::script> script;
-    EXPECT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
+    ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_TRUE(script->is_server_secure());
 }
 

@@ -107,4 +107,32 @@ int script_reader::build_timeout()
     return get_value<int>("/timeout");
 }
 
+std::map<std::string, std::string> script_reader::build_variables()
+{
+    std::map<std::string, std::string> vars;
+    if (is_present("/variables"))
+    {
+        json_reader jr_ranges{get_value<json_reader>("/variables")};
+        const auto var_names = jr_ranges.get_attributes();
+        for (const auto &key : var_names)
+        {
+            const std::string full_key{"/variables/" + key};
+            if (is_string(full_key))
+            {
+                vars.emplace(key, get_value<std::string>(full_key));
+            }
+            else if (is_number(full_key))
+            {
+                vars.emplace(key, std::to_string(get_value<int>(full_key)));
+            }
+            else
+            {
+                throw std::logic_error(
+                    "Error in script. Variables can only be strings or integers.");
+            }
+        }
+    }
+    return vars;
+}
+
 }  // namespace traffic

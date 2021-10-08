@@ -35,6 +35,9 @@ public:
     std::string get_json_as_string(const std::string& path);
     std::string as_string();
 
+    bool is_string(const std::string& path);
+    bool is_number(const std::string& path);
+
 protected:
     rapidjson::Document document;
 
