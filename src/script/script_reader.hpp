@@ -1,6 +1,7 @@
 #pragma once
 
 #include "json_reader.hpp"
+#include <map>
 
 namespace traffic
 {
@@ -22,6 +23,8 @@ public:
     message build_message(const std::string &m);
 
     msg_modifier build_message_modifier();
+
+    std::map<std::string, std::string> build_variables();
 
 private:
     script_reader(json_reader &&mgr);

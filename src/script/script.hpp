@@ -33,6 +33,8 @@ public:
     bool validate_answer(const answer_type& last_answer) const;
 
     void parse_ranges(const std::map<std::string, int64_t>& current);
+    void parse_variables();
+
     const std::vector<std::string> get_message_names() const;
 
 private:
@@ -42,11 +44,14 @@ private:
     bool save_from_answer(const std::string& answer, const msg_modifier& sfa);
     bool add_to_request(const msg_modifier& atb, message& m);
     const bool is_last() const { return messages.size() == 1; };
+    void replace_in_messages(const std::string& old_str, const std::string& new_str);
 
     std::deque<message> messages;
     range_type ranges;
     server_info server;
     int timeout_ms;
+
+    std::map<std::string, std::string> vars;
     std::map<std::string, std::string> saved_strs;
     std::map<std::string, int> saved_ints;
     std::map<std::string, json_reader> saved_jsons;

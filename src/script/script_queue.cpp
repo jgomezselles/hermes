@@ -37,6 +37,7 @@ std::optional<script> script_queue::get_next_script()
         script script_to_start(*new_script);
         update_currents_in_range(script_to_start.get_ranges());
         script_to_start.parse_ranges(current_in_range);
+        script_to_start.parse_variables();
         ++in_flight;
         return script_to_start;
     }

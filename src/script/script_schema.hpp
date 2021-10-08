@@ -30,7 +30,17 @@ const std::string schema = R"(
     "timeout": {
       "type": "integer"
     },
-    "ranges" : {
+    "variables": {
+      "type": "object",
+      "minProperties": 1,
+        "additionalProperties": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "integer"}
+          ]
+      }
+    },
+    "ranges": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
