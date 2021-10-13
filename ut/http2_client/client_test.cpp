@@ -8,8 +8,6 @@
 #include <thread>
 
 #include "client_impl.hpp"
-#include "message_builder.hpp"
-#include "script_builder.hpp"
 #include "script_queue_if.hpp"
 #include "stats_if.hpp"
 
@@ -125,6 +123,20 @@ public:
         client_worker.join();
     };
 
+    traffic::json_reader build_script()
+    {
+        traffic::json_reader json;
+        json.set<std::string>("/dns", server_host);
+        json.set<std::string>("/port", server_port);
+        json.set<int>("/timeout", 2000);
+        json.set<std::vector<std::string>>("/flow", {"test1"});
+        json.set<std::string>("/messages/test1/url", "v1/test");
+        json.set<traffic::json_reader>("/messages/test1/body", {"{}", ""});
+        json.set<std::string>("/messages/test1/method", "GET");
+        json.set<int>("/messages/test1/response/code", 200);
+        return json;
+    }
+
 protected:
     std::unique_ptr<nghttp2::asio_http2::server::http2> server;
     std::unique_ptr<boost::asio::ssl::context> tlsCtx;
@@ -220,10 +232,10 @@ TEST_P(client_test_p, SendMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    ut_helpers::script_builder script_builder;
-    script_builder.dns(server_host).port(server_port);
+    auto json = build_script();
+
     std::stringstream json_stream;
-    json_stream << script_builder.build();
+    json_stream << json.as_string();
 
     std::optional<traffic::script> script(json_stream);
     traffic::answer_type ans = std::make_pair(200, response_body);
@@ -250,15 +262,12 @@ TEST_P(client_test_p, TimeoutInAnswer)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    ut_helpers::script_builder script_builder;
-    script_builder.dns(server_host)
-        .port(server_port)
-        .timeout(500)
-        .messages(std::vector<std::string>{
-            ut_helpers::message_builder(1).url("v1/test_timeout").build()});
+    auto json = build_script();
+    json.set<int>("/timeout", 500);
+    json.set<std::string>("/messages/test1/url", "v1/test_timeout");
 
     std::stringstream json_stream;
-    json_stream << script_builder.build();
+    json_stream << json.as_string();
     std::optional<traffic::script> script(json_stream);
 
     std::promise<void> prom;
@@ -284,14 +293,12 @@ TEST_P(client_test_p, WrongCodeInAnswer)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    ut_helpers::script_builder script_builder;
-    script_builder.dns(server_host)
-        .port(server_port)
-        .messages(
-            std::vector<std::string>{ut_helpers::message_builder(1).url("v1/wrong_url").build()});
+    auto json = build_script();
+    json.set<int>("/timeout", 500);
+    json.set<std::string>("/messages/test1/url", "v1/wrong_url");
 
     std::stringstream json_stream;
-    json_stream << script_builder.build();
+    json_stream << json.as_string();
     std::optional<traffic::script> script(json_stream);
 
     std::promise<void> prom;
@@ -324,10 +331,8 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    ut_helpers::script_builder script_builder;
-    script_builder.dns(server_host).port(server_port);
     std::stringstream json_stream;
-    json_stream << script_builder.build();
+    json_stream << build_script().as_string();
 
     std::optional<traffic::script> script(json_stream);
     traffic::answer_type ans = std::make_pair(200, response_body);
