@@ -1,7 +1,8 @@
 #pragma once
 
-#include "json_reader.hpp"
 #include <map>
+
+#include "json_reader.hpp"
 
 namespace traffic
 {

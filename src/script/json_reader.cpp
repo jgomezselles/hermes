@@ -1,5 +1,6 @@
 #include "json_reader.hpp"
 
+#include <rapidjson/document.h>
 #include <rapidjson/schema.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -172,7 +173,7 @@ std::string json_reader::get_json_as_string(const std::string& path)
     throw std::logic_error("No value set in " + path);
 }
 
-std::string json_reader::as_string()
+std::string json_reader::as_string() const
 {
     rapidjson::StringBuffer buffer;
     buffer.Clear();
@@ -189,6 +190,20 @@ void json_reader::set<int>(const std::string& path, const int& value)
     if (val)
     {
         val->SetInt(value);
+        return;
+    }
+
+    throw std::logic_error("Error setting integer under " + path);
+}
+
+template <>
+void json_reader::set<bool>(const std::string& path, const bool& value)
+{
+    rapidjson::Pointer(path.c_str()).Create(document);
+    auto* val = rapidjson::Pointer(path.c_str()).Get(document);
+    if (val)
+    {
+        val->SetBool(value);
         return;
     }
 
@@ -223,6 +238,27 @@ void json_reader::set<json_reader>(const std::string& path, const json_reader& v
     throw std::logic_error("Error setting object under " + path);
 }
 
+template <>
+void json_reader::set<std::vector<std::string>>(const std::string& path,
+                                                const std::vector<std::string>& values)
+{
+    rapidjson::Pointer(path.c_str()).Create(document);
+    auto* val = rapidjson::Pointer(path.c_str()).Get(document);
+    if (val)
+    {
+        val->SetArray();
+        for (const auto& value : values)
+        {
+            rapidjson::Value v;
+            v.SetString(value.c_str(), value.size(), document.GetAllocator());
+            val->PushBack(v, document.GetAllocator());
+        }
+        return;
+    }
+
+    throw std::logic_error("Error setting object under " + path);
+}
+
 bool json_reader::is_present(const std::string& path)
 {
     return rapidjson::Pointer(path.c_str()).Get(document) != nullptr;
@@ -238,6 +274,11 @@ bool json_reader::is_number(const std::string& path)
 {
     const auto* val = rapidjson::Pointer(path.c_str()).Get(document);
     return val->GetType() == rapidjson::kNumberType;
+}
+
+void json_reader::erase(const std::string& path)
+{
+    rapidjson::Pointer(path.c_str()).Erase(document);
 }
 
 }  // namespace traffic
