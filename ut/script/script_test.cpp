@@ -3,20 +3,26 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <functional>
 #include <map>
 #include <sstream>
 
-#include "action_builder.hpp"
-#include "json_element_builder.hpp"
-#include "json_object_builder.hpp"
-#include "message_builder.hpp"
-#include "range_builder.hpp"
-#include "response_builder.hpp"
-#include "script_builder.hpp"
-
 class script_test : public ::testing::Test
 {
+public:
+    traffic::json_reader build_script()
+    {
+        traffic::json_reader json;
+        json.set<std::string>("/dns", "public-dns");
+        json.set<std::string>("/port", "8686");
+        json.set<int>("/timeout", 2000);
+        json.set<std::vector<std::string>>("/flow", {"test1"});
+        json.set<std::string>("/messages/test1/url", "v1/test");
+        json.set<traffic::json_reader>("/messages/test1/body", {"{}", ""});
+        json.set<std::string>("/messages/test1/method", "GET");
+        json.set<int>("/messages/test1/response/code", 200);
+        return json;
+    }
+
 protected:
     void buildStream(const std::string &json)
     {
@@ -25,7 +31,6 @@ protected:
     }
 
     std::stringstream json_stream;
-    ut_helpers::script_builder script_builder;
 };
 
 TEST_F(script_test, EmptyScript)
@@ -50,7 +55,8 @@ TEST_F(script_test, EmptyFile)
 
 TEST_F(script_test, MinimumCorrectFile)
 {
-    buildStream(script_builder.ranges(std::nullopt).build());
+    json_stream << build_script().as_string();
+
     std::unique_ptr<traffic::script> script;
     ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_EQ("public-dns", script->get_server_dns());
@@ -63,7 +69,10 @@ TEST_F(script_test, MinimumCorrectFile)
 
 TEST_F(script_test, SecureSetToFalse)
 {
-    buildStream(script_builder.secure(false).ranges(std::nullopt).build());
+    auto json = build_script();
+    json.set<bool>("/secure", false);
+    json_stream << json.as_string();
+
     std::unique_ptr<traffic::script> script;
     ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_FALSE(script->is_server_secure());
@@ -71,7 +80,9 @@ TEST_F(script_test, SecureSetToFalse)
 
 TEST_F(script_test, SecureSetToTrue)
 {
-    buildStream(script_builder.secure(true).ranges(std::nullopt).build());
+    auto json = build_script();
+    json.set<bool>("/secure", true);
+    json_stream << json.as_string();
     std::unique_ptr<traffic::script> script;
     ASSERT_NO_THROW(script = std::make_unique<traffic::script>(json_stream));
     EXPECT_TRUE(script->is_server_secure());
@@ -79,542 +90,501 @@ TEST_F(script_test, SecureSetToTrue)
 
 TEST_F(script_test, ValidationErrorNoFlow)
 {
-    buildStream(script_builder.flow(std::nullopt).build());
+    auto json = build_script();
+    json.erase("/flow");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoMessages)
 {
-    buildStream(script_builder.messages(std::nullopt).build());
+    auto json = build_script();
+    json.erase("/messages");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoDns)
 {
-    buildStream(script_builder.dns(std::nullopt).build());
+    auto json = build_script();
+    json.erase("/dns");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoPort)
 {
-    buildStream(script_builder.port(std::nullopt).build());
+    auto json = build_script();
+    json.erase("/port");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoTimeout)
 {
-    buildStream(script_builder.timeout(std::nullopt).build());
+    auto json = build_script();
+    json.erase("/timeout");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoMethodInMessage)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1).method(std::nullopt).build()})
-                    .build());
+    auto json = build_script();
+    json.erase("/messages/test1/method");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoUrlInMessage)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1).url(std::nullopt).build()})
-                    .build());
+    auto json = build_script();
+    json.erase("/messages/test1/url");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoBodyInMessage)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1).response(std::nullopt).build()})
-                    .build());
+    auto json = build_script();
+    json.erase("/messages/test1/body");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoResponseInMessage)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1).response(std::nullopt).build()})
-                    .build());
+    auto json = build_script();
+    json.erase("/messages/test1/response");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, ValidationErrorNoCodeInResponseInMessage)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .response(ut_helpers::response_builder(std::nullopt).build())
-                            .build()})
-                    .build());
+    auto json = build_script();
+    json.erase("/messages/test1/response/code");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
+}
+
+TEST_F(script_test, TotalMessageIsNotErrorIfNotCalledInFlow)
+{
+    auto json = build_script();
+    auto other_msg = json.get_value<traffic::json_reader>("/messages/test1");
+    json.set<traffic::json_reader>("/messages/Total", other_msg);
+    json_stream << json.as_string();
+    ASSERT_NO_THROW(traffic::script{json_stream});
 }
 
 TEST_F(script_test, TotalMessageIsReserved)
 {
-    buildStream(
-        script_builder.flow(std::vector<std::string>{"Total"})
-            .messages(std::vector<std::string>{ut_helpers::message_builder("Total").build()})
-            .build());
+    auto json = build_script();
+    auto other_msg = json.get_value<traffic::json_reader>("/messages/test1");
+    json.set<std::vector<std::string>>("/flow", {"Total", "test1"});
+    json.set<traffic::json_reader>("/messages/Total", other_msg);
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
 TEST_F(script_test, MessageInFlowNotFound)
 {
-    buildStream(script_builder.flow(std::vector<std::string>{"\"test1\"", "\"test2\""}).build());
+    auto json = build_script();
+    json.set<std::vector<std::string>>("/flow", {"test1", "test2"});
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, MessageWithSFA)
+TEST_F(script_test, MessageWithSFATypes)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .sfa(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path("/$meta")
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+
+    json_stream << json.as_string();
     ASSERT_NO_THROW(traffic::script{json_stream});
 }
 
-TEST_F(script_test, ValidationErrorMessageWithSFANoName)
+TEST_F(script_test, MessageWithSFAWrongType)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .sfa(ut_helpers::action_builder()
-                                                                    .name(std::nullopt)
-                                                                    .path("/$meta")
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "bool");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorMessageWithSFANoPath)
+TEST_F(script_test, MessageWithSFANoName)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .sfa(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path(std::nullopt)
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorMessageWithSFANoValueType)
+TEST_F(script_test, MessageWithSFANoPath)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .sfa(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path("/$meta")
-                                                                    .value_type(std::nullopt)
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, MessageWithATB)
+TEST_F(script_test, MessageWithSFANoValueType)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .atb(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path("/$meta")
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
+    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json_stream << json.as_string();
+    ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
+}
+
+TEST_F(script_test, MessageWithAFSTBTypes)
+{
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "string");
+
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_object");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+
+    json_stream << json.as_string();
     ASSERT_NO_THROW(traffic::script{json_stream});
 }
 
-TEST_F(script_test, ValidationErrorMessageWithATBNoName)
+TEST_F(script_test, MessageWithAFSTBWrongType)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .atb(ut_helpers::action_builder()
-                                                                    .name(std::nullopt)
-                                                                    .path("/$meta")
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "bool");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorMessageWithATBNoPath)
+TEST_F(script_test, MessageWithAFSTBNoName)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .atb(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path(std::nullopt)
-                                                                    .value_type("object")
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "string");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorMessageWithATBNoValueType)
+TEST_F(script_test, MessageWithAFSTBNoPath)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1)
-                                                           .atb(ut_helpers::action_builder()
-                                                                    .name("meta")
-                                                                    .path("/$meta")
-                                                                    .value_type(std::nullopt)
-                                                                    .build())
-                                                           .build()})
-                    .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorNoMinInRange)
+TEST_F(script_test, MessageWithAFSTBNoValueType)
 {
-    buildStream(
-        script_builder
-            .ranges(std::vector<std::string>{ut_helpers::range_builder().min(std::nullopt).build()})
-            .build());
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorNoMaxInRange)
+TEST_F(script_test, BuildRanges)
 {
-    buildStream(
-        script_builder
-            .ranges(std::vector<std::string>{ut_helpers::range_builder().max(std::nullopt).build()})
-            .build());
+    auto json = build_script();
+    json.set<int>("/ranges/range1/min", 0);
+    json.set<int>("/ranges/range1/max", 1000);
+    json.set<int>("/ranges/range2/min", 1);
+    json.set<int>("/ranges/range2/max", 30);
+    json_stream << json.as_string();
+    ASSERT_NO_THROW(traffic::script{json_stream});
+}
+
+TEST_F(script_test, NoMinInRange)
+{
+    auto json = build_script();
+    json.set<int>("/ranges/range1/max", 2);
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorMaxUnderMinInRange)
+TEST_F(script_test, NoMaxInRange)
 {
-    buildStream(
-        script_builder
-            .ranges(std::vector<std::string>{ut_helpers::range_builder().min(10).max(5).build()})
-            .build());
+    auto json = build_script();
+    json.set<int>("/ranges/range1/min", 2);
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, ValidationErrorNoRangeInRanges)
+TEST_F(script_test, MaxLowerThanMinInRange)
 {
-    buildStream(script_builder.ranges(std::vector<std::string>{}).build());
+    auto json = build_script();
+    json.set<int>("/ranges/range1/max", 2);
+    json.set<int>("/ranges/range1/min", 3);
+    json_stream << json.as_string();
     ASSERT_THROW(traffic::script{json_stream}, std::logic_error);
 }
 
-TEST_F(script_test, PostProcessIsLast)
+TEST_F(script_test, MaxEqualToMinInRange)
 {
-    buildStream(script_builder.build());
+    auto json = build_script();
+    json.set<int>("/ranges/range1/max", 666);
+    json.set<int>("/ranges/range1/min", 666);
+    json_stream << json.as_string();
+    ASSERT_NO_THROW(traffic::script{json_stream});
+}
+
+TEST_F(script_test, NoRangeInRanges)
+{
+    auto json = build_script();
+    traffic::json_reader ranges_empty("{}", "{}");
+    json.set<traffic::json_reader>("/ranges", ranges_empty);
+    json_stream << json.as_string();
+    ASSERT_NO_THROW(traffic::script{json_stream});
+}
+
+TEST_F(script_test, PostProcessLastMessageReturnsFalse)
+{
+    const auto json = build_script();
+    json_stream << json.as_string();
     traffic::script script{json_stream};
     ASSERT_FALSE(script.post_process(traffic::answer_type(200, "OK")));
 }
 
-TEST_F(script_test, PostProcessIsOK)
+TEST_F(script_test, PostProcessTwoAnswers)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{ut_helpers::message_builder(1).build(),
-                                                       ut_helpers::message_builder(2).build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    auto json = build_script();
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, "OK")));
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, "OK")));
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, "OK")));
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, "OK")));
 }
 
-TEST_F(script_test, PostProcessCorrectStringValueINSFA)
+TEST_F(script_test, PostProcessFoundStringInSFAPath)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/url")
-                                     .value_type("string")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_string("url", "OK").build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path, "I am a string");
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessCorrectIntValueINSFA)
+TEST_F(script_test, PostProcessFoundIntInSFAPath)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/port")
-                                     .value_type("int")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_int("port", 9090).build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<int>(expected_path, 7);
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessCorrectObjectValueINSFA)
+TEST_F(script_test, PostProcessFoundObjectInSFAPath)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/data")
-                                     .value_type("object")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer =
-        ut_helpers::json_object_builder()
-            .manipulate_object(
-                "data", ut_helpers::json_object_builder().manipulate_int("port", 9090).build())
-            .build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<traffic::json_reader>(expected_path, {"{}", "{}"});
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessInCorrectStringValueINSFA)
+TEST_F(script_test, PostProcessFoundIntWhenExpectingStringValueInSFA)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/url")
-                                     .value_type("string")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_int("url", 9090).build();
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<int>(expected_path, 123456);
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessInCorrectIntValueINSFA)
+TEST_F(script_test, PostProcessFoundStringWhenExpectingIntValueInSFA)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/port")
-                                     .value_type("int")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_string("port", "9090").build();
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path, "Oops, I'm a string");
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessInCorrectObjectValueINSFA)
+TEST_F(script_test, PostProcessFoundStringWhenExpectingObjectValueInSFA)
 {
-    buildStream(script_builder
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .sfa(ut_helpers::action_builder()
-                                     .name("meta")
-                                     .path("/data")
-                                     .value_type("object")
-                                     .build())
-                            .build(),
-                        ut_helpers::message_builder(2).method("POST").build()})
-                    .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-                    .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_int("data", 9090).build();
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path, "Oops, I'm a string");
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessCorrectStringValueINSFAUsedInATB)
+TEST_F(script_test, PostProcessCorrectStringValueInSFAUsedInATB)
 {
-    buildStream(
-        script_builder
-            .messages(std::vector<std::string>{
-                ut_helpers::message_builder(1)
-                    .method("POST")
-                    .sfa(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/url")
-                             .value_type("string")
-                             .build())
-                    .build(),
-                ut_helpers::message_builder(2)
-                    .method("POST")
-                    .body(ut_helpers::json_object_builder().manipulate_string("url", "").build())
-                    .atb(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/url")
-                             .value_type("string")
-                             .build())
-                    .build()})
-            .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-            .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "string");
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_string("url", "OK").build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
-    EXPECT_STRCASEEQ(answer.c_str(), script.get_next_body().c_str());
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path, "I am a string");
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
 }
 
 TEST_F(script_test, PostProcessCorrectIntValueINSFAUsedInATB)
 {
-    buildStream(
-        script_builder
-            .messages(std::vector<std::string>{
-                ut_helpers::message_builder(1)
-                    .method("POST")
-                    .sfa(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/port")
-                             .value_type("int")
-                             .build())
-                    .build(),
-                ut_helpers::message_builder(2)
-                    .method("POST")
-                    .body(ut_helpers::json_object_builder().manipulate_int("port", 0).build())
-                    .atb(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/port")
-                             .value_type("int")
-                             .build())
-                    .build()})
-            .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-            .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_int("port", 9090).build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
-    EXPECT_STRCASEEQ(answer.c_str(), script.get_next_body().c_str());
+
+    traffic::json_reader answer;
+    answer.set<int>(expected_path, 53);
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
 }
 
-TEST_F(script_test, PostProcessCorrectObjectValueINSFAUsedInATB)
+TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
 {
-    buildStream(
-        script_builder
-            .messages(std::vector<std::string>{
-                ut_helpers::message_builder(1)
-                    .method("POST")
-                    .sfa(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/data")
-                             .value_type("object")
-                             .build())
-                    .build(),
-                ut_helpers::message_builder(2)
-                    .method("POST")
-                    .body(ut_helpers::json_object_builder().manipulate_object("data", "{}").build())
-                    .atb(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/data")
-                             .value_type("object")
-                             .build())
-                    .build()})
-            .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-            .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_object");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto payload = ut_helpers::json_object_builder().manipulate_int("port", 9090).build();
-    auto answer = ut_helpers::json_object_builder().manipulate_object("data", payload).build();
-    EXPECT_TRUE(script.post_process(traffic::answer_type(200, answer)));
-    EXPECT_STRCASEEQ(answer.c_str(), script.get_next_body().c_str());
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path + "/sub_path1", "hi there");
+    answer.set<int>(expected_path + "/sub_path1", 235);
+    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
 }
 
-TEST_F(script_test, PostProcessNotFoundValueINSFAToUseInATB)
+TEST_F(script_test, PostProcessNotFoundValueInSFAToUseInATB)
 {
-    buildStream(
-        script_builder
-            .messages(std::vector<std::string>{
-                ut_helpers::message_builder(1).method("POST").build(),
-                ut_helpers::message_builder(2)
-                    .method("POST")
-                    .body(ut_helpers::json_object_builder().manipulate_string("url", "").build())
-                    .atb(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/url")
-                             .value_type("string")
-                             .build())
-                    .build()})
-            .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-            .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_string("url", "OK").build();
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<int>("/not/expected/path", 53);
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
-TEST_F(script_test, PostProcessInCorrectTypeValueINSFAUsedInATB)
+TEST_F(script_test, PostProcessInCorrectTypeValueInSFAUsedInATB)
 {
-    buildStream(
-        script_builder
-            .messages(std::vector<std::string>{
-                ut_helpers::message_builder(1)
-                    .method("POST")
-                    .sfa(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/url")
-                             .value_type("string")
-                             .build())
-                    .build(),
-                ut_helpers::message_builder(2)
-                    .method("POST")
-                    .body(ut_helpers::json_object_builder().manipulate_string("url", "").build())
-                    .atb(ut_helpers::action_builder()
-                             .name("meta")
-                             .path("/url")
-                             .value_type("int")
-                             .build())
-                    .build()})
-            .flow(std::vector<std::string>{"\"test1\"", "\"test2\""})
-            .build());
+    const std::string expected_path{"/some/path"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
+    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json_stream << json.as_string();
     traffic::script script{json_stream};
-    auto answer = ut_helpers::json_object_builder().manipulate_string("url", "OK").build();
-    EXPECT_FALSE(script.post_process(traffic::answer_type(200, answer)));
+
+    traffic::json_reader answer;
+    answer.set<std::string>(expected_path, "I am a string BUT I am expected to be int");
+    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
 }
 
 TEST_F(script_test, ParseRangesInRangeValue)
 {
-    buildStream(script_builder
-                    .ranges(std::vector<std::string>{
-                        ut_helpers::range_builder("my_range").min(50).max(60).build()})
-                    .messages(std::vector<std::string>{
-                        ut_helpers::message_builder(1)
-                            .method("POST")
-                            .url("/my/url/<my_range>")
-                            .body(ut_helpers::json_object_builder()
-                                      .manipulate_string("data", "in-range-<my_range>")
-                                      .build())
-                            .build()})
-                    .build());
+    auto json = build_script();
+    json.set<int>("/ranges/my_range/min", 50);
+    json.set<int>("/ranges/my_range/max", 60);
+    json.set<std::string>("/messages/test1/url", "/my/url/<my_range>");
+    json.set<std::string>("/messages/test1/body/data", "in-range-<my_range>");
+    json_stream << json.as_string();
+
     traffic::script script{json_stream};
     script.parse_ranges(std::map<std::string, int64_t>{{"my_range", 55}});
-    EXPECT_STREQ("/my/url/55", script.get_next_url().c_str());
-    EXPECT_STREQ("{\"data\":\"in-range-55\"}", script.get_next_body().c_str());
+    ASSERT_STREQ("/my/url/55", script.get_next_url().c_str());
+    ASSERT_STREQ("{\"data\":\"in-range-55\"}", script.get_next_body().c_str());
 }
