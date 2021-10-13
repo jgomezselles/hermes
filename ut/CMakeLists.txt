@@ -31,8 +31,6 @@ PRIVATE
         pthread
 )
 
-add_subdirectory(helpers)
-include_directories(helpers)
 add_subdirectory(script)
 add_subdirectory(stats)
 add_subdirectory(sender)
