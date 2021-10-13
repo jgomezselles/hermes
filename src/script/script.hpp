@@ -38,8 +38,7 @@ public:
     const std::vector<std::string> get_message_names() const;
 
 private:
-    void build(std::istream& file);
-    void build(const json_reader& input_json);
+    void build(const std::string& input_json);
 
     bool process_next(const std::string& last_answer);
     bool save_from_answer(const std::string& answer, const msg_modifier& sfa);
