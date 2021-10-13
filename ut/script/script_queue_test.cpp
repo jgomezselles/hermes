@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <sstream>
-
 class script_queue_sut : public traffic::script_queue
 {
 public:
@@ -28,12 +26,9 @@ public:
         return json;
     }
 
-    void setup_queue(const std::string& json)
+    void setup_queue(const traffic::json_reader& json)
     {
-        std::stringstream json_stream;
-        json_stream << json;
-        traffic::script script(json_stream);
-        script_queue = std::make_unique<script_queue_sut>(script);
+        script_queue = std::make_unique<script_queue_sut>(traffic::script(json));
     }
 
     std::unique_ptr<script_queue_sut> script_queue;
@@ -41,7 +36,7 @@ public:
 
 TEST_F(script_queue_test, EnqueueSimpleScriptJustRunOnce)
 {
-    setup_queue(build_script().as_string());
+    setup_queue(build_script());
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
@@ -61,7 +56,7 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
 {
     auto json = build_script();
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    setup_queue(json.as_string());
+    setup_queue(json);
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
@@ -85,7 +80,7 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
 
 TEST_F(script_queue_test, CancelScriptReturnsNoMorePending)
 {
-    setup_queue(build_script().as_string());
+    setup_queue(build_script());
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
@@ -99,7 +94,7 @@ TEST_F(script_queue_test, CancelScriptReturnsNoMorePending)
 
 TEST_F(script_queue_test, CloseWindowReturnsNone)
 {
-    setup_queue(build_script().as_string());
+    setup_queue(build_script());
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
@@ -114,7 +109,7 @@ TEST_F(script_queue_test, CloseWindowReturnsNone)
 
 TEST_F(script_queue_test, CloseWindowAndCancelCurrentReturnsNoneAndNoMorePending)
 {
-    setup_queue(build_script().as_string());
+    setup_queue(build_script());
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
@@ -136,7 +131,7 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     json.set<int>("/ranges/range1/min", 5);
     json.set<int>("/ranges/range1/max", 6);
-    setup_queue(json.as_string());
+    setup_queue(json);
 
     auto script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
