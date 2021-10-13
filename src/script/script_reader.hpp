@@ -6,7 +6,7 @@
 
 namespace traffic
 {
-class script_reader : public json_reader
+class script_reader
 {
 public:
     script_reader(const std::string &json);
@@ -27,6 +27,7 @@ public:
 
 private:
     script_reader(json_reader &&mgr);
+    json_reader json_rdr;
 };
 
 }  // namespace traffic
