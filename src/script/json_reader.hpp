@@ -12,7 +12,6 @@ class json_reader
 {
 public:
     json_reader();
-    json_reader(std::istream& file, const std::string& schema);
     json_reader(const std::string& json, const std::string& schema_str);
     json_reader(const json_reader& other);
     friend void swap(json_reader& first, json_reader& second);

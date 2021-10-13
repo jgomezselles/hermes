@@ -34,14 +34,6 @@ void json_reader::parse(const std::string& json_str, const std::string& schema_s
 
 json_reader::json_reader() {}
 
-json_reader::json_reader(std::istream& file, const std::string& schema_str)
-{
-    const auto json_str =
-        std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-    parse(json_str, schema_str);
-}
-
 json_reader::json_reader(const std::string& json, const std::string& schema)
 {
     parse(json, schema);

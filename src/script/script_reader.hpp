@@ -9,8 +9,6 @@ namespace traffic
 class script_reader : public json_reader
 {
 public:
-    script_reader(std::istream &file);
-
     script_reader(const std::string &json);
 
     server_info build_server_info();

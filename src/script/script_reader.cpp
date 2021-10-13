@@ -4,8 +4,6 @@
 
 namespace traffic
 {
-script_reader::script_reader(std::istream &file) : json_reader(file, ::script::schema) {}
-
 script_reader::script_reader(const std::string &json) : json_reader(json, ::script::schema) {}
 
 script_reader::script_reader(json_reader &&other) : json_reader(std::move(other)) {}
