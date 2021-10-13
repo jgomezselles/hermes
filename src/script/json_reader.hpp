@@ -30,10 +30,12 @@ public:
         throw std::logic_error("Type not implemented when asked for " + path);
     }
 
+    void erase(const std::string& path);
+
     bool is_present(const std::string& path);
     std::vector<std::string> get_attributes();
     std::string get_json_as_string(const std::string& path);
-    std::string as_string();
+    std::string as_string() const;
 
     bool is_string(const std::string& path);
     bool is_number(const std::string& path);
@@ -66,9 +68,16 @@ template <>
 void json_reader::set<int>(const std::string& path, const int& value);
 
 template <>
+void json_reader::set<bool>(const std::string& path, const bool& value);
+
+template <>
 void json_reader::set<std::string>(const std::string& path, const std::string& value);
 
 template <>
 void json_reader::set<json_reader>(const std::string& path, const json_reader& value);
+
+template <>
+void json_reader::set<std::vector<std::string>>(const std::string& path,
+                                                const std::vector<std::string>& value);
 
 }  // namespace traffic
