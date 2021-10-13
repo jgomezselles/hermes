@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include "json_reader.hpp"
 #include "script_reader.hpp"
 
 namespace traffic
@@ -24,9 +25,19 @@ script::script(const std::string& path)
     build(json_file);
 }
 
-script::script(std::istream& input)
+script::script(const json_reader& input_json)
 {
-    build(input);
+    build(input_json);
+}
+
+void script::build(const json_reader& input_json)
+{
+    script_reader jr{input_json.as_string()};
+    ranges = jr.build_ranges();
+    messages = jr.build_messages();
+    server = jr.build_server_info();
+    timeout_ms = jr.build_timeout();
+    vars = jr.build_variables();
 }
 
 void script::build(std::istream& file)

@@ -232,12 +232,7 @@ TEST_P(client_test_p, SendMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    auto json = build_script();
-
-    std::stringstream json_stream;
-    json_stream << json.as_string();
-
-    std::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(build_script());
     traffic::answer_type ans = std::make_pair(200, response_body);
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -266,9 +261,7 @@ TEST_P(client_test_p, TimeoutInAnswer)
     json.set<int>("/timeout", 500);
     json.set<std::string>("/messages/test1/url", "v1/test_timeout");
 
-    std::stringstream json_stream;
-    json_stream << json.as_string();
-    std::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -297,9 +290,7 @@ TEST_P(client_test_p, WrongCodeInAnswer)
     json.set<int>("/timeout", 500);
     json.set<std::string>("/messages/test1/url", "v1/wrong_url");
 
-    std::stringstream json_stream;
-    json_stream << json.as_string();
-    std::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(json);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -331,10 +322,7 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    std::stringstream json_stream;
-    json_stream << build_script().as_string();
-
-    std::optional<traffic::script> script(json_stream);
+    std::optional<traffic::script> script(build_script());
     traffic::answer_type ans = std::make_pair(200, response_body);
     std::promise<void> prom1, prom2;
     std::future<void> fut1 = prom1.get_future(), fut2 = prom2.get_future();

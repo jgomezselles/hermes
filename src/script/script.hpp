@@ -14,7 +14,7 @@ class script
 public:
     script() = delete;
     script(const std::string& path);
-    script(std::istream& input);
+    script(const json_reader& input_json);
 
     ~script() = default;
 
@@ -39,6 +39,7 @@ public:
 
 private:
     void build(std::istream& file);
+    void build(const json_reader& input_json);
 
     bool process_next(const std::string& last_answer);
     bool save_from_answer(const std::string& answer, const msg_modifier& sfa);
