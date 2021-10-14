@@ -33,6 +33,18 @@ script::script(const json_reader& input_json)
     build(input_json.as_string());
 }
 
+void script::validate_members() const
+{
+    for (const auto& [k, _] : vars)
+    {
+        if (ranges.find(k) != ranges.end())
+        {
+            throw std::logic_error(
+                k + " found in both ranges and variables. Please, choose a different name.");
+        }
+    }
+}
+
 void script::build(const std::string& input_json)
 {
     script_reader sr{input_json};
@@ -41,6 +53,7 @@ void script::build(const std::string& input_json)
     server = sr.build_server_info();
     timeout_ms = sr.build_timeout();
     vars = sr.build_variables();
+    validate_members();
 }
 
 const std::vector<std::string> script::get_message_names() const
