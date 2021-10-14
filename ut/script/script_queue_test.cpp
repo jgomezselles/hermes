@@ -156,3 +156,19 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
     ASSERT_TRUE(script_opt);
     ASSERT_EQ(5, script_queue->get_current("range1"));
 }
+
+TEST_F(script_queue_test, ParseVariables)
+{
+    auto json = build_script();
+    json.set<int>("/variables/my_int", 1);
+    json.set<std::string>("/variables/my_str", "lol");
+    json.set<std::string>("/messages/test1/body/entry", "<my_int>");
+    json.set<std::string>("/messages/test1/url", "v1/url/<my_str>");
+    setup_queue(json);
+
+    auto script_opt = script_queue->get_next_script();
+    ASSERT_TRUE(script_opt);
+    traffic::json_reader next_body(script_opt->get_next_body(), "{}");
+    ASSERT_EQ(next_body.get_value<std::string>("/entry"), "1");
+    ASSERT_STREQ(script_opt->get_next_url().c_str(), "v1/url/lol");
+}
