@@ -35,12 +35,12 @@ script::script(const json_reader& input_json)
 
 void script::build(const std::string& input_json)
 {
-    script_reader jr{input_json};
-    ranges = jr.build_ranges();
-    messages = jr.build_messages();
-    server = jr.build_server_info();
-    timeout_ms = jr.build_timeout();
-    vars = jr.build_variables();
+    script_reader sr{input_json};
+    ranges = sr.build_ranges();
+    messages = sr.build_messages();
+    server = sr.build_server_info();
+    timeout_ms = sr.build_timeout();
+    vars = sr.build_variables();
 }
 
 const std::vector<std::string> script::get_message_names() const
