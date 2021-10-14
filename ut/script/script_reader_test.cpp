@@ -287,4 +287,31 @@ TEST_F(script_reader_test, NoRangeInRanges)
     ASSERT_NO_THROW(sr.build_ranges());
 }
 
+TEST_F(script_reader_test, BuildVariablesOk)
+{
+    auto json = build_script();
+    json.set<std::string>("/variables/my_var", "hello");
+    json.set<int>("/variables/my_other_var", 5);
+    auto sr = script_reader(json.as_string());
+    auto vars = sr.build_variables();
+
+    std::map<std::string, std::string> expected_vars{{"my_var", "hello"}, {"my_other_var", "5"}};
+
+    ASSERT_EQ(vars, expected_vars);
+}
+
+TEST_F(script_reader_test, BuildVariablesWrongType)
+{
+    auto json = build_script();
+    json.set<bool>("/variables/wrong_type", true);
+    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
+}
+
+TEST_F(script_reader_test, BuildVariablesEmpty)
+{
+    auto json = build_script();
+    json.set<json_reader>("/variables", json_reader());
+    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
+}
+
 }  // namespace traffic
