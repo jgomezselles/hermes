@@ -277,3 +277,28 @@ TEST_F(script_test, ParseRangesInRangeValue)
     ASSERT_STREQ("/my/url/55", script.get_next_url().c_str());
     ASSERT_STREQ("{\"data\":\"in-range-55\"}", script.get_next_body().c_str());
 }
+
+TEST_F(script_test, SameNameInRangesAndVariables)
+{
+    auto json = build_script();
+    json.set<int>("/ranges/my_range/min", 1);
+    json.set<int>("/ranges/my_range/max", 2);
+    json.set<int>("/variables/my_range", 4);
+
+    ASSERT_THROW(traffic::script script{json}, std::logic_error);
+}
+
+TEST_F(script_test, ParseVariables)
+{
+    auto json = build_script();
+    json.set<int>("/variables/my_int", 50);
+    json.set<std::string>("/variables/my_string", "hello");
+    json.set<std::string>("/messages/test1/url", "/my/<my_int>/path");
+    json.set<traffic::json_reader>("/messages/test1/body",
+                                   traffic::json_reader("{\"<my_string>\": true}", "{}"));
+
+    traffic::script script{json};
+    script.parse_variables();
+    ASSERT_STREQ("/my/50/path", script.get_next_url().c_str());
+    ASSERT_STREQ("{\"hello\":true}", script.get_next_body().c_str());
+}

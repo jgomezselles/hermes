@@ -38,6 +38,7 @@ public:
     const std::vector<std::string> get_message_names() const;
 
 private:
+    void validate_members() const;
     void build(const std::string& input_json);
 
     bool process_next(const std::string& last_answer);
