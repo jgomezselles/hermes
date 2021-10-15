@@ -87,3 +87,22 @@ TEST(json_reader_test, SchemaValidationOk)
     auto json = json_reader(json_str, schema);
     ASSERT_EQ(json_str, json.as_string());
 }
+
+TEST(json_reader_test, AssignmentAndComparisonOperators)
+{
+    std::string json_str = R"("This is a string")";
+    auto json = json_reader(json_str, "");
+    auto other_json = json;
+
+    ASSERT_EQ(json, other_json);
+    ASSERT_EQ(json_str, json.as_string());
+    ASSERT_EQ(json.as_string(), other_json.as_string());
+}
+
+TEST(json_reader_test, CopyCtor)
+{
+    std::string json_str = R"({"attr1": ["arr1", "arr2"], "attr2": 5})";
+    auto json = json_reader(json_str, "");
+    json_reader other_json(json);
+    ASSERT_EQ(json, other_json);
+}
