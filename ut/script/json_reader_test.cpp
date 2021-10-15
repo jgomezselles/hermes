@@ -580,4 +580,28 @@ TEST(json_reader_test, IsNumber)
     ASSERT_FALSE(json.is_number("/sub_json/wrong_sub_path"));
 }
 
+TEST(json_reader_test, Erase)
+{
+    json_reader json(R"({"str": 666,"sub_json":{"sub_int": 1.54}})", "");
+
+    ASSERT_TRUE(json.is_present("/sub_json/sub_int"));
+    json.erase("/sub_json/sub_int");
+    ASSERT_FALSE(json.is_present("/sub_json/sub_int"));
+
+    ASSERT_TRUE(json.is_present("/sub_json"));
+    json.erase("/sub_json");
+    ASSERT_FALSE(json.is_present("/sub_json"));
+
+    ASSERT_TRUE(json.is_present("/str"));
+    json.erase("/str");
+    ASSERT_FALSE(json.is_present("/str"));
+
+}
+
+TEST(json_reader_test, EraseNotPresent)
+{
+    json_reader json;
+    ASSERT_NO_THROW(json.erase("/sub_json/sub_int"));
+}
+
 }  // namespace traffic
