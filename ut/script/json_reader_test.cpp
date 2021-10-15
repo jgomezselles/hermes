@@ -518,3 +518,33 @@ TEST(json_reader_test, GetAttributes)
     ASSERT_EQ(attrs, expected_attrs);
 }
 
+TEST(json_reader_test, AsString)
+{
+    std::string full_json{R"({"str":"hello","sub_json":{"sub_str":"world"}})"};
+    json_reader expected_json(full_json, "");
+    ASSERT_EQ(full_json, expected_json.as_string());
+    ASSERT_EQ(expected_json.get_json_as_string(""), expected_json.as_string());
+    ASSERT_EQ(expected_json.get_json_as_string("/sub_json"), R"({"sub_str":"world"})");
+}
+
+TEST(json_reader_test, GetJsonAsStringNotFound)
+{
+    auto json = json_reader(R"( "some string" )", "");
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] auto json_str = json.get_json_as_string(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("No value set in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+}  // namespace traffic
