@@ -409,3 +409,90 @@ TEST(json_reader_test, ObjectNotFound)
         std::logic_error);
 }
 
+using str_array = std::vector<std::string>;
+
+TEST(json_reader_test, SetGetStrArray)
+{
+    auto json = json_reader();
+    str_array array{"first", "second"};
+    json.set<str_array>("/array", array);
+    ASSERT_EQ(array, json.get_value<str_array>("/array"));
+
+    json_reader expected_json(R"({"array": ["first", "second"]})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, EmptyStrArray)
+{
+    auto json = json_reader();
+    str_array array{};
+    json.set<str_array>("/array", array);
+    ASSERT_EQ(array, json.get_value<str_array>("/array"));
+
+    json_reader expected_json(R"({"array": []})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, WrongTypeGettingStrArray)
+{
+    std::string path{"/no_array"};
+    auto json = json_reader();
+    json.set<std::string>(path, "I'm a string");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] str_array sa = json.get_value<str_array>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Array not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+
+}
+
+TEST(json_reader_test, WrongTypeElementInStrArray)
+{
+    std::string path{"/array_of_ints"};
+    auto json = json_reader(R"( { "array_of_ints": [1,2,3] } )", "");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] str_array sa = json.get_value<str_array>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Expected string but found other in array under " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+
+}
+
+TEST(json_reader_test, GetStrArrayNotFound)
+{
+    auto json = json_reader();
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] str_array sa = json.get_value<str_array>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Array not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
