@@ -160,3 +160,100 @@ TEST(json_reader_test, StringNotFound)
         },
         std::logic_error);
 }
+
+TEST(json_reader_test, SetGetBool)
+{
+    auto json = json_reader();
+    json.set<bool>("/bull", true);
+    ASSERT_EQ(true, json.get_value<bool>("/bull"));
+
+    json.set<bool>("/sub_json/sub_bool", false);
+    ASSERT_EQ(false, json.get_value<bool>("/sub_json/sub_bool"));
+
+    json_reader expected_json(R"({"bull": true, "sub_json": {"sub_bool": false}})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, WrongTypeGettingBool)
+{
+    std::string path{"/no_bool"};
+    auto json = json_reader();
+    json.set<int>(path, 2);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] bool b = json.get_value<bool>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Bool not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+
+}
+
+TEST(json_reader_test, WrongTypeGettingBoolZero)
+{
+    std::string path{"/no_bool"};
+    auto json = json_reader();
+    json.set<int>(path, 0);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] bool b = json.get_value<bool>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Bool not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST(json_reader_test, WrongTypeGettingBoolOne)
+{
+    std::string path{"/no_bool"};
+    auto json = json_reader();
+    json.set<int>(path, 1);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] bool b = json.get_value<bool>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Bool not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST(json_reader_test, BoolNotFound)
+{
+    auto json = json_reader();
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] bool b = json.get_value<bool>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Bool not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
