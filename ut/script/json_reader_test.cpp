@@ -193,7 +193,6 @@ TEST(json_reader_test, WrongTypeGettingBool)
             }
         },
         std::logic_error);
-
 }
 
 TEST(json_reader_test, WrongTypeGettingBoolZero)
@@ -290,7 +289,6 @@ TEST(json_reader_test, WrongTypeGettingInt)
             }
         },
         std::logic_error);
-
 }
 
 TEST(json_reader_test, WrongTypeGettingIntZero)
@@ -386,7 +384,6 @@ TEST(json_reader_test, WrongTypeGettingObject)
             }
         },
         std::logic_error);
-
 }
 
 TEST(json_reader_test, ObjectNotFound)
@@ -452,7 +449,6 @@ TEST(json_reader_test, WrongTypeGettingStrArray)
             }
         },
         std::logic_error);
-
 }
 
 TEST(json_reader_test, WrongTypeElementInStrArray)
@@ -468,12 +464,13 @@ TEST(json_reader_test, WrongTypeElementInStrArray)
             }
             catch (const std::logic_error& e)
             {
-                EXPECT_STREQ(e.what(), std::string("Expected string but found other in array under " + path).c_str());
+                EXPECT_STREQ(
+                    e.what(),
+                    std::string("Expected string but found other in array under " + path).c_str());
                 throw;
             }
         },
         std::logic_error);
-
 }
 
 TEST(json_reader_test, GetStrArrayNotFound)
@@ -512,7 +509,8 @@ TEST(json_reader_test, GetAttributesEmptyObject)
 
 TEST(json_reader_test, GetAttributes)
 {
-    auto json = json_reader(R"({ "attr1": {}, "attr2": "stringy", "attr3": 3, "attr4": false, "attr5": [] })", "");
+    auto json = json_reader(
+        R"({ "attr1": {}, "attr2": "stringy", "attr3": 3, "attr4": false, "attr5": [] })", "");
     auto attrs = json.get_attributes();
     std::vector<std::string> expected_attrs{"attr1", "attr2", "attr3", "attr4", "attr5"};
     ASSERT_EQ(attrs, expected_attrs);
@@ -595,7 +593,6 @@ TEST(json_reader_test, Erase)
     ASSERT_TRUE(json.is_present("/str"));
     json.erase("/str");
     ASSERT_FALSE(json.is_present("/str"));
-
 }
 
 TEST(json_reader_test, EraseNotPresent)
