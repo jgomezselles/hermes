@@ -496,3 +496,25 @@ TEST(json_reader_test, GetStrArrayNotFound)
         std::logic_error);
 }
 
+TEST(json_reader_test, GetAttributesNoObject)
+{
+    auto json = json_reader(R"("This is a string, not an object")", "");
+    auto attrs = json.get_attributes();
+    ASSERT_TRUE(attrs.empty());
+}
+
+TEST(json_reader_test, GetAttributesEmptyObject)
+{
+    auto json = json_reader(R"({ })", "");
+    auto attrs = json.get_attributes();
+    ASSERT_TRUE(attrs.empty());
+}
+
+TEST(json_reader_test, GetAttributes)
+{
+    auto json = json_reader(R"({ "attr1": {}, "attr2": "stringy", "attr3": 3, "attr4": false, "attr5": [] })", "");
+    auto attrs = json.get_attributes();
+    std::vector<std::string> expected_attrs{"attr1", "attr2", "attr3", "attr4", "attr5"};
+    ASSERT_EQ(attrs, expected_attrs);
+}
+
