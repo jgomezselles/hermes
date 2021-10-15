@@ -264,8 +264,14 @@ bool json_reader::is_present(const std::string& path)
 
 bool json_reader::is_string(const std::string& path)
 {
-    const auto* val = rapidjson::Pointer(path.c_str()).Get(document);
-    return val->GetType() == rapidjson::kStringType;
+    const rapidjson::Pointer ptr {path.c_str()};
+    if(ptr.IsValid())
+    {
+        const auto* val = ptr.Get(document);
+        return val && val->GetType() == rapidjson::kStringType;
+    }
+
+    return false;
 }
 
 bool json_reader::is_number(const std::string& path)

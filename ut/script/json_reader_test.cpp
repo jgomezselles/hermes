@@ -558,4 +558,15 @@ TEST(json_reader_test, IsPresent)
     ASSERT_FALSE(json.is_present("/sub_str/wrong_sub_path"));
 }
 
+TEST(json_reader_test, IsString)
+{
+    json_reader json(R"({"str":"hello","sub_json":{"sub_str":"world"}})", "");
+    ASSERT_TRUE(json.is_string("/str"));
+    ASSERT_FALSE(json.is_string("kasdjfh"));
+    ASSERT_FALSE(json.is_string("/sub_json"));
+    ASSERT_TRUE(json.is_string("/sub_json/sub_str"));
+    ASSERT_FALSE(json.is_string("/wrong_path"));
+    ASSERT_FALSE(json.is_string("/sub_str/wrong_sub_path"));
+}
+
 }  // namespace traffic
