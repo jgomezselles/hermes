@@ -258,7 +258,8 @@ void json_reader::set<std::vector<std::string>>(const std::string& path,
 
 bool json_reader::is_present(const std::string& path)
 {
-    return rapidjson::Pointer(path.c_str()).Get(document) != nullptr;
+    const rapidjson::Pointer ptr {path.c_str()};
+    return ptr.IsValid() && ptr.Get(document) != nullptr;
 }
 
 bool json_reader::is_string(const std::string& path)

@@ -547,4 +547,15 @@ TEST(json_reader_test, GetJsonAsStringNotFound)
         std::logic_error);
 }
 
+TEST(json_reader_test, IsPresent)
+{
+    json_reader json(R"({"str":"hello","sub_json":{"sub_str":"world"}})", "");
+    ASSERT_TRUE(json.is_present("/str"));
+    ASSERT_FALSE(json.is_present("str"));
+    ASSERT_TRUE(json.is_present("/sub_json"));
+    ASSERT_TRUE(json.is_present("/sub_json/sub_str"));
+    ASSERT_FALSE(json.is_present("/wrong_path"));
+    ASSERT_FALSE(json.is_present("/sub_str/wrong_sub_path"));
+}
+
 }  // namespace traffic
