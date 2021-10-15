@@ -186,7 +186,7 @@ TEST_F(script_test, PostProcessCorrectStringValueInSFAUsedInATB)
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "I am a string");
     ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
-    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
+    ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
 TEST_F(script_test, PostProcessCorrectIntValueINSFAUsedInATB)
@@ -205,7 +205,7 @@ TEST_F(script_test, PostProcessCorrectIntValueINSFAUsedInATB)
     traffic::json_reader answer;
     answer.set<int>(expected_path, 53);
     ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
-    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
+    ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
 TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
@@ -225,7 +225,7 @@ TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
     answer.set<std::string>(expected_path + "/sub_path1", "hi there");
     answer.set<int>(expected_path + "/sub_path1", 235);
     ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
-    EXPECT_STRCASEEQ(answer.as_string().c_str(), script.get_next_body().c_str());
+    ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
 TEST_F(script_test, PostProcessNotFoundValueInSFAToUseInATB)
@@ -274,8 +274,8 @@ TEST_F(script_test, ParseRangesInRangeValue)
 
     traffic::script script{json};
     script.parse_ranges(std::map<std::string, int64_t>{{"my_range", 55}});
-    ASSERT_STREQ("/my/url/55", script.get_next_url().c_str());
-    ASSERT_STREQ("{\"data\":\"in-range-55\"}", script.get_next_body().c_str());
+    ASSERT_EQ("/my/url/55", script.get_next_url());
+    ASSERT_EQ("{\"data\":\"in-range-55\"}", script.get_next_body());
 }
 
 TEST_F(script_test, SameNameInRangesAndVariables)
@@ -299,6 +299,6 @@ TEST_F(script_test, ParseVariables)
 
     traffic::script script{json};
     script.parse_variables();
-    ASSERT_STREQ("/my/50/path", script.get_next_url().c_str());
-    ASSERT_STREQ("{\"hello\":true}", script.get_next_body().c_str());
+    ASSERT_EQ("/my/50/path", script.get_next_url());
+    ASSERT_EQ("{\"hello\":true}", script.get_next_body());
 }

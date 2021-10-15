@@ -170,5 +170,5 @@ TEST_F(script_queue_test, ParseVariables)
     ASSERT_TRUE(script_opt);
     traffic::json_reader next_body(script_opt->get_next_body(), "{}");
     ASSERT_EQ(next_body.get_value<std::string>("/entry"), "1");
-    ASSERT_STREQ(script_opt->get_next_url().c_str(), "v1/url/lol");
+    ASSERT_EQ(script_opt->get_next_url(), "v1/url/lol");
 }
