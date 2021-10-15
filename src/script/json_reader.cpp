@@ -60,6 +60,11 @@ json_reader& json_reader::operator=(json_reader other)
     return *this;
 }
 
+bool json_reader::operator==(const json_reader& other) const
+{
+    return document == other.document;
+}
+
 template <>
 json_reader json_reader::get_value<json_reader>(const std::string& path)
 {

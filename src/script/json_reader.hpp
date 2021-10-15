@@ -16,6 +16,7 @@ public:
     json_reader(const json_reader& other);
     friend void swap(json_reader& first, json_reader& second);
     json_reader& operator=(json_reader other);
+    bool operator==(const json_reader& other) const;
 
     template <typename t>
     t get_value(const std::string& path)
