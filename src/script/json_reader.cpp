@@ -125,7 +125,7 @@ std::vector<std::string> json_reader::get_value<std::vector<std::string>>(const 
         {
             if (!element.IsString())
             {
-                throw std::logic_error("String not expected in array under" + path);
+                throw std::logic_error("Expected string but found other in array under " + path);
             }
             result.push_back(element.GetString());
         }
@@ -133,7 +133,7 @@ std::vector<std::string> json_reader::get_value<std::vector<std::string>>(const 
         return result;
     }
 
-    throw std::logic_error("No value set in " + path);
+    throw std::logic_error("Array not found in " + path);
 }
 
 std::vector<std::string> json_reader::get_attributes()
