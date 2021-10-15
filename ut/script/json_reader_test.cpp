@@ -569,4 +569,15 @@ TEST(json_reader_test, IsString)
     ASSERT_FALSE(json.is_string("/sub_str/wrong_sub_path"));
 }
 
+TEST(json_reader_test, IsNumber)
+{
+    json_reader json(R"({"int": 666,"sub_json":{"sub_int": 1.54}})", "");
+    ASSERT_TRUE(json.is_number("/int"));
+    ASSERT_FALSE(json.is_number("kasdjfh"));
+    ASSERT_FALSE(json.is_number("/sub_json"));
+    ASSERT_TRUE(json.is_number("/sub_json/sub_int"));
+    ASSERT_FALSE(json.is_number("/wrong_path"));
+    ASSERT_FALSE(json.is_number("/sub_json/wrong_sub_path"));
+}
+
 }  // namespace traffic
