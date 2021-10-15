@@ -258,14 +258,14 @@ void json_reader::set<std::vector<std::string>>(const std::string& path,
 
 bool json_reader::is_present(const std::string& path)
 {
-    const rapidjson::Pointer ptr {path.c_str()};
+    const rapidjson::Pointer ptr{path.c_str()};
     return ptr.IsValid() && ptr.Get(document) != nullptr;
 }
 
 bool json_reader::is_string(const std::string& path)
 {
-    const rapidjson::Pointer ptr {path.c_str()};
-    if(ptr.IsValid())
+    const rapidjson::Pointer ptr{path.c_str()};
+    if (ptr.IsValid())
     {
         const auto* val = ptr.Get(document);
         return val && val->GetType() == rapidjson::kStringType;
@@ -276,8 +276,8 @@ bool json_reader::is_string(const std::string& path)
 
 bool json_reader::is_number(const std::string& path)
 {
-    const rapidjson::Pointer ptr {path.c_str()};
-    if(ptr.IsValid())
+    const rapidjson::Pointer ptr{path.c_str()};
+    if (ptr.IsValid())
     {
         const auto* val = ptr.Get(document);
         return val && val->GetType() == rapidjson::kNumberType;
