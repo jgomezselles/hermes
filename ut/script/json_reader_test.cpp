@@ -257,3 +257,100 @@ TEST(json_reader_test, BoolNotFound)
         },
         std::logic_error);
 }
+
+TEST(json_reader_test, SetGetInt)
+{
+    auto json = json_reader();
+    json.set<int>("/int", 1);
+    ASSERT_EQ(1, json.get_value<int>("/int"));
+
+    json.set<int>("/sub_json/sub_int", 5);
+    ASSERT_EQ(5, json.get_value<int>("/sub_json/sub_int"));
+
+    json_reader expected_json(R"({"int": 1, "sub_json": {"sub_int": 5}})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, WrongTypeGettingInt)
+{
+    std::string path{"/no_int"};
+    auto json = json_reader();
+    json.set<std::string>(path, "I'm a string");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] int i = json.get_value<int>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Integer not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+
+}
+
+TEST(json_reader_test, WrongTypeGettingIntZero)
+{
+    std::string path{"/no_int"};
+    auto json = json_reader();
+    json.set<bool>(path, false);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] int i = json.get_value<int>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Integer not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST(json_reader_test, WrongTypeGettingIntOne)
+{
+    std::string path{"/no_int"};
+    auto json = json_reader();
+    json.set<bool>(path, true);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] int i = json.get_value<int>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Integer not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST(json_reader_test, IntNotFound)
+{
+    auto json = json_reader();
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] int i = json.get_value<int>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Integer not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
