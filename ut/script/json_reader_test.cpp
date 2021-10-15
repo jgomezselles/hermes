@@ -106,3 +106,57 @@ TEST(json_reader_test, CopyCtor)
     json_reader other_json(json);
     ASSERT_EQ(json, other_json);
 }
+
+TEST(json_reader_test, SetGetString)
+{
+    auto json = json_reader();
+    json.set<std::string>("/str", "hello");
+    ASSERT_EQ("hello", json.get_value<std::string>("/str"));
+
+    json.set<std::string>("/sub_json/sub_str", "world");
+    ASSERT_EQ("world", json.get_value<std::string>("/sub_json/sub_str"));
+
+    json_reader expected_json(R"({"str": "hello", "sub_json": {"sub_str": "world"}})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, WrongTypeGettingString)
+{
+    std::string path{"/no_str"};
+    auto json = json_reader();
+    json.set<int>(path, 2);
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] std::string str = json.get_value<std::string>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("String not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST(json_reader_test, StringNotFound)
+{
+    auto json = json_reader();
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] std::string str = json.get_value<std::string>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("String not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
