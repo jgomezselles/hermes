@@ -354,3 +354,58 @@ TEST(json_reader_test, IntNotFound)
         },
         std::logic_error);
 }
+
+TEST(json_reader_test, SetGetObject)
+{
+    auto json = json_reader();
+    json_reader sub_json(R"({"sub_json": {"sub_json_int": 5}})", "");
+    json.set<json_reader>("/json", sub_json);
+    ASSERT_EQ(sub_json, json.get_value<json_reader>("/json"));
+    ASSERT_EQ(5, json.get_value<int>("/json/sub_json/sub_json_int"));
+
+    json_reader expected_json(R"({"json": {"sub_json": {"sub_json_int": 5}}})", "");
+    ASSERT_EQ(json, expected_json);
+}
+
+TEST(json_reader_test, WrongTypeGettingObject)
+{
+    std::string path{"/no_object"};
+    auto json = json_reader();
+    json.set<std::string>(path, "I'm a string");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] json_reader j = json.get_value<json_reader>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Object not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+
+}
+
+TEST(json_reader_test, ObjectNotFound)
+{
+    auto json = json_reader();
+    std::string path{"/wrong_path"};
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                [[maybe_unused]] json_reader j = json.get_value<json_reader>(path);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(e.what(), std::string("Object not found in " + path).c_str());
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
