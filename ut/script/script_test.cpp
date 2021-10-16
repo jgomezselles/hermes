@@ -302,3 +302,22 @@ TEST_F(script_test, ParseVariables)
     ASSERT_EQ("/my/50/path", script.get_next_url());
     ASSERT_EQ("{\"hello\":true}", script.get_next_body());
 }
+
+TEST_F(script_test, BuildAndGetNextHeadersOk)
+{
+    auto json = build_script();
+    json.set<traffic::json_reader>(
+        "/messages/test1/headers",
+        traffic::json_reader(R"( { "key1" : "val1", "key2": "val2" } )", "{}"));
+
+    traffic::script script{json};
+    traffic::msg_headers h{ {"key1", "val1"}, {"key2", "val2"} };
+    ASSERT_EQ( h, script.get_next_headers());
+}
+
+TEST_F(script_test, EmptyHeaders)
+{
+    auto json = build_script();
+    traffic::script script{json};
+    ASSERT_TRUE(script.get_next_headers().empty());
+}
