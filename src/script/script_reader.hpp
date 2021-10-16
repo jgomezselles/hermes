@@ -16,6 +16,7 @@ public:
     range_type build_ranges();
     std::deque<message> build_messages();
     message build_message(const std::string &m);
+    msg_headers build_message_headers();
     msg_modifier build_message_modifier();
     std::map<std::string, std::string> build_variables();
 

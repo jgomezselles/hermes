@@ -57,6 +57,16 @@ std::deque<message> script_reader::build_messages()
     return messages_to_build;
 }
 
+msg_headers script_reader::build_message_headers()
+{
+    msg_headers mh;
+    for (const auto &attr : json_rdr.get_attributes())
+    {
+        mh.emplace(attr, json_rdr.get_value<std::string>("/" + attr));
+    }
+    return mh;
+}
+
 message script_reader::build_message(const std::string &m)
 {
     message parsed_message;
@@ -66,6 +76,12 @@ message script_reader::build_message(const std::string &m)
     parsed_message.body = json_rdr.get_json_as_string("/body");
     parsed_message.method = json_rdr.get_value<std::string>("/method");
     parsed_message.pass_code = json_rdr.get_value<int>("/response/code");
+
+    if (json_rdr.is_present("/headers"))
+    {
+        script_reader sr_headers{json_rdr.get_value<json_reader>("/headers")};
+        parsed_message.headers = sr_headers.build_message_headers();
+    }
 
     if (json_rdr.is_present("/save_from_answer"))
     {
