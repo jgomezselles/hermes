@@ -27,7 +27,7 @@ struct message
     std::string body;
     std::string method;
     int pass_code;
-    std::optional<msg_headers> headers;
+    msg_headers headers;
     std::optional<msg_modifier> sfa;
     std::optional<msg_modifier> atb;
 };
