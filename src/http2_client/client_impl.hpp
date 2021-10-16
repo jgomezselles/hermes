@@ -62,7 +62,7 @@ public:
 private:
     void open_new_connection();
     request get_next_request(const traffic::script& s);
-    std::string get_uri(const std::string& uri_path);
+    std::string build_uri(const std::string& uri_path);
     void handle_timeout(const std::shared_ptr<race_control>& control, const std::string& msg_name);
     void handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
                                   const std::string& msg_name);
