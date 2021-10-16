@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "json_reader.hpp"
-#include "script_sctructs.hpp"
+#include "script_structs.hpp"
 
 #pragma once
 

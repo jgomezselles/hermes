@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "rapidjson/document.h"
-#include "script_sctructs.hpp"
+#include "script_structs.hpp"
 
 namespace traffic
 {

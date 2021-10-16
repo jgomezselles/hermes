@@ -1,6 +1,6 @@
 #include <optional>
 
-#include "script_sctructs.hpp"
+#include "script_structs.hpp"
 
 #pragma once
 
