@@ -1,11 +1,11 @@
 #include "client_utils.hpp"
-#include "script.hpp"
 
 #include <gtest/gtest.h>
 
+#include "script.hpp"
+
 namespace http2_client
 {
-
 TEST(client_utils_test, BuildUri)
 {
     std::string host("host"), port("port"), path("/path/");
@@ -36,7 +36,7 @@ TEST(client_utils_test, BuildHeadersEmptyHeaders)
 
 TEST(client_utils_test, BuildHeadersAddingHeaders)
 {
-    traffic::msg_headers h{{"first_k", "first_v"}, {"second_k", "second_v"} };
+    traffic::msg_headers h{{"first_k", "first_v"}, {"second_k", "second_v"}};
     size_t s{8};
     const auto built = build_headers(s, h);
     check_pre_built_headers(s, built);
@@ -53,4 +53,4 @@ TEST(client_utils_test, BuildHeadersAddingHeaders)
     ASSERT_FALSE(element->second.sensitive);
 }
 
-}
+}  // namespace http2_client
