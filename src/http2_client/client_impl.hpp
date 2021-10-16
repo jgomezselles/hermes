@@ -7,6 +7,7 @@
 #pragma once
 
 #include "client.hpp"
+#include "client_utils.hpp"
 #include "connection.hpp"
 #include "script_queue.hpp"
 
@@ -17,34 +18,9 @@ class stats_if;
 
 namespace http2_client
 {
-struct race_control
-{
-    race_control() : timed_out(false), answered(false) {}
-    bool timed_out;
-    bool answered;
-    std::mutex mtx;
-};
-
-struct request
-{
-    std::string url;
-    std::string method;
-    std::string body;
-    nghttp2::asio_http2::header_map headers;
-    std::string name;
-};
-
 class client_impl : public client
 {
 public:
-    enum class method
-    {
-        GET,
-        PUT,
-        POST,
-        DELETE
-    };
-
     client_impl(std::shared_ptr<stats::stats_if> stats, boost::asio::io_context& io_ctx,
                 std::unique_ptr<traffic::script_queue_if> q, const std::string& h,
                 const std::string& p, const bool secure_session = false);
@@ -61,8 +37,6 @@ public:
 
 private:
     void open_new_connection();
-    request get_next_request(const traffic::script& s);
-    std::string build_uri(const std::string& uri_path);
     void handle_timeout(const std::shared_ptr<race_control>& control, const std::string& msg_name);
     void handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
                                   const std::string& msg_name);
