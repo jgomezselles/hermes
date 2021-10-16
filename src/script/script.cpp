@@ -43,6 +43,18 @@ void script::validate_members() const
                 k + " found in both ranges and variables. Please, choose a different name.");
         }
     }
+
+    for (const auto& m : messages)
+    {
+        for (const std::string& forbidden : {"content_type", "content_length"})
+        {
+            if (m.headers.find(forbidden) != m.headers.end())
+            {
+                throw std::logic_error(
+                    forbidden + " is built automatically in headers. Cannot set custom values.");
+            }
+        }
+    }
 }
 
 void script::build(const std::string& input_json)
