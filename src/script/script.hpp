@@ -22,6 +22,7 @@ public:
     const std::string& get_next_body() const { return messages.front().body; };
     const std::string& get_next_method() const { return messages.front().method; };
     const std::string& get_next_msg_name() const { return messages.front().id; };
+    const msg_headers& get_next_headers() const { return messages.front().headers; };
 
     const range_type& get_ranges() const { return ranges; };
     const std::string& get_server_dns() const { return server.dns; };
