@@ -335,7 +335,7 @@ TEST_F(script_reader_test, BuildMessageHeadersEmpty)
     auto sr = script_reader(build_script().as_string());
     const auto messages = sr.build_messages();
     ASSERT_EQ(messages.size(), 1);
-    ASSERT_EQ(messages.front().headers, std::nullopt);
+    ASSERT_TRUE(messages.front().headers.empty());
 }
 
 TEST_F(script_reader_test, ParseMessageHeadersWrongType)
