@@ -311,8 +311,8 @@ TEST_F(script_test, BuildAndGetNextHeadersOk)
         traffic::json_reader(R"( { "key1" : "val1", "key2": "val2" } )", "{}"));
 
     traffic::script script{json};
-    traffic::msg_headers h{ {"key1", "val1"}, {"key2", "val2"} };
-    ASSERT_EQ( h, script.get_next_headers());
+    traffic::msg_headers h{{"key1", "val1"}, {"key2", "val2"}};
+    ASSERT_EQ(h, script.get_next_headers());
 }
 
 TEST_F(script_test, EmptyHeaders)
@@ -320,4 +320,48 @@ TEST_F(script_test, EmptyHeaders)
     auto json = build_script();
     traffic::script script{json};
     ASSERT_TRUE(script.get_next_headers().empty());
+}
+
+TEST_F(script_test, ContentTypeInHeaders)
+{
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/headers/content_type", "rocket league");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                traffic::script script(json);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(
+                    e.what(),
+                    "content_type is built automatically in headers. Cannot set custom values.");
+                throw;
+            }
+        },
+        std::logic_error);
+}
+
+TEST_F(script_test, ContentLengthInHeaders)
+{
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/headers/content_length", "6467");
+
+    EXPECT_THROW(
+        {
+            try
+            {
+                traffic::script script(json);
+            }
+            catch (const std::logic_error& e)
+            {
+                EXPECT_STREQ(
+                    e.what(),
+                    "content_length is built automatically in headers. Cannot set custom values.");
+                throw;
+            }
+        },
+        std::logic_error);
 }
