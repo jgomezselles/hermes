@@ -314,4 +314,42 @@ TEST_F(script_reader_test, BuildVariablesEmpty)
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
+TEST_F(script_reader_test, BuildMessageHeadersOk)
+{
+    const std::string header1{"my_header"}, header2{"my_other_header"};
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/headers/header1", header1);
+    json.set<std::string>("/messages/test1/headers/header2", header2);
+
+    auto sr = script_reader(json.as_string());
+    const auto messages = sr.build_messages();
+
+    ASSERT_EQ(messages.size(), 1);
+
+    const msg_headers expected_headers{{"header1", header1}, {"header2", header2}};
+    ASSERT_EQ(messages.front().headers, expected_headers);
+}
+
+TEST_F(script_reader_test, BuildMessageHeadersEmpty)
+{
+    auto sr = script_reader(build_script().as_string());
+    const auto messages = sr.build_messages();
+    ASSERT_EQ(messages.size(), 1);
+    ASSERT_EQ(messages.front().headers, std::nullopt);
+}
+
+TEST_F(script_reader_test, ParseMessageHeadersWrongType)
+{
+    auto json = build_script();
+    json.set<int>("/messages/test1/headers/wrong_type", 5);
+    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
+}
+
+TEST_F(script_reader_test, ParseMessageHeadersEmptyObject)
+{
+    auto json = build_script();
+    json.set<json_reader>("/messages/test1/headers", json_reader(R"("{}")", ""));
+    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
+}
+
 }  // namespace traffic
