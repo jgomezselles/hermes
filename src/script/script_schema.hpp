@@ -84,6 +84,13 @@ const std::string schema = R"(
           "body": {
             "type": "object"
           },
+          "headers":{
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
           "method": {
             "type": "string"
           },
