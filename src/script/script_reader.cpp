@@ -69,14 +69,14 @@ message script_reader::build_message(const std::string &m)
 
     if (json_rdr.is_present("/save_from_answer"))
     {
-        script_reader jr_sfa{json_rdr.get_value<json_reader>("/save_from_answer")};
-        parsed_message.sfa = jr_sfa.build_message_modifier();
+        script_reader sr_sfa{json_rdr.get_value<json_reader>("/save_from_answer")};
+        parsed_message.sfa = sr_sfa.build_message_modifier();
     }
 
     if (json_rdr.is_present("/add_from_saved_to_body"))
     {
-        script_reader jr_atb{json_rdr.get_value<json_reader>("/add_from_saved_to_body")};
-        parsed_message.atb = jr_atb.build_message_modifier();
+        script_reader sr_atb{json_rdr.get_value<json_reader>("/add_from_saved_to_body")};
+        parsed_message.atb = sr_atb.build_message_modifier();
     }
 
     return parsed_message;
