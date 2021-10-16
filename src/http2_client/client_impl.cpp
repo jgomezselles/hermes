@@ -45,7 +45,7 @@ client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_co
     }
 }
 
-std::string client_impl::get_uri(const std::string& uri_path)
+std::string client_impl::build_uri(const std::string& uri_path)
 {
     return "http://" + host + ":" + port + "/" + uri_path;
 }
