@@ -21,8 +21,6 @@
 #include "stats.hpp"
 
 namespace ng = nghttp2::asio_http2;
-using ng::header_map;
-using ng::header_value;
 using namespace std::chrono;
 
 namespace http2_client
@@ -43,11 +41,6 @@ client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_co
     {
         std::cerr << "Fatal error. Could not connect to: " << host << ":" << port << std::endl;
     }
-}
-
-std::string client_impl::build_uri(const std::string& uri_path)
-{
-    return "http://" + host + ":" + port + "/" + uri_path;
 }
 
 void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
@@ -91,17 +84,6 @@ void client_impl::on_timeout(const boost::system::error_code& e,
     }
 }
 
-request client_impl::get_next_request(const traffic::script& s)
-{
-    std::string body = s.get_next_body();
-    header_value type = {"application/json", false};
-    header_value length = {std::to_string(body.length()), false};
-    header_map map = {{"content-type", type}, {"content-length", length}};
-
-    return request{get_uri(s.get_next_url()), s.get_next_method(), body, map,
-                   s.get_next_msg_name()};
-}
-
 void client_impl::open_new_connection()
 {
     if (!mtx.try_lock())
@@ -130,7 +112,7 @@ void client_impl::send()
         return;
     }
     auto script = *script_opt;
-    request req = get_next_request(script);
+    request req = get_next_request(host, port, script);
 
     if (!is_connected())
     {
