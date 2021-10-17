@@ -271,11 +271,16 @@ TEST_F(script_test, ParseRangesInRangeValue)
     json.set<int>("/ranges/my_range/max", 60);
     json.set<std::string>("/messages/test1/url", "/my/url/<my_range>");
     json.set<std::string>("/messages/test1/body/data", "in-range-<my_range>");
+    json.set<std::string>("/messages/test1/headers/x-header-1", "h1-<my_range>-end");
+    json.set<std::string>("/messages/test1/headers/x-header-2", "h2-<my_range>-end");
 
     traffic::script script{json};
     script.parse_ranges(std::map<std::string, int64_t>{{"my_range", 55}});
     ASSERT_EQ("/my/url/55", script.get_next_url());
     ASSERT_EQ("{\"data\":\"in-range-55\"}", script.get_next_body());
+
+    traffic::msg_headers expected_headers {{"x-header-1", "h1-55-end"}, {"x-header-2", "h2-55-end"}};
+    ASSERT_EQ(script.get_next_headers(), expected_headers);
 }
 
 TEST_F(script_test, SameNameInRangesAndVariables)
@@ -296,11 +301,16 @@ TEST_F(script_test, ParseVariables)
     json.set<std::string>("/messages/test1/url", "/my/<my_int>/path");
     json.set<traffic::json_reader>("/messages/test1/body",
                                    traffic::json_reader("{\"<my_string>\": true}", "{}"));
+    json.set<std::string>("/messages/test1/headers/x-header-1", "h1-<my_string>-end");
+    json.set<std::string>("/messages/test1/headers/x-header-2", "h2-<my_int>-end");
 
     traffic::script script{json};
     script.parse_variables();
     ASSERT_EQ("/my/50/path", script.get_next_url());
     ASSERT_EQ("{\"hello\":true}", script.get_next_body());
+
+    traffic::msg_headers expected_headers {{"x-header-1", "h1-hello-end"}, {"x-header-2", "h2-50-end"}};
+    ASSERT_EQ(script.get_next_headers(), expected_headers);
 }
 
 TEST_F(script_test, BuildAndGetNextHeadersOk)
