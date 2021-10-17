@@ -174,6 +174,15 @@ void script::replace_in_messages(const std::string& old_str, const std::string& 
         std::string str_to_replace = "<" + old_str + ">";
         boost::replace_all(m.body, str_to_replace, new_str);
         boost::replace_all(m.url, str_to_replace, new_str);
+
+        traffic::msg_headers new_headers;
+        for (std::pair<std::string, std::string> p : m.headers)
+        {
+            boost::replace_all(p.first, str_to_replace, new_str);
+            boost::replace_all(p.second, str_to_replace, new_str);
+            new_headers.emplace(p);
+        }
+        m.headers = std::move(new_headers);
     }
 }
 
