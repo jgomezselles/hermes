@@ -279,7 +279,7 @@ TEST_F(script_test, ParseRangesInRangeValue)
     ASSERT_EQ("/my/url/55", script.get_next_url());
     ASSERT_EQ("{\"data\":\"in-range-55\"}", script.get_next_body());
 
-    traffic::msg_headers expected_headers {{"x-header-1", "h1-55-end"}, {"x-header-2", "h2-55-end"}};
+    traffic::msg_headers expected_headers{{"x-header-1", "h1-55-end"}, {"x-header-2", "h2-55-end"}};
     ASSERT_EQ(script.get_next_headers(), expected_headers);
 }
 
@@ -309,7 +309,8 @@ TEST_F(script_test, ParseVariables)
     ASSERT_EQ("/my/50/path", script.get_next_url());
     ASSERT_EQ("{\"hello\":true}", script.get_next_body());
 
-    traffic::msg_headers expected_headers {{"x-header-1", "h1-hello-end"}, {"x-header-2", "h2-50-end"}};
+    traffic::msg_headers expected_headers{{"x-header-1", "h1-hello-end"},
+                                          {"x-header-2", "h2-50-end"}};
     ASSERT_EQ(script.get_next_headers(), expected_headers);
 }
 
