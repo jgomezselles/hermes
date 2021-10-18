@@ -67,6 +67,23 @@ msg_headers script_reader::build_message_headers()
     return mh;
 }
 
+msg_modifier_v2 script_reader::build_message_modifier_v2()
+{
+    msg_modifier_v2 mm;
+    if (json_rdr.is_present("/headers"))
+    {
+        script_reader sr_headers{json_rdr.get_value<json_reader>("/headers")};
+        mm.headers = sr_headers.build_message_headers();
+    }
+
+    if (json_rdr.is_present("/body"))
+    {
+        script_reader sr_headers{json_rdr.get_value<json_reader>("/body")};
+        mm.body_fields = sr_headers.build_message_headers();
+    }
+    return mm;
+}
+
 message script_reader::build_message(const std::string &m)
 {
     message parsed_message;
@@ -81,6 +98,12 @@ message script_reader::build_message(const std::string &m)
     {
         script_reader sr_headers{json_rdr.get_value<json_reader>("/headers")};
         parsed_message.headers = sr_headers.build_message_headers();
+    }
+
+    if (json_rdr.is_present("/save"))
+    {
+        script_reader sr_save{json_rdr.get_value<json_reader>("/save")};
+        parsed_message.save = sr_save.build_message_modifier_v2();
     }
 
     if (json_rdr.is_present("/save_from_answer"))

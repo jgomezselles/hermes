@@ -35,6 +35,11 @@ script::script(const json_reader& input_json)
 
 void script::validate_members() const
 {
+    //VALIDATE SAVE in MESSAGES
+    // start building a set<string>. If insert fails -> boom
+
+    //VALIDATE LOAD in MESSAGES
+    // use the set<string>. If load not found: boom
     for (const auto& [k, _] : vars)
     {
         if (ranges.find(k) != ranges.end())
