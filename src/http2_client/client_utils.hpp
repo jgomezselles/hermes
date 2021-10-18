@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nghttp2/asio_http2_client.h>
+#include <nghttp2/asio_http2.h>
 
 #include <mutex>
 #include <string>

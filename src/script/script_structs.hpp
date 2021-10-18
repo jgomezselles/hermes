@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nghttp2/asio_http2.h>
+
 #include <deque>
 #include <map>
 #include <optional>
