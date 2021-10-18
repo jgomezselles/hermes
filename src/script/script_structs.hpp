@@ -10,8 +10,34 @@ namespace traffic
 {
 // name_to_overwrite(min, max)
 using range_type = std::map<std::string, std::pair<int, int>>;
-using answer_type = std::pair<int, std::string>;
 using msg_headers = std::map<std::string, std::string>;
+
+struct answer_type
+{
+    int result_code;
+    std::string body;
+    nghttp2::asio_http2::header_map headers;
+
+    // This operator shall be used only for testing
+    bool operator==(const answer_type& other) const
+    {
+        if (result_code == other.result_code && body == other.body &&
+            headers.size() != other.headers.size())
+        {
+            for (const auto& [k, v] : headers)
+            {
+                const auto& it = other.headers.find(k);
+                if (it == other.headers.end() || it->second.value != v.value ||
+                    it->second.sensitive != v.sensitive)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+};
 
 struct msg_modifier
 {

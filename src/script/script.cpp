@@ -35,10 +35,10 @@ script::script(const json_reader& input_json)
 
 void script::validate_members() const
 {
-    //VALIDATE SAVE in MESSAGES
+    // VALIDATE SAVE in MESSAGES
     // start building a set<string>. If insert fails -> boom
 
-    //VALIDATE LOAD in MESSAGES
+    // VALIDATE LOAD in MESSAGES
     // use the set<string>. If load not found: boom
     for (const auto& [k, _] : vars)
     {
@@ -136,13 +136,13 @@ bool script::add_to_request(const msg_modifier& atb, message& m)
     return true;
 }
 
-bool script::process_next(const std::string& last_answer)
+bool script::process_next(const answer_type& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
     const auto& last_msg = messages.front();
     if (last_msg.sfa.has_value())
     {
-        if (!save_from_answer(last_answer, *last_msg.sfa))
+        if (!save_from_answer(last_answer.body, *last_msg.sfa))
         {
             return false;
         }
@@ -164,12 +164,12 @@ bool script::process_next(const std::string& last_answer)
 
 bool script::validate_answer(const answer_type& last_answer) const
 {
-    return last_answer.first == messages.front().pass_code;
+    return last_answer.result_code == messages.front().pass_code;
 }
 
 const bool script::post_process(const answer_type& last_answer)
 {
-    return !is_last() && process_next(last_answer.second);
+    return !is_last() && process_next(last_answer);
 }
 
 void script::replace_in_messages(const std::string& old_str, const std::string& new_str)

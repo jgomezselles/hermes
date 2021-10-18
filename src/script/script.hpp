@@ -42,7 +42,7 @@ private:
     void validate_members() const;
     void build(const std::string& input_json);
 
-    bool process_next(const std::string& last_answer);
+    bool process_next(const answer_type& last_answer);
     bool save_from_answer(const std::string& answer, const msg_modifier& sfa);
     bool add_to_request(const msg_modifier& atb, message& m);
     const bool is_last() const { return messages.size() == 1; };
