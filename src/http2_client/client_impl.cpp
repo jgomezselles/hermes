@@ -173,7 +173,7 @@ void client_impl::send()
                     }
                     else
                     {
-                        traffic::answer_type ans = std::make_pair(res.status_code(), *answer);
+                        traffic::answer_type ans = {res.status_code(), *answer, res.header()};
                         bool valid_answer = script.validate_answer(ans);
                         if (valid_answer)
                         {

@@ -233,7 +233,7 @@ TEST_P(client_test_p, SendMessage)
     auto queue = std::make_unique<script_queue_mock>();
 
     std::optional<traffic::script> script(build_script());
-    traffic::answer_type ans = std::make_pair(200, response_body);
+    traffic::answer_type ans {200, response_body};
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
@@ -323,7 +323,7 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
     auto queue = std::make_unique<script_queue_mock>();
 
     std::optional<traffic::script> script(build_script());
-    traffic::answer_type ans = std::make_pair(200, response_body);
+    traffic::answer_type ans {200, response_body};
     std::promise<void> prom1, prom2;
     std::future<void> fut1 = prom1.get_future(), fut2 = prom2.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(3).WillRepeatedly(Return(script));

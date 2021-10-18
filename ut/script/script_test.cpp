@@ -68,7 +68,7 @@ TEST_F(script_test, PostProcessLastMessageReturnsFalse)
 {
     const auto json = build_script();
     traffic::script script{json};
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, "OK")));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, R"("OK")"}));
 }
 
 TEST_F(script_test, PostProcessTwoAnswers)
@@ -76,8 +76,8 @@ TEST_F(script_test, PostProcessTwoAnswers)
     auto json = build_script();
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, "OK")));
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, "OK")));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, R"("OK")"}));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, R"("OK")"}));
 }
 
 TEST_F(script_test, PostProcessFoundStringInSFAPath)
@@ -92,7 +92,7 @@ TEST_F(script_test, PostProcessFoundStringInSFAPath)
 
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "I am a string");
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessFoundIntInSFAPath)
@@ -107,7 +107,7 @@ TEST_F(script_test, PostProcessFoundIntInSFAPath)
 
     traffic::json_reader answer;
     answer.set<int>(expected_path, 7);
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessFoundObjectInSFAPath)
@@ -122,7 +122,7 @@ TEST_F(script_test, PostProcessFoundObjectInSFAPath)
 
     traffic::json_reader answer;
     answer.set<traffic::json_reader>(expected_path, {"{}", "{}"});
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessFoundIntWhenExpectingStringValueInSFA)
@@ -137,7 +137,7 @@ TEST_F(script_test, PostProcessFoundIntWhenExpectingStringValueInSFA)
 
     traffic::json_reader answer;
     answer.set<int>(expected_path, 123456);
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessFoundStringWhenExpectingIntValueInSFA)
@@ -152,7 +152,7 @@ TEST_F(script_test, PostProcessFoundStringWhenExpectingIntValueInSFA)
 
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "Oops, I'm a string");
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessFoundStringWhenExpectingObjectValueInSFA)
@@ -167,7 +167,7 @@ TEST_F(script_test, PostProcessFoundStringWhenExpectingObjectValueInSFA)
 
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "Oops, I'm a string");
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessCorrectStringValueInSFAUsedInATB)
@@ -185,7 +185,7 @@ TEST_F(script_test, PostProcessCorrectStringValueInSFAUsedInATB)
 
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "I am a string");
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
     ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
@@ -204,7 +204,7 @@ TEST_F(script_test, PostProcessCorrectIntValueINSFAUsedInATB)
 
     traffic::json_reader answer;
     answer.set<int>(expected_path, 53);
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
     ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
@@ -224,7 +224,7 @@ TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
     traffic::json_reader answer;
     answer.set<std::string>(expected_path + "/sub_path1", "hi there");
     answer.set<int>(expected_path + "/sub_path1", 235);
-    ASSERT_TRUE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string()}));
     ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
@@ -243,7 +243,7 @@ TEST_F(script_test, PostProcessNotFoundValueInSFAToUseInATB)
 
     traffic::json_reader answer;
     answer.set<int>("/not/expected/path", 53);
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, PostProcessInCorrectTypeValueInSFAUsedInATB)
@@ -261,7 +261,7 @@ TEST_F(script_test, PostProcessInCorrectTypeValueInSFAUsedInATB)
 
     traffic::json_reader answer;
     answer.set<std::string>(expected_path, "I am a string BUT I am expected to be int");
-    ASSERT_FALSE(script.post_process(traffic::answer_type(200, answer.as_string())));
+    ASSERT_FALSE(script.post_process(traffic::answer_type{200, answer.as_string()}));
 }
 
 TEST_F(script_test, ParseRangesInRangeValue)
