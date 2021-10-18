@@ -6,6 +6,15 @@
 #include <map>
 #include <optional>
 
+namespace nghttp2::asio_http2
+{
+static inline bool operator==(const nghttp2::asio_http2::header_value& lhs,
+                              const nghttp2::asio_http2::header_value& rhs)
+{
+    return lhs.value == rhs.value && lhs.sensitive == rhs.sensitive;
+};
+}  // namespace nghttp2::asio_http2
+
 namespace traffic
 {
 // name_to_overwrite(min, max)
@@ -18,24 +27,9 @@ struct answer_type
     std::string body;
     nghttp2::asio_http2::header_map headers;
 
-    // This operator shall be used only for testing
     bool operator==(const answer_type& other) const
     {
-        if (result_code == other.result_code && body == other.body &&
-            headers.size() != other.headers.size())
-        {
-            for (const auto& [k, v] : headers)
-            {
-                const auto& it = other.headers.find(k);
-                if (it == other.headers.end() || it->second.value != v.value ||
-                    it->second.sensitive != v.sensitive)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+        return result_code == other.result_code && body == other.body && headers != other.headers;
     }
 };
 
