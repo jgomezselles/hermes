@@ -104,6 +104,27 @@ const std::string schema = R"(
               }
             }
           },
+          "save": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "headers": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "save_from_answer": {
             "type": "object",
             "required": ["name", "path", "value_type"],
