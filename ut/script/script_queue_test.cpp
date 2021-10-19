@@ -42,7 +42,7 @@ TEST_F(script_queue_test, EnqueueSimpleScriptJustRunOnce)
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
-    script_queue->enqueue_script(script_opt.value(), {200, "OK"});
+    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
     script_queue->close_window();
@@ -62,13 +62,13 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
-    script_queue->enqueue_script(script_opt.value(), {200, "OK"});
+    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
     ASSERT_TRUE(script_queue->has_pending_scripts());
     script_opt = script_queue->get_next_script();
     ASSERT_TRUE(script_opt);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
-    script_queue->enqueue_script(script_opt.value(), {200, "OK"});
+    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
     script_queue->close_window();
@@ -143,12 +143,12 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
 
     // Now let's answer the first one, so get_next_script will return
     // the first one back to us, keeping the "5"
-    script_queue->enqueue_script(script_opt.value(), {200, "OK"});
+    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
     script_opt = script_queue->get_next_script();
     ASSERT_EQ(6, script_queue->get_current("range1"));
 
     // The same for script 2
-    script_queue->enqueue_script(script_opt2.value(), {200, "OK"});
+    script_queue->enqueue_script(script_opt2.value(), {200, R"("OK")"});
     script_opt = script_queue->get_next_script();
     ASSERT_EQ(6, script_queue->get_current("range1"));
 

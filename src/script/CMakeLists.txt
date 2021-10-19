@@ -4,6 +4,7 @@ STATIC
     script.cpp
     json_reader.cpp
     script_reader.cpp
+    script_functions.cpp
 )
 
 target_include_directories(hermes-script
