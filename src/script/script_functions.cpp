@@ -19,9 +19,9 @@ void save_headers(const std::map<std::string, std::string>& headers2save,
         const auto& header_to_save = answer_headers.find(header_field);
         if (header_to_save == answer_headers.end())
         {
-            throw std::logic_error("Header " + header_field + " not found");
+            throw std::logic_error("Header " + header_field + " not found.");
         }
-        vars.emplace(id, header_to_save->second.value);
+        vars.insert_or_assign(id, header_to_save->second.value);
     }
 }
 
@@ -31,7 +31,7 @@ void save_body_fields(const std::map<std::string, std::string>& fields2save,
     json_reader body_json{body_str, ""};
     for (const auto& [id, path] : fields2save)
     {
-        vars.emplace(id, body_json.get_json_as_string(path));
+        vars.insert_or_assign(id, body_json.get_json_as_string(path));
     }
 }
 
