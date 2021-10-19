@@ -354,8 +354,8 @@ TEST_F(script_reader_test, ParseMessageHeadersEmptyObject)
 
 TEST_F(script_reader_test, BuildMessageSaveOk)
 {
-    const std::string header1{"x-header-1"}, header2{"x-header-2"},
-        body_path_1{"/path/one"}, body_path_2{"/path/two"};
+    const std::string header1{"x-header-1"}, header2{"x-header-2"}, body_path_1{"/path/one"},
+        body_path_2{"/path/two"};
     auto json = build_script();
     json.set<std::string>("/messages/test1/save/headers/header1", header1);
     json.set<std::string>("/messages/test1/save/headers/header2", header2);
@@ -367,13 +367,10 @@ TEST_F(script_reader_test, BuildMessageSaveOk)
 
     ASSERT_EQ(messages.size(), 1);
 
-    std::map<std::string, std::string> expected_headers {
-            {"header1", header1}, {"header2", header2}
-    };
+    std::map<std::string, std::string> expected_headers{{"header1", header1}, {"header2", header2}};
 
-    std::map<std::string, std::string> expected_body_fields {
-            {"field1", body_path_1}, {"field2", body_path_2}
-    };
+    std::map<std::string, std::string> expected_body_fields{{"field1", body_path_1},
+                                                            {"field2", body_path_2}};
 
     ASSERT_EQ(messages.front().save.body_fields, expected_body_fields);
     ASSERT_EQ(messages.front().save.headers, expected_headers);

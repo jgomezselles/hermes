@@ -5,10 +5,13 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <optional>
+#include <set>
 #include <vector>
 
 #include "json_reader.hpp"
+#include "script_functions.hpp"
 #include "script_reader.hpp"
 
 namespace traffic
@@ -35,22 +38,17 @@ script::script(const json_reader& input_json)
 
 void script::validate_members() const
 {
-    // VALIDATE SAVE in MESSAGES
-    // start building a set<string>. If insert fails -> boom
+    std::set<std::string> unique_ids;
+    check_repeated(unique_ids, vars);
+    check_repeated(unique_ids, ranges);
 
     // VALIDATE LOAD in MESSAGES
     // use the set<string>. If load not found: boom
-    for (const auto& [k, _] : vars)
-    {
-        if (ranges.find(k) != ranges.end())
-        {
-            throw std::logic_error(
-                k + " found in both ranges and variables. Please, choose a different name.");
-        }
-    }
-
     for (const auto& m : messages)
     {
+        check_repeated(unique_ids, m.save.headers);
+        check_repeated(unique_ids, m.save.body_fields);
+
         for (const std::string& forbidden : {"content_type", "content_length"})
         {
             if (m.headers.find(forbidden) != m.headers.end())
@@ -109,6 +107,21 @@ bool script::save_from_answer(const std::string& answer, const msg_modifier& sfa
     return true;
 }
 
+bool script::save(const answer_type& answer, const msg_modifier_v2& save)
+{
+    try
+    {
+        save_headers(save.headers, answer.headers, vars);
+        save_body_fields(save.body_fields, answer.body, vars);
+    }
+    catch (std::logic_error& le)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool script::add_to_request(const msg_modifier& atb, message& m)
 {
     json_reader modified_body(m.body, "{}");
@@ -146,6 +159,11 @@ bool script::process_next(const answer_type& last_answer)
         {
             return false;
         }
+    }
+
+    if (!save(last_answer, last_msg.save))
+    {
+        return false;
     }
 
     messages.pop_front();
