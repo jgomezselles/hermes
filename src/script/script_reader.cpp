@@ -169,11 +169,6 @@ std::map<std::string, std::string> script_reader::build_variables()
             {
                 vars.emplace(key, std::to_string(json_rdr.get_value<int>(full_key)));
             }
-            else
-            {
-                throw std::logic_error(
-                    "Error in script. Variables can only be strings or integers.");
-            }
         }
     }
     return vars;
