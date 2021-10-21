@@ -35,17 +35,24 @@ struct answer_type
 
 struct msg_modifier
 {
-    std::string name;
     std::string path;
     std::string value_type;
+    bool operator==(const msg_modifier& other) const
+    {
+        return path == other.path && value_type == other.value_type;
+    };
 };
 
-struct msg_modifier_v2
+struct msg_modifiers
 {
     // id, header_field
     std::map<std::string, std::string> headers;
     // id, path
-    std::map<std::string, std::string> body_fields;
+    std::map<std::string, msg_modifier> body_fields;
+    bool operator==(const msg_modifiers& other) const
+    {
+        return headers == other.headers && body_fields == other.body_fields;
+    };
 };
 
 struct message
@@ -57,10 +64,8 @@ struct message
     int pass_code;
     msg_headers headers;
 
-    std::optional<msg_modifier> sfa;
-    std::optional<msg_modifier> atb;
-
-    msg_modifier_v2 save;
+    msg_modifiers sfa;
+    std::map<std::string, msg_modifier> atb;
 };
 
 struct server_info

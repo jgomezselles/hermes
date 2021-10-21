@@ -84,9 +84,8 @@ TEST_F(script_test, PostProcessFoundStringInSFAPath)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -99,9 +98,8 @@ TEST_F(script_test, PostProcessFoundIntInSFAPath)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/value_type", "int");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -114,9 +112,8 @@ TEST_F(script_test, PostProcessFoundObjectInSFAPath)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/value_type", "object");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -129,9 +126,8 @@ TEST_F(script_test, PostProcessFoundIntWhenExpectingStringValueInSFA)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -144,9 +140,8 @@ TEST_F(script_test, PostProcessFoundStringWhenExpectingIntValueInSFA)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "int");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -159,9 +154,8 @@ TEST_F(script_test, PostProcessFoundStringWhenExpectingObjectValueInSFA)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "object");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     traffic::script script{json};
 
@@ -174,13 +168,11 @@ TEST_F(script_test, PostProcessCorrectStringValueInSFAUsedInATB)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "string");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/value_type", "string");
     traffic::script script{json};
 
     traffic::json_reader answer;
@@ -193,13 +185,11 @@ TEST_F(script_test, PostProcessCorrectIntValueINSFAUsedInATB)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/value_type", "int");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/value_type", "int");
     traffic::script script{json};
 
     traffic::json_reader answer;
@@ -212,13 +202,11 @@ TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/value_type", "object");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_object");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_object/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_object/value_type", "object");
     traffic::script script{json};
 
     traffic::json_reader answer;
@@ -228,17 +216,65 @@ TEST_F(script_test, PostProcessCorrectObjectValueInSFAUsedInATB)
     ASSERT_EQ(answer.as_string(), script.get_next_body());
 }
 
+TEST_F(script_test, PostProcessSaveHeadersAndUseThemLater)
+{
+    auto json = build_script();
+    json.set<std::string>("/variables/my_var_string", "String");
+
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header1", "x-header-1");
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header2", "x-header-2");
+    json.set<std::string>("/messages/test1/save_from_answer/saved1/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/saved1/value_type", "string");
+
+    json.set<std::string>("/messages/test2/add_from_saved_to_body/saved1/path", "/new/path");
+    json.set<std::string>("/messages/test2/add_from_saved_to_body/saved1/value_type", "string");
+    json.set<std::string>("/messages/test2/url", "v1/test");
+    json.set<traffic::json_reader>("/messages/test2/body", {R"({"header2": "<header2>"})", ""});
+    json.set<traffic::json_reader>("/messages/test2/headers",
+                                   {R"({"frankensheader": "<my_var_string>:<header1>"})", ""});
+    json.set<std::string>("/messages/test2/method", "PUT");
+    json.set<int>("/messages/test2/response/code", 200);
+
+    json.set<std::vector<std::string>>("/flow", {"test1", "test2"});
+
+    traffic::script script{json};
+
+    traffic::json_reader answer;
+    answer.set<std::string>("/some/path", "hi there");
+
+    nghttp2::asio_http2::header_map answer_headers{{"x-header-1", {"I am header 1", false}},
+                                                   {"x-header-2", {"I am header 2", false}}};
+
+    ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string(), answer_headers}));
+
+    traffic::json_reader expected_next_body;
+    expected_next_body.set<std::string>(
+        "/header2",
+        "<header2>");  // This one is going to be parsed in script_queue->get_next_script
+    expected_next_body.set<std::string>("/new/path", "hi there");
+
+    ASSERT_EQ(expected_next_body.as_string(), script.get_next_body());
+
+    traffic::msg_headers expected_next_headers{{"frankensheader", "<my_var_string>:<header1>"}};
+
+    ASSERT_EQ(expected_next_headers, script.get_next_headers());
+
+    script.parse_variables();
+    expected_next_headers["frankensheader"] = "String:I am header 1";
+    expected_next_body.set<std::string>("/header2", "I am header 2");
+    ASSERT_EQ(expected_next_headers, script.get_next_headers());
+    ASSERT_EQ(expected_next_body.as_string(), script.get_next_body());
+}
+
 TEST_F(script_test, PostProcessNotFoundValueInSFAToUseInATB)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/value_type", "int");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/value_type", "int");
     traffic::script script{json};
 
     traffic::json_reader answer;
@@ -250,13 +286,11 @@ TEST_F(script_test, PostProcessInCorrectTypeValueInSFAUsedInATB)
 {
     const std::string expected_path{"/some/path"};
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", expected_path);
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", expected_path);
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/path", expected_path);
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/value_type", "int");
     traffic::script script{json};
 
     traffic::json_reader answer;

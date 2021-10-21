@@ -42,13 +42,8 @@ void script::validate_members() const
     check_repeated(unique_ids, vars);
     check_repeated(unique_ids, ranges);
 
-    // VALIDATE LOAD in MESSAGES
-    // use the set<string>. If load not found: boom
     for (const auto& m : messages)
     {
-        check_repeated(unique_ids, m.save.headers);
-        check_repeated(unique_ids, m.save.body_fields);
-
         for (const std::string& forbidden : {"content_type", "content_length"})
         {
             if (m.headers.find(forbidden) != m.headers.end())
@@ -82,22 +77,27 @@ const std::vector<std::string> script::get_message_names() const
     return res;
 }
 
-bool script::save_from_answer(const std::string& answer, const msg_modifier& sfa)
+bool script::save_from_answer(const answer_type& answer, const msg_modifiers& sfa)
 {
     try
     {
-        json_reader ans_json{answer, "{}"};
-        if (sfa.value_type == "string")
+        save_headers(sfa.headers, answer.headers, vars);
+
+        for (const auto& [id, mm] : sfa.body_fields)
         {
-            saved_strs[sfa.name] = ans_json.get_value<std::string>(sfa.path);
-        }
-        else if (sfa.value_type == "int")
-        {
-            saved_ints[sfa.name] = ans_json.get_value<int>(sfa.path);
-        }
-        else if (sfa.value_type == "object")
-        {
-            saved_jsons[sfa.name] = ans_json.get_value<json_reader>(sfa.path);
+            json_reader ans_json{answer.body, "{}"};
+            if (mm.value_type == "string")
+            {
+                saved_strs[id] = ans_json.get_value<std::string>(mm.path);
+            }
+            else if (mm.value_type == "int")
+            {
+                saved_ints[id] = ans_json.get_value<int>(mm.path);
+            }
+            else if (mm.value_type == "object")
+            {
+                saved_jsons[id] = ans_json.get_value<json_reader>(mm.path);
+            }
         }
     }
     catch (std::logic_error& le)
@@ -107,42 +107,35 @@ bool script::save_from_answer(const std::string& answer, const msg_modifier& sfa
     return true;
 }
 
-bool script::save(const answer_type& answer, const msg_modifier_v2& save)
-{
-    try
-    {
-        save_headers(save.headers, answer.headers, vars);
-        save_body_fields(save.body_fields, answer.body, vars);
-    }
-    catch (std::logic_error& le)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool script::add_to_request(const msg_modifier& atb, message& m)
+bool script::add_to_request(const std::map<std::string, msg_modifier>& atb, message& m)
 {
     json_reader modified_body(m.body, "{}");
 
     try
     {
-        if (atb.value_type == "string")
+        for (const auto& [id, mm] : atb)
         {
-            modified_body.set(atb.path, saved_strs.at(atb.name));
+            if (mm.value_type == "string")
+            {
+                modified_body.set(mm.path, saved_strs.at(id));
+            }
+            else if (mm.value_type == "int")
+            {
+                modified_body.set(mm.path, saved_ints.at(id));
+            }
+            else if (mm.value_type == "object")
+            {
+                modified_body.set(mm.path, saved_jsons.at(id));
+            }
         }
-        else if (atb.value_type == "int")
-        {
-            modified_body.set(atb.path, saved_ints.at(atb.name));
-        }
-        else if (atb.value_type == "object")
-        {
-            modified_body.set(atb.path, saved_jsons.at(atb.name));
-        }
+
         m.body = modified_body.as_string();
     }
     catch (std::out_of_range& oor)
+    {
+        return false;
+    }
+    catch (std::logic_error& le)
     {
         return false;
     }
@@ -153,15 +146,7 @@ bool script::process_next(const answer_type& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
     const auto& last_msg = messages.front();
-    if (last_msg.sfa.has_value())
-    {
-        if (!save_from_answer(last_answer.body, *last_msg.sfa))
-        {
-            return false;
-        }
-    }
-
-    if (!save(last_answer, last_msg.save))
+    if (!save_from_answer(last_answer, last_msg.sfa))
     {
         return false;
     }
@@ -169,12 +154,9 @@ bool script::process_next(const answer_type& last_answer)
     messages.pop_front();
 
     auto& next_msg = messages.front();
-    if (next_msg.atb.has_value())
+    if (!add_to_request(next_msg.atb, next_msg))
     {
-        if (!add_to_request(*next_msg.atb, next_msg))
-        {
-            return false;
-        }
+        return false;
     }
 
     return true;

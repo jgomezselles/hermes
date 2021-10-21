@@ -18,8 +18,9 @@ public:
     message build_message(const std::string &m);
     msg_headers build_message_headers();
     msg_modifier build_message_modifier();
+    msg_modifiers build_sfa();
+    std::map<std::string, msg_modifier> build_atb();
     std::map<std::string, std::string> build_variables();
-    msg_modifier_v2 build_message_modifier_v2();
 
 private:
     script_reader(json_reader &&mgr);

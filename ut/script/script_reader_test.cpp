@@ -132,31 +132,88 @@ TEST_F(script_reader_test, MessageInFlowNotFound)
     ASSERT_THROW(sr.build_messages(), std::logic_error);
 }
 
-TEST_F(script_reader_test, MessageWithSFATypes)
+TEST_F(script_reader_test, MessageWithHeadersInSFA)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_string");
-    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "string");
-
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_object");
-    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
-
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_int");
-    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "int");
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header_id_1", "x-my-header");
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header_id_2",
+                          "x-my-other-header");
 
     auto sr = script_reader(json.as_string());
-    ASSERT_NO_THROW(sr.build_messages());
+    const auto msgs = sr.build_messages();
+
+    ASSERT_EQ(msgs.size(), 1);
+    std::map<std::string, std::string> expected_headers{{"header_id_1", "x-my-header"},
+                                                        {"header_id_2", "x-my-other-header"}};
+    ASSERT_EQ(msgs.front().sfa.headers, expected_headers);
+
+    ASSERT_TRUE(msgs.front().sfa.body_fields.empty());
+}
+
+TEST_F(script_reader_test, MessageWithoutHeadersInSFA)
+{
+    auto json = build_script();
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/path", "/some/other/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/value_type", "object");
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/path", "/yet/another/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/value_type", "int");
+
+    auto sr = script_reader(json.as_string());
+    const auto msgs = sr.build_messages();
+
+    ASSERT_EQ(msgs.size(), 1);
+    ASSERT_TRUE(msgs.front().sfa.headers.empty());
+
+    std::map<std::string, msg_modifier> expected_body_fields{
+        {"my_string", {"/some/path", "string"}},
+        {"my_object", {"/some/other/path", "object"}},
+        {"my_int", {"/yet/another/path", "int"}}};
+
+    ASSERT_EQ(msgs.front().sfa.body_fields, expected_body_fields);
+}
+
+TEST_F(script_reader_test, MessageWithFullSFA)
+{
+    auto json = build_script();
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header_id_1", "x-my-header");
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header_id_2",
+                          "x-my-other-header");
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_string/value_type", "string");
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/path", "/some/other/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_object/value_type", "object");
+
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/path", "/yet/another/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_int/value_type", "int");
+
+    auto sr = script_reader(json.as_string());
+    const auto msgs = sr.build_messages();
+
+    ASSERT_EQ(msgs.size(), 1);
+    std::map<std::string, std::string> expected_headers{{"header_id_1", "x-my-header"},
+                                                        {"header_id_2", "x-my-other-header"}};
+    ASSERT_EQ(msgs.front().sfa.headers, expected_headers);
+
+    std::map<std::string, msg_modifier> expected_body_fields{
+        {"my_string", {"/some/path", "string"}},
+        {"my_object", {"/some/other/path", "object"}},
+        {"my_int", {"/yet/another/path", "int"}}};
+
+    ASSERT_EQ(msgs.front().sfa.body_fields, expected_body_fields);
 }
 
 TEST_F(script_reader_test, MessageWithSFAWrongType)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
-    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "bool");
+    json.set<std::string>("/messages/test1/save_from_answer/my_sfa/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_sfa/value_type", "bool");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
@@ -171,44 +228,49 @@ TEST_F(script_reader_test, MessageWithSFANoName)
 TEST_F(script_reader_test, MessageWithSFANoPath)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
-    json.set<std::string>("/messages/test1/save_from_answer/value_type", "object");
+    json.set<std::string>("/messages/test1/save_from_answer/my_sfa/value_type", "object");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
 TEST_F(script_reader_test, MessageWithSFANoValueType)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/save_from_answer/name", "my_sfa");
-    json.set<std::string>("/messages/test1/save_from_answer/path", "/some/path");
+    json.set<std::string>("/messages/test1/save_from_answer/my_sfa/path", "/some/path");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
 TEST_F(script_reader_test, MessageWithAFSTBTypes)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_string");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "string");
 
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_object");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_string/value_type", "string");
 
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_int");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "int");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_object/path",
+                          "/some/other/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_object/value_type", "object");
+
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/path",
+                          "/yet/another/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_int/value_type", "int");
 
     auto sr = script_reader(json.as_string());
-    ASSERT_NO_THROW(sr.build_messages());
+    const auto msgs = sr.build_messages();
+
+    ASSERT_EQ(msgs.size(), 1);
+
+    std::map<std::string, msg_modifier> expected_atb{{"my_string", {"/some/path", "string"}},
+                                                     {"my_object", {"/some/other/path", "object"}},
+                                                     {"my_int", {"/yet/another/path", "int"}}};
+
+    ASSERT_EQ(msgs.front().atb, expected_atb);
 }
 
 TEST_F(script_reader_test, MessageWithAFSTBWrongType)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "bool");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_atb/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_atb/value_type", "bool");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
@@ -223,16 +285,14 @@ TEST_F(script_reader_test, MessageWithAFSTBNoName)
 TEST_F(script_reader_test, MessageWithAFSTBNoPath)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/value_type", "object");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_atb/value_type", "object");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
 TEST_F(script_reader_test, MessageWithAFSTBNoValueType)
 {
     auto json = build_script();
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/name", "my_sfa");
-    json.set<std::string>("/messages/test1/add_from_saved_to_body/path", "/some/path");
+    json.set<std::string>("/messages/test1/add_from_saved_to_body/my_atb/path", "/some/path");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
@@ -349,80 +409,6 @@ TEST_F(script_reader_test, ParseMessageHeadersEmptyObject)
 {
     auto json = build_script();
     json.set<json_reader>("/messages/test1/headers", json_reader(R"("{}")", ""));
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-}
-
-TEST_F(script_reader_test, BuildMessageSaveOk)
-{
-    const std::string header1{"x-header-1"}, header2{"x-header-2"}, body_path_1{"/path/one"},
-        body_path_2{"/path/two"};
-    auto json = build_script();
-    json.set<std::string>("/messages/test1/save/headers/header1", header1);
-    json.set<std::string>("/messages/test1/save/headers/header2", header2);
-    json.set<std::string>("/messages/test1/save/body/field1", body_path_1);
-    json.set<std::string>("/messages/test1/save/body/field2", body_path_2);
-
-    auto sr = script_reader(json.as_string());
-    const auto messages = sr.build_messages();
-
-    ASSERT_EQ(messages.size(), 1);
-
-    std::map<std::string, std::string> expected_headers{{"header1", header1}, {"header2", header2}};
-
-    std::map<std::string, std::string> expected_body_fields{{"field1", body_path_1},
-                                                            {"field2", body_path_2}};
-
-    ASSERT_EQ(messages.front().save.body_fields, expected_body_fields);
-    ASSERT_EQ(messages.front().save.headers, expected_headers);
-}
-
-TEST_F(script_reader_test, BuildMessageSaveEmpty)
-{
-    auto sr = script_reader(build_script().as_string());
-    const auto messages = sr.build_messages();
-    ASSERT_EQ(messages.size(), 1);
-    ASSERT_TRUE(messages.front().save.body_fields.empty());
-    ASSERT_TRUE(messages.front().save.headers.empty());
-}
-
-TEST_F(script_reader_test, ParseMessageSaveWrongTypes)
-{
-    auto json = build_script();
-    json.set<int>("/messages/test1/save/wrong_type", 5);
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-
-    json = build_script();
-    json.set<std::string>("/messages/test1/save/wrong_type", "wrong");
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-
-    json = build_script();
-    json.set<int>("/messages/test1/save/headers/body/wrong_type", 33);
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-
-    json = build_script();
-    json.set<int>("/messages/test1/save/headers/headers/header1/wrong_type", 33);
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-
-    json = build_script();
-    json.set<int>("/messages/test1/save/headers/body/body1/wrong_type", 666);
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-}
-
-TEST_F(script_reader_test, ParseMessageEmptyBodyAndHeaders)
-{
-    auto json = build_script();
-    json.set<json_reader>("/messages/test1/save/headers", {R"({})", ""});
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-
-    json = build_script();
-    json.set<json_reader>("/messages/test1/save/body", {R"({})", ""});
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-}
-
-TEST_F(script_reader_test, ParseMessageAdditionalProperties)
-{
-    auto json = build_script();
-    json.set<std::string>("/messages/test1/save/no_header_nor_body", "boom");
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
