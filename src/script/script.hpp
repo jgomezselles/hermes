@@ -43,7 +43,7 @@ private:
     void build(const std::string& input_json);
 
     bool process_next(const answer_type& last_answer);
-    bool save_from_answer(const answer_type& answer, const msg_modifiers& sfa);
+    bool save_from_answer(const answer_type& answer, const msg_modifier& sfa);
     bool add_to_request(const std::map<std::string, body_modifier>& atb, message& m);
 
     const bool is_last() const { return messages.size() == 1; };

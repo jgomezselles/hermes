@@ -18,7 +18,7 @@ public:
     message build_message(const std::string &m);
     msg_headers build_message_headers();
     body_modifier build_body_modifier();
-    msg_modifiers build_sfa();
+    msg_modifier build_sfa();
     std::map<std::string, body_modifier> build_atb();
     std::map<std::string, std::string> build_variables();
 

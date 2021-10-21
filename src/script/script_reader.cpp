@@ -78,9 +78,9 @@ std::map<std::string, body_modifier> script_reader::build_atb()
     return bms;
 }
 
-msg_modifiers script_reader::build_sfa()
+msg_modifier script_reader::build_sfa()
 {
-    msg_modifiers mms;
+    msg_modifier mms;
     for (const auto &attr : json_rdr.get_attributes())
     {
         if (attr == "headers")
