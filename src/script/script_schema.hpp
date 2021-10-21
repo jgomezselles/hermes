@@ -104,10 +104,9 @@ const std::string schema = R"(
               }
             }
           },
-          "save": {
+          "save_from_answer": {
             "type": "object",
             "minProperties": 1,
-            "additionalProperties": false,
             "properties": {
               "headers": {
                 "type": "object",
@@ -115,47 +114,38 @@ const std::string schema = R"(
                 "additionalProperties": {
                   "type": "string"
                 }
-              },
-              "body": {
-                "type": "object",
-                "minProperties": 1,
-                "additionalProperties": {
-                  "type": "string"
-                }
               }
-            }
-          },
-          "save_from_answer": {
-            "type": "object",
-            "required": ["name", "path", "value_type"],
-            "additionalProperties": false,
-            "properties": {
-              "name": {
+            },
+            "additionalProperties": {
+              "type": "object",
+              "required": ["path", "value_type"],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
                 "type": "string"
-              },
-              "path": {
-                "type": "string"
-              },
-              "value_type": {
-                "type": "string",
-                "enum": ["string", "int", "object"]
+                },
+                "value_type": {
+                  "type": "string",
+                  "enum": ["string", "int", "object"]
+                }
               }
             }
           },
           "add_from_saved_to_body": {
             "type": "object",
-            "required": ["name", "path", "value_type"],
-            "additionalProperties": false,
-            "properties": {
-              "name": {
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "required": ["path", "value_type"],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
                 "type": "string"
-              },
-              "path": {
-                "type": "string"
-              },
-              "value_type": {
-                "type": "string",
-                "enum": ["string", "int", "object"]
+                },
+                "value_type": {
+                  "type": "string",
+                  "enum": ["string", "int", "object"]
+                }
               }
             }
           }

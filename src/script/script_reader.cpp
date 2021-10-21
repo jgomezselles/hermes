@@ -67,21 +67,34 @@ msg_headers script_reader::build_message_headers()
     return mh;
 }
 
-msg_modifier_v2 script_reader::build_message_modifier_v2()
+std::map<std::string, msg_modifier> script_reader::build_atb()
 {
-    msg_modifier_v2 mm;
-    if (json_rdr.is_present("/headers"))
+    std::map<std::string, msg_modifier> mms;
+    for (const auto &attr : json_rdr.get_attributes())
     {
-        script_reader sr_headers{json_rdr.get_value<json_reader>("/headers")};
-        mm.headers = sr_headers.build_message_headers();
+        script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
+        mms.insert({attr, sr_body_fields.build_message_modifier()});
     }
+    return mms;
+}
 
-    if (json_rdr.is_present("/body"))
+msg_modifiers script_reader::build_sfa()
+{
+    msg_modifiers mms;
+    for (const auto &attr : json_rdr.get_attributes())
     {
-        script_reader sr_headers{json_rdr.get_value<json_reader>("/body")};
-        mm.body_fields = sr_headers.build_message_headers();
+        if (attr == "headers")
+        {
+            script_reader sr_headers{json_rdr.get_value<json_reader>("/headers")};
+            mms.headers = sr_headers.build_message_headers();
+        }
+        else
+        {
+            script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
+            mms.body_fields.insert({attr, sr_body_fields.build_message_modifier()});
+        }
     }
-    return mm;
+    return mms;
 }
 
 message script_reader::build_message(const std::string &m)
@@ -100,22 +113,16 @@ message script_reader::build_message(const std::string &m)
         parsed_message.headers = sr_headers.build_message_headers();
     }
 
-    if (json_rdr.is_present("/save"))
-    {
-        script_reader sr_save{json_rdr.get_value<json_reader>("/save")};
-        parsed_message.save = sr_save.build_message_modifier_v2();
-    }
-
     if (json_rdr.is_present("/save_from_answer"))
     {
         script_reader sr_sfa{json_rdr.get_value<json_reader>("/save_from_answer")};
-        parsed_message.sfa = sr_sfa.build_message_modifier();
+        parsed_message.sfa = sr_sfa.build_sfa();
     }
 
     if (json_rdr.is_present("/add_from_saved_to_body"))
     {
         script_reader sr_atb{json_rdr.get_value<json_reader>("/add_from_saved_to_body")};
-        parsed_message.atb = sr_atb.build_message_modifier();
+        parsed_message.atb = sr_atb.build_atb();
     }
 
     return parsed_message;
@@ -124,7 +131,6 @@ message script_reader::build_message(const std::string &m)
 msg_modifier script_reader::build_message_modifier()
 {
     msg_modifier mm;
-    mm.name = json_rdr.get_value<std::string>("/name");
     mm.value_type = json_rdr.get_value<std::string>("/value_type");
     mm.path = json_rdr.get_value<std::string>("/path");
     return mm;
