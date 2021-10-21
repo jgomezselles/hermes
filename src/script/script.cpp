@@ -135,10 +135,7 @@ bool script::add_to_request(const std::map<std::string, msg_modifier>& atb, mess
     {
         return false;
     }
-    catch (std::logic_error& le)
-    {
-        return false;
-    }
+
     return true;
 }
 
