@@ -44,7 +44,7 @@ private:
 
     bool process_next(const answer_type& last_answer);
     bool save_from_answer(const answer_type& answer, const msg_modifiers& sfa);
-    bool add_to_request(const std::map<std::string, msg_modifier>& atb, message& m);
+    bool add_to_request(const std::map<std::string, body_modifier>& atb, message& m);
 
     const bool is_last() const { return messages.size() == 1; };
     void replace_in_messages(const std::string& old_str, const std::string& new_str);

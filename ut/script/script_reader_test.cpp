@@ -169,7 +169,7 @@ TEST_F(script_reader_test, MessageWithoutHeadersInSFA)
     ASSERT_EQ(msgs.size(), 1);
     ASSERT_TRUE(msgs.front().sfa.headers.empty());
 
-    std::map<std::string, msg_modifier> expected_body_fields{
+    std::map<std::string, body_modifier> expected_body_fields{
         {"my_string", {"/some/path", "string"}},
         {"my_object", {"/some/other/path", "object"}},
         {"my_int", {"/yet/another/path", "int"}}};
@@ -201,7 +201,7 @@ TEST_F(script_reader_test, MessageWithFullSFA)
                                                         {"header_id_2", "x-my-other-header"}};
     ASSERT_EQ(msgs.front().sfa.headers, expected_headers);
 
-    std::map<std::string, msg_modifier> expected_body_fields{
+    std::map<std::string, body_modifier> expected_body_fields{
         {"my_string", {"/some/path", "string"}},
         {"my_object", {"/some/other/path", "object"}},
         {"my_int", {"/yet/another/path", "int"}}};
@@ -259,9 +259,9 @@ TEST_F(script_reader_test, MessageWithAFSTBTypes)
 
     ASSERT_EQ(msgs.size(), 1);
 
-    std::map<std::string, msg_modifier> expected_atb{{"my_string", {"/some/path", "string"}},
-                                                     {"my_object", {"/some/other/path", "object"}},
-                                                     {"my_int", {"/yet/another/path", "int"}}};
+    std::map<std::string, body_modifier> expected_atb{{"my_string", {"/some/path", "string"}},
+                                                      {"my_object", {"/some/other/path", "object"}},
+                                                      {"my_int", {"/yet/another/path", "int"}}};
 
     ASSERT_EQ(msgs.front().atb, expected_atb);
 }

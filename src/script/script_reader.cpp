@@ -67,15 +67,15 @@ msg_headers script_reader::build_message_headers()
     return mh;
 }
 
-std::map<std::string, msg_modifier> script_reader::build_atb()
+std::map<std::string, body_modifier> script_reader::build_atb()
 {
-    std::map<std::string, msg_modifier> mms;
+    std::map<std::string, body_modifier> bms;
     for (const auto &attr : json_rdr.get_attributes())
     {
         script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
-        mms.insert({attr, sr_body_fields.build_message_modifier()});
+        bms.insert({attr, sr_body_fields.build_body_modifier()});
     }
-    return mms;
+    return bms;
 }
 
 msg_modifiers script_reader::build_sfa()
@@ -91,7 +91,7 @@ msg_modifiers script_reader::build_sfa()
         else
         {
             script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
-            mms.body_fields.insert({attr, sr_body_fields.build_message_modifier()});
+            mms.body_fields.insert({attr, sr_body_fields.build_body_modifier()});
         }
     }
     return mms;
@@ -128,9 +128,9 @@ message script_reader::build_message(const std::string &m)
     return parsed_message;
 }
 
-msg_modifier script_reader::build_message_modifier()
+body_modifier script_reader::build_body_modifier()
 {
-    msg_modifier mm;
+    body_modifier mm;
     mm.value_type = json_rdr.get_value<std::string>("/value_type");
     mm.path = json_rdr.get_value<std::string>("/path");
     return mm;

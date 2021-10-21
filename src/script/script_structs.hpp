@@ -33,11 +33,11 @@ struct answer_type
     }
 };
 
-struct msg_modifier
+struct body_modifier
 {
     std::string path;
     std::string value_type;
-    bool operator==(const msg_modifier& other) const
+    bool operator==(const body_modifier& other) const
     {
         return path == other.path && value_type == other.value_type;
     };
@@ -48,7 +48,7 @@ struct msg_modifiers
     // id, header_field
     std::map<std::string, std::string> headers;
     // id, path
-    std::map<std::string, msg_modifier> body_fields;
+    std::map<std::string, body_modifier> body_fields;
     bool operator==(const msg_modifiers& other) const
     {
         return headers == other.headers && body_fields == other.body_fields;
@@ -65,7 +65,7 @@ struct message
     msg_headers headers;
 
     msg_modifiers sfa;
-    std::map<std::string, msg_modifier> atb;
+    std::map<std::string, body_modifier> atb;
 };
 
 struct server_info
