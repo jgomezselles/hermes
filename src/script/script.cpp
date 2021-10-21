@@ -107,7 +107,7 @@ bool script::save_from_answer(const answer_type& answer, const msg_modifiers& sf
     return true;
 }
 
-bool script::add_to_request(const std::map<std::string, msg_modifier>& atb, message& m)
+bool script::add_to_request(const std::map<std::string, body_modifier>& atb, message& m)
 {
     json_reader modified_body(m.body, "{}");
 

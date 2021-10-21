@@ -17,9 +17,9 @@ public:
     std::deque<message> build_messages();
     message build_message(const std::string &m);
     msg_headers build_message_headers();
-    msg_modifier build_message_modifier();
+    body_modifier build_body_modifier();
     msg_modifiers build_sfa();
-    std::map<std::string, msg_modifier> build_atb();
+    std::map<std::string, body_modifier> build_atb();
     std::map<std::string, std::string> build_variables();
 
 private:
