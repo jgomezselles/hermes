@@ -43,13 +43,13 @@ struct body_modifier
     };
 };
 
-struct msg_modifiers
+struct msg_modifier
 {
     // id, header_field
     std::map<std::string, std::string> headers;
     // id, path
     std::map<std::string, body_modifier> body_fields;
-    bool operator==(const msg_modifiers& other) const
+    bool operator==(const msg_modifier& other) const
     {
         return headers == other.headers && body_fields == other.body_fields;
     };
@@ -64,7 +64,7 @@ struct message
     int pass_code;
     msg_headers headers;
 
-    msg_modifiers sfa;
+    msg_modifier sfa;
     std::map<std::string, body_modifier> atb;
 };
 

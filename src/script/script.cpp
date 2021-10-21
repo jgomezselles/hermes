@@ -77,7 +77,7 @@ const std::vector<std::string> script::get_message_names() const
     return res;
 }
 
-bool script::save_from_answer(const answer_type& answer, const msg_modifiers& sfa)
+bool script::save_from_answer(const answer_type& answer, const msg_modifier& sfa)
 {
     try
     {
