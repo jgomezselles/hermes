@@ -17,8 +17,8 @@ namespace http2_client
 using nghttp2::asio_http2::header_map;
 using nghttp2::asio_http2::header_value;
 
-inline static const std::string CONTENT_TYPE = "content_type";
-inline static const std::string CONTENT_LENGTH = "content_length";
+inline static const std::string CONTENT_TYPE = "content-type";
+inline static const std::string CONTENT_LENGTH = "content-length";
 inline static const std::string APP_JSON = "application/json";
 
 struct race_control

@@ -14,12 +14,12 @@ TEST(client_utils_test, BuildUri)
 
 void check_pre_built_headers(const size_t s, const header_map& built)
 {
-    auto element = built.find(CONTENT_TYPE);
+    auto element = built.find("content-type");
     ASSERT_NE(element, built.end());
-    ASSERT_EQ(element->second.value, APP_JSON);
+    ASSERT_EQ(element->second.value, "application/json");
     ASSERT_FALSE(element->second.sensitive);
 
-    element = built.find(CONTENT_LENGTH);
+    element = built.find("content-length");
     ASSERT_NE(element, built.end());
     ASSERT_EQ(element->second.value, std::to_string(8));
     ASSERT_FALSE(element->second.sensitive);
