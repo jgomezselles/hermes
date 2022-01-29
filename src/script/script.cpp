@@ -139,6 +139,22 @@ bool script::add_to_request(const std::map<std::string, body_modifier>& atb, mes
     return true;
 }
 
+void replace_in_message(const std::string& old_str, const std::string new_str, message& m)
+{
+    std::string str_to_replace = "<" + old_str + ">";
+    boost::replace_all(m.body, str_to_replace, new_str);
+    boost::replace_all(m.url, str_to_replace, new_str);
+
+    traffic::msg_headers new_headers;
+    for (std::pair<std::string, std::string> p : m.headers)
+    {
+        boost::replace_all(p.first, str_to_replace, new_str);
+        boost::replace_all(p.second, str_to_replace, new_str);
+        new_headers.emplace(p);
+    }
+    m.headers = std::move(new_headers);
+}
+
 bool script::process_next(const answer_type& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
@@ -154,6 +170,11 @@ bool script::process_next(const answer_type& last_answer)
     if (!add_to_request(next_msg.atb, next_msg))
     {
         return false;
+    }
+
+    for (const auto& [k, v] : vars)
+    {
+        replace_in_message(k, v, next_msg);
     }
 
     return true;
@@ -173,18 +194,7 @@ void script::replace_in_messages(const std::string& old_str, const std::string& 
 {
     for (auto& m : messages)
     {
-        std::string str_to_replace = "<" + old_str + ">";
-        boost::replace_all(m.body, str_to_replace, new_str);
-        boost::replace_all(m.url, str_to_replace, new_str);
-
-        traffic::msg_headers new_headers;
-        for (std::pair<std::string, std::string> p : m.headers)
-        {
-            boost::replace_all(p.first, str_to_replace, new_str);
-            boost::replace_all(p.second, str_to_replace, new_str);
-            new_headers.emplace(p);
-        }
-        m.headers = std::move(new_headers);
+        replace_in_message(old_str, new_str, m);
     }
 }
 

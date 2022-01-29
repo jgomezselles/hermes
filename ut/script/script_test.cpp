@@ -223,12 +223,13 @@ TEST_F(script_test, PostProcessSaveHeadersAndUseThemLater)
 
     json.set<std::string>("/messages/test1/save_from_answer/headers/header1", "x-header-1");
     json.set<std::string>("/messages/test1/save_from_answer/headers/header2", "x-header-2");
+    json.set<std::string>("/messages/test1/save_from_answer/headers/header3", "x-header-3");
     json.set<std::string>("/messages/test1/save_from_answer/saved1/path", "/some/path");
     json.set<std::string>("/messages/test1/save_from_answer/saved1/value_type", "string");
 
     json.set<std::string>("/messages/test2/add_from_saved_to_body/saved1/path", "/new/path");
     json.set<std::string>("/messages/test2/add_from_saved_to_body/saved1/value_type", "string");
-    json.set<std::string>("/messages/test2/url", "v1/test");
+    json.set<std::string>("/messages/test2/url", "v1/test?<my_var_string>=<header3>");
     json.set<traffic::json_reader>("/messages/test2/body", {R"({"header2": "<header2>"})", ""});
     json.set<traffic::json_reader>("/messages/test2/headers",
                                    {R"({"frankensheader": "<my_var_string>:<header1>"})", ""});
@@ -243,27 +244,21 @@ TEST_F(script_test, PostProcessSaveHeadersAndUseThemLater)
     answer.set<std::string>("/some/path", "hi there");
 
     nghttp2::asio_http2::header_map answer_headers{{"x-header-1", {"I am header 1", false}},
-                                                   {"x-header-2", {"I am header 2", false}}};
+                                                   {"x-header-2", {"I am header 2", false}},
+                                                   {"x-header-3", {"I am header 3", false}}};
 
     ASSERT_TRUE(script.post_process(traffic::answer_type{200, answer.as_string(), answer_headers}));
 
     traffic::json_reader expected_next_body;
-    expected_next_body.set<std::string>(
-        "/header2",
-        "<header2>");  // This one is going to be parsed in script_queue->get_next_script
-    expected_next_body.set<std::string>("/new/path", "hi there");
-
-    ASSERT_EQ(expected_next_body.as_string(), script.get_next_body());
-
-    traffic::msg_headers expected_next_headers{{"frankensheader", "<my_var_string>:<header1>"}};
-
-    ASSERT_EQ(expected_next_headers, script.get_next_headers());
-
-    script.parse_variables();
-    expected_next_headers["frankensheader"] = "String:I am header 1";
     expected_next_body.set<std::string>("/header2", "I am header 2");
-    ASSERT_EQ(expected_next_headers, script.get_next_headers());
+    expected_next_body.set<std::string>("/new/path", "hi there");
     ASSERT_EQ(expected_next_body.as_string(), script.get_next_body());
+
+    traffic::msg_headers expected_next_headers{{"frankensheader", "String:I am header 1"}};
+    ASSERT_EQ(expected_next_headers, script.get_next_headers());
+
+    std::string expected_next_url{"v1/test?String=I am header 3"};
+    ASSERT_EQ(expected_next_url, script.get_next_url());
 }
 
 TEST_F(script_test, PostProcessNotFoundValueInSFAToUseInATB)
