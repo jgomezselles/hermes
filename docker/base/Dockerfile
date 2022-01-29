@@ -19,3 +19,10 @@ RUN set -x && wget https://github.com/Tencent/rapidjson/archive/4b3d7c2.tar.gz -
     cmake -DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_EXAMPLES=OFF -DRAPIDJSON_BUILD_TESTS=OFF \
                 -DRAPIDJSON_SCHEMA_USE_INTERNALREGEX=0 -DRAPIDJSON_SCHEMA_USE_STDREGEX=1 . && \
     make install && cd .. && rm -rf * && set +x
+
+RUN set -x && apk add openjdk11 maven && \
+    wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/4.6.2.2472.tar.gz && \
+    tar -zxvf 4.6.2.2472.tar.gz && \
+    cd sonar-scanner-cli-* && \
+    mvn package && mkdir /jars && cp target/sonar-scanner-cli-4.6.2-SNAPSHOT.jar /jars/sonar-scanner.jar && \
+    cd .. && rm -rf * && set +x
