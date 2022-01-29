@@ -1,5 +1,7 @@
 [![CI](https://github.com/jgomezselles/hermes/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/jgomezselles/hermes/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jgomezselles/hermes/badge.svg?branch=main)](https://coveralls.io/github/jgomezselles/hermes?branch=main)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/24429/badge.svg)](https://scan.coverity.com/projects/jgomezselles-hermes)
+
 # What is hermes?
 
 Hermes is an http/2 traffic generator written in C++ able to send multiplexed
