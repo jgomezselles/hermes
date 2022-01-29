@@ -231,7 +231,7 @@ jobs:
         name: Run cmake with debug and coverage flags
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
-          run: make -j -C build
+          make -j -C build hermes
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
