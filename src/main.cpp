@@ -89,7 +89,6 @@ int main(int argc, char* argv[])
             case 's':
                 syslog(LOG_INFO, "Schema for traffic definition: \n%s", script::schema.c_str());
                 exit(0);
-                break;
             case 'o':
                 output_file = optarg;
                 break;
