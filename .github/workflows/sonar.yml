@@ -24,6 +24,8 @@ jobs:
           java-version: 11
       - name: Install boost
         run: sudo apt install -y libboost-all-dev
+      - name: Install gtest
+        run: sudo apt install -y googletest google-mock
       - name: Install rapidjson
         run: sudo apt install -y rapidjson-dev
       - name: Install nghttp2
@@ -34,8 +36,6 @@ jobs:
           ./configure --enable-asio-lib --disable-shared --enable-python-bindings=no
           sudo make -j install
           cd .. && sudo rm -rf nghttp2*
-          ls -la  /usr/local/lib
-
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
