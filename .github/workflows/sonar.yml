@@ -25,7 +25,13 @@ jobs:
       - name: Install boost
         run: sudo apt install -y libboost-all-dev
       - name: Install gtest
-        run: sudo apt install -y googletest google-mock
+        run: |
+          wget  https://github.com/google/googletest/archive/2fe3bd9.tar.gz -O gtest.tar.gz
+          tar xf gtest.tar.gz
+          cd googletest*
+          cmake .
+          sudo make -j install 
+          cd .. && sudo rm -rf googletest*
       - name: Install rapidjson
         run: sudo apt install -y rapidjson-dev
       - name: Install nghttp2
