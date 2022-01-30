@@ -64,6 +64,7 @@ jobs:
         run: |
           mkdir build
           sudo sh scripts/generate_certs_for_ut_server.sh
+          sudo chmod +r /usr/local/share/ca-certificates/localhost.key /usr/local/share/ca-certificates/localhost.crt
           cmake -S . -B build
           build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build build/ --config Debug
       - name: Exec unit tests
