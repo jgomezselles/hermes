@@ -33,7 +33,7 @@ jobs:
           cd nghttp2-1.45.1
           ./configure --enable-asio-lib --disable-shared --enable-python-bindings=no
           sudo make -j install
-          cd .. && rm -rf nghttp2-1.45.1
+          cd .. && sudo rm -rf nghttp2*
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
