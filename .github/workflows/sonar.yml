@@ -13,8 +13,6 @@ jobs:
     env:
       SONAR_SCANNER_VERSION: 4.6.1.2450 # Find the latest version in the "Linux" link on this page:
                                         # https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-cli
-      SONAR_SERVER_URL: "https://sonarcloud.io"
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
     steps:
       - uses: actions/checkout@v2
         with:
@@ -67,11 +65,19 @@ jobs:
       - name: Run build-wrapper
         run: |
           mkdir build
-          cmake -S . -B build
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build/ --config Release
+          sudo cmake -S . -B build
+          build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build build/ --config Debug
+      - name: Exec unit tests
+        run: ./build/ut/unit-test
+      - name: Generate gcov files
+        run: |
+          mkdir gcov
+          cd gcov
+          for i in $(find .. -type f -name '*gcno' -printf '%h\n' 2> /dev/null | uniq); do gcov -b -p -c $i/*.gcno; done
+          cd ..
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+          sonar-scanner
