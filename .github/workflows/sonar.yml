@@ -29,11 +29,11 @@ jobs:
       - name: Install nghttp2
         run: |
           wget https://github.com/nghttp2/nghttp2/releases/download/v1.45.1/nghttp2-1.45.1.tar.bz2
-          tar xf nghttp2*
-          cd nghttp2*
+          tar xf nghttp2-1.45.1.tar.bz2
+          cd nghttp2-1.45.1
           ./configure --enable-asio-lib --disable-shared --enable-python-bindings=no
           sudo make -j install
-          cd .. && rm -rf nghttp2*
+          cd .. && rm -rf nghttp2-1.45.1
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
