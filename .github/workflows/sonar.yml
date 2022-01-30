@@ -26,6 +26,8 @@ jobs:
       #  run: sudo apt install -y libboost-all-dev
       - name: Install rapidjson
         run: sudo apt install -y rapidjson-dev
+      - name: Install nghttp2
+        run: sudo apt install -y libnghttp2-dev
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
