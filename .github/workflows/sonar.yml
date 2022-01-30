@@ -22,8 +22,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Install boost
-        run: sudo apt install -y libboost-all-dev
+      #- name: Install boost
+      #  run: sudo apt install -y libboost-all-dev
+      - name: Install rapidjson
+        run: sudo apt install -y rapidjson-dev
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
