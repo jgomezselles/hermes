@@ -1,7 +1,9 @@
 name: sonar-scanner
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+      - sonar-scanner
 jobs:
 
   sonar:
