@@ -1,8 +1,8 @@
 #include <chrono>
 #pragma once
 
-using std::chrono::time_point;
 using std::chrono::steady_clock;
+using std::chrono::time_point;
 namespace config
 {
 class params
