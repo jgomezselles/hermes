@@ -33,7 +33,7 @@ jobs:
       uses: actions/checkout@v2
     - 
       name: Run cmake with debug and coverage flags
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug .
     - 
       name: Compile code and unit tests
       run: make -j -C build
