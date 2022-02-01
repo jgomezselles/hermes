@@ -23,9 +23,9 @@ inline static const std::string APP_JSON = "application/json";
 
 struct race_control
 {
-    race_control() : timed_out(false), answered(false) {}
-    bool timed_out;
-    bool answered;
+    race_control() = default;
+    bool timed_out = false;
+    bool answered = false;
     std::mutex mtx;
 };
 

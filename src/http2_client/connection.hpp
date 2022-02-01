@@ -64,7 +64,7 @@ private:
     nghttp2::asio_http2::client::session session;
 
     /// Class attributes
-    status connection_status;
+    status connection_status = status::NOT_OPEN;
 
     /// Concurrency attributes
     std::mutex mtx;

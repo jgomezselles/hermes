@@ -5,7 +5,7 @@ namespace http2_client
 class client
 {
 public:
-    virtual ~client() {}
+    virtual ~client() = default;
 
     virtual void send() = 0;
 

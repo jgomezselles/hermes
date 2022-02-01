@@ -34,8 +34,7 @@ client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_co
       host(h),
       port(p),
       secure_session(secure_session),
-      conn(std::make_unique<connection>(h, p, secure_session)),
-      mtx()
+      conn(std::make_unique<connection>(h, p, secure_session))
 {
     if (!conn->wait_to_be_connected())
     {
@@ -44,9 +43,9 @@ client_impl::client_impl(std::shared_ptr<stats::stats_if> st, boost::asio::io_co
 }
 
 void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
-                                 const std::string& msg_name)
+                                 const std::string& msg_name) const
 {
-    std::lock_guard<std::mutex> guard(control->mtx);
+    std::scoped_lock guard(control->mtx);
     if (control->answered)
     {
         return;
@@ -57,7 +56,7 @@ void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
 }
 
 void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
-                                           const std::string& msg_name)
+                                           const std::string& msg_name) const
 {
     if (control->mtx.try_lock())
     {
@@ -72,7 +71,7 @@ void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& 
 }
 
 void client_impl::on_timeout(const boost::system::error_code& e,
-                             std::shared_ptr<race_control> control, std::string msg_name)
+                             std::shared_ptr<race_control> control, const std::string& msg_name)
 {
     if (e.value() == 0)
     {
@@ -92,8 +91,7 @@ void client_impl::open_new_connection()
     }
     conn.reset();
 
-    auto new_conn = std::make_unique<connection>(host, port, secure_session);
-    if (new_conn->wait_to_be_connected())
+    if (auto new_conn = std::make_unique<connection>(host, port, secure_session); new_conn->wait_to_be_connected())
     {
         conn = std::move(new_conn);
     }
@@ -111,7 +109,7 @@ void client_impl::send()
     {
         return;
     }
-    auto script = *script_opt;
+    const auto script = *script_opt;
     request req = get_next_request(host, port, script);
 
     if (!is_connected())
@@ -129,7 +127,7 @@ void client_impl::send()
         return;
     }
 
-    auto& session = conn->get_session();
+    const auto& session = conn->get_session();
     session.io_service().post([this, script, &session, req] {
         boost::system::error_code ec;
         auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
@@ -155,7 +153,7 @@ void client_impl::send()
                 auto elapsed_time =
                     duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
 
-                std::lock_guard<std::mutex> guard(ctrl->mtx);
+                std::lock_guard guard(ctrl->mtx);
                 if (ctrl->timed_out)
                 {
                     return;
@@ -189,7 +187,11 @@ void client_impl::send()
                 });
             });
 
-        nghttp_req->on_close([](uint32_t error_code) {});
+        nghttp_req->on_close([]([[maybe_unused]]uint32_t error_code)
+        {
+            //on_close is registered here for the sake of completion and
+            //because it helps debugging cometimes, but no implementation needed.
+        });
     });
     mtx.unlock_shared();
 }

@@ -25,7 +25,7 @@ public:
                 std::unique_ptr<traffic::script_queue_if> q, const std::string& h,
                 const std::string& p, const bool secure_session = false);
 
-    virtual ~client_impl() {}
+    ~client_impl() final = default;
 
     void send() override;
     bool has_finished() const override { return !queue->has_pending_scripts(); };
@@ -37,11 +37,11 @@ public:
 
 private:
     void open_new_connection();
-    void handle_timeout(const std::shared_ptr<race_control>& control, const std::string& msg_name);
+    void handle_timeout(const std::shared_ptr<race_control>& control, const std::string& msg_name) const;
     void handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
-                                  const std::string& msg_name);
+                                  const std::string& msg_name) const;
     void on_timeout(const boost::system::error_code& e, std::shared_ptr<race_control> control,
-                    std::string msg_name);
+                    const std::string& msg_name);
 
     std::shared_ptr<stats::stats_if> stats;
     boost::asio::io_context& io_ctx;
