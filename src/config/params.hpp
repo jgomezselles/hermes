@@ -9,10 +9,7 @@ class params
 {
 public:
     params() = delete;
-    params(const int wait_time, const int duration)
-        : wait_time(wait_time), duration(duration)
-    {
-    }
+    params(const int wait_time, const int duration) : wait_time(wait_time), duration(duration) {}
     params(const params& p) = default;
 
     ~params() = default;

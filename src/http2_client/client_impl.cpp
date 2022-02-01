@@ -91,7 +91,8 @@ void client_impl::open_new_connection()
     }
     conn.reset();
 
-    if (auto new_conn = std::make_unique<connection>(host, port, secure_session); new_conn->wait_to_be_connected())
+    if (auto new_conn = std::make_unique<connection>(host, port, secure_session);
+        new_conn->wait_to_be_connected())
     {
         conn = std::move(new_conn);
     }
@@ -187,10 +188,9 @@ void client_impl::send()
                 });
             });
 
-        nghttp_req->on_close([]([[maybe_unused]]uint32_t error_code)
-        {
-            //on_close is registered here for the sake of completion and
-            //because it helps debugging cometimes, but no implementation needed.
+        nghttp_req->on_close([]([[maybe_unused]] uint32_t error_code) {
+            // on_close is registered here for the sake of completion and
+            // because it helps debugging cometimes, but no implementation needed.
         });
     });
     mtx.unlock_shared();
