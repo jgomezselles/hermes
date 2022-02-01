@@ -1,6 +1,7 @@
 [![CI](https://github.com/jgomezselles/hermes/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/jgomezselles/hermes/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jgomezselles/hermes/badge.svg?branch=main)](https://coveralls.io/github/jgomezselles/hermes?branch=main)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/24429/badge.svg)](https://scan.coverity.com/projects/jgomezselles-hermes)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=jgomezselles_hermes&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=jgomezselles_hermes)
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-orange.svg)](https://sonarcloud.io/summary/new_code?id=jgomezselles_hermes)
 
 # What is hermes?
 
