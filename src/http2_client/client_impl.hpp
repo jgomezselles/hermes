@@ -42,7 +42,7 @@ private:
     void handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
                                   const std::string& msg_name) const;
     void on_timeout(const boost::system::error_code& e, std::shared_ptr<race_control> control,
-                    const std::string& msg_name);
+                    const std::string& msg_name) const;
 
     std::shared_ptr<stats::stats_if> stats;
     boost::asio::io_context& io_ctx;

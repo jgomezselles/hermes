@@ -71,7 +71,7 @@ void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& 
 }
 
 void client_impl::on_timeout(const boost::system::error_code& e,
-                             std::shared_ptr<race_control> control, const std::string& msg_name)
+                             std::shared_ptr<race_control> control, const std::string& msg_name) const
 {
     if (e.value() == 0)
     {
@@ -110,7 +110,7 @@ void client_impl::send()
     {
         return;
     }
-    const auto script = *script_opt;
+    const auto& script = *script_opt;
     request req = get_next_request(host, port, script);
 
     if (!is_connected())
