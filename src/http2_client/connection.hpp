@@ -7,16 +7,10 @@
 #include <string>
 #include <thread>
 
-namespace nghttp2
-{
-namespace asio_http2
-{
-namespace client
+namespace nghttp2::asio_http2::client
 {
 class session;
 }
-}  // namespace asio_http2
-}  // namespace nghttp2
 
 namespace http2_client
 {
@@ -36,7 +30,6 @@ public:
         CLOSED
     };
 
-public:
     connection(const std::string& host, const std::string& port, const bool secure_session = false);
 
     connection(const connection& o) = delete;
