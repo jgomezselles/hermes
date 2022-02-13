@@ -73,7 +73,6 @@ int main(int argc, char* argv[])
         {
             case 'h':
                 usage(0);
-                break;
             case 'r':
                 rate = atoi(optarg);
                 break;
