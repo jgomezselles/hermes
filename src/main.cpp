@@ -30,15 +30,15 @@ namespace ba = boost::asio;
 using namespace nghttp2::asio_http2;
 using namespace nghttp2::asio_http2::client;
 
-char* progname;
-unsigned int default_rate{10};
+const char* progname;
+const unsigned int default_rate{10};
 const int default_duration{60};
 const int default_stats_print_period{10};
 
 const std::string default_traffic_path{"/etc/scripts/traffic.json"};
 const std::string default_output_file{"hermes.out"};
 
-static void usage(int rc)
+[[noreturn]] static void usage(int rc)
 {
     syslog(LOG_INFO,
            "C++ Traffic Generator. Usage:  %s [options] \n"
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     {
         the_script = traffic::script(traffic_json_path);
     }
-    catch (std::logic_error& e)
+    catch (const std::logic_error& e)
     {
         std::cerr << e.what() << std::endl;
         std::cerr << "Error in script. Please, check your traffic script located in '"
