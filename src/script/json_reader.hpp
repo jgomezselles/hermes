@@ -11,23 +11,24 @@ namespace traffic
 class json_reader
 {
 public:
-    json_reader();
+    json_reader() = default;
+    ~json_reader() = default;
     json_reader(const std::string& json, const std::string& schema_str);
     json_reader(const json_reader& other);
-    friend void swap(json_reader& first, json_reader& second);
+    friend void swap(json_reader& first, json_reader& second) noexcept;
     json_reader& operator=(json_reader other);
     bool operator==(const json_reader& other) const;
 
     template <typename t>
     t get_value(const std::string& path)
     {
-        throw std::logic_error("Type not implemented when asked for " + path);
+        throw std::invalid_argument("Type not implemented when asked for " + path);
     }
 
     template <typename t>
-    void set(const std::string& path, const t& value)
+    void set(const std::string& path, const t&)
     {
-        throw std::logic_error("Type not implemented when asked for " + path);
+        throw std::invalid_argument("Type not implemented when asked for " + path);
     }
 
     void erase(const std::string& path);
@@ -40,13 +41,11 @@ public:
     bool is_string(const std::string& path);
     bool is_number(const std::string& path);
 
-protected:
-    rapidjson::Document document;
-
-    json_reader(const rapidjson::Value* value);
-
 private:
+    json_reader(const rapidjson::Value* value);
     void parse(const std::string& json_str, const std::string& schema_str);
+
+    rapidjson::Document document;
 };
 
 template <>
