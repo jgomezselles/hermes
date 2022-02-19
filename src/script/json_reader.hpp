@@ -42,7 +42,7 @@ public:
     bool is_number(const std::string& path);
 
 private:
-    json_reader(const rapidjson::Value* value);
+    explicit json_reader(const rapidjson::Value* value);
     void parse(const std::string& json_str, const std::string& schema_str);
 
     rapidjson::Document document;
