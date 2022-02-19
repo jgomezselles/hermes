@@ -21,9 +21,9 @@ script::script(const std::string& path)
     std::ifstream json_file(path);
     if (!json_file)
     {
-        throw std::logic_error("File " + path +
-                               " not found."
-                               "Terminating application.");
+        throw std::out_of_range("File " + path +
+                                " not found."
+                                "Terminating application.");
     }
     const auto json_str =
         std::string((std::istreambuf_iterator<char>(json_file)), std::istreambuf_iterator<char>());
@@ -185,7 +185,7 @@ bool script::validate_answer(const answer_type& last_answer) const
     return last_answer.result_code == messages.front().pass_code;
 }
 
-const bool script::post_process(const answer_type& last_answer)
+bool script::post_process(const answer_type& last_answer)
 {
     return !is_last() && process_next(last_answer);
 }
