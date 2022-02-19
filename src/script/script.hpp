@@ -13,8 +13,8 @@ class script
 {
 public:
     script() = delete;
-    script(const std::string& path);
-    script(const json_reader& input_json);
+    explicit script(const std::string& path);
+    explicit script(const json_reader& input_json);
 
     ~script() = default;
 
@@ -27,10 +27,10 @@ public:
     const range_type& get_ranges() const { return ranges; };
     const std::string& get_server_dns() const { return server.dns; };
     const std::string& get_server_port() const { return server.port; };
-    const bool is_server_secure() const { return server.secure; };
-    const int get_timeout_ms() const { return timeout_ms; };
+    bool is_server_secure() const { return server.secure; };
+    int get_timeout_ms() const { return timeout_ms; };
 
-    const bool post_process(const answer_type& last_answer);
+    bool post_process(const answer_type& last_answer);
     bool validate_answer(const answer_type& last_answer) const;
 
     void parse_ranges(const std::map<std::string, int64_t>& current);
