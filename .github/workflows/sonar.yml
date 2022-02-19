@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: 11
       - name: Install boost
-        run: sudo apt install -y libboost-all-dev
+        run: sudo apt update && sudo apt install -y libboost-all-dev
       - name: Install gtest
         run: |
           wget  https://github.com/google/googletest/archive/2fe3bd9.tar.gz -O gtest.tar.gz
