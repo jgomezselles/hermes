@@ -268,7 +268,7 @@ bool json_reader::is_string(const std::string& path)
 
 bool json_reader::is_number(const std::string& path)
 {
-    if (const rapidjson::Pointer ptr{path.c_str()};ptr.IsValid())
+    if (const rapidjson::Pointer ptr{path.c_str()}; ptr.IsValid())
     {
         const auto* val = ptr.Get(document);
         return val && val->GetType() == rapidjson::kNumberType;
