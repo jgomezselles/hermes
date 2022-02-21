@@ -126,7 +126,7 @@ std::vector<std::string> json_reader::get_value<std::vector<std::string>>(const 
                 throw std::invalid_argument("Expected string but found other in array under " +
                                             path);
             }
-            result.push_back(element.GetString());
+            result.emplace_back(element.GetString());
         }
 
         return result;
@@ -187,7 +187,7 @@ void json_reader::set<int>(const std::string& path, const int& value)
         return;
     }
 
-    throw std::logic_error("Error setting integer under " + path);
+    throw std::out_of_range("Error setting integer under " + path);
 }
 
 template <>
@@ -200,7 +200,7 @@ void json_reader::set<bool>(const std::string& path, const bool& value)
         return;
     }
 
-    throw std::logic_error("Error setting integer under " + path);
+    throw std::out_of_range("Error setting integer under " + path);
 }
 
 template <>
@@ -213,7 +213,7 @@ void json_reader::set<std::string>(const std::string& path, const std::string& v
         return;
     }
 
-    throw std::logic_error("Error setting string under " + path);
+    throw std::out_of_range("Error setting string under " + path);
 }
 
 template <>
@@ -226,7 +226,7 @@ void json_reader::set<json_reader>(const std::string& path, const json_reader& v
         return;
     }
 
-    throw std::logic_error("Error setting object under " + path);
+    throw std::out_of_range("Error setting object under " + path);
 }
 
 template <>
@@ -257,8 +257,7 @@ bool json_reader::is_present(const std::string& path)
 
 bool json_reader::is_string(const std::string& path)
 {
-    const rapidjson::Pointer ptr{path.c_str()};
-    if (ptr.IsValid())
+    if (const rapidjson::Pointer ptr{path.c_str()}; ptr.IsValid())
     {
         const auto* val = ptr.Get(document);
         return val && val->GetType() == rapidjson::kStringType;
@@ -269,8 +268,7 @@ bool json_reader::is_string(const std::string& path)
 
 bool json_reader::is_number(const std::string& path)
 {
-    const rapidjson::Pointer ptr{path.c_str()};
-    if (ptr.IsValid())
+    if (const rapidjson::Pointer ptr{path.c_str()};ptr.IsValid())
     {
         const auto* val = ptr.Get(document);
         return val && val->GetType() == rapidjson::kNumberType;
