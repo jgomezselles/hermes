@@ -20,12 +20,8 @@ class script_queue : public script_queue_if
 
 public:
     script_queue() = delete;
-    script_queue(const script& s)
-        : new_script(std::make_unique<script>(s)), scripts(), in_flight(0), window_closed(false)
-    {
-    }
-
-    ~script_queue() = default;
+    explicit script_queue(const script& s) : new_script(std::make_unique<script>(s)) {}
+    ~script_queue() override = default;
 
     std::optional<script> get_next_script() override;
     void enqueue_script(script s, const answer_type& last_answer) override;
@@ -39,11 +35,11 @@ private:
 
     std::unique_ptr<script> new_script;
     std::deque<script> scripts;
-    std::atomic<int64_t> in_flight;
-    std::atomic<bool> window_closed;
+    std::atomic<int64_t> in_flight{0};
+    std::atomic<bool> window_closed{false};
     mutable mutex_type rw_mutex;
 
 protected:
-    std::map<std::string, int64_t> current_in_range;
+    std::map<std::string, int64_t, std::less<>> current_in_range;
 };
 }  // namespace traffic

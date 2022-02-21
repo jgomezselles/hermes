@@ -38,7 +38,7 @@ script::script(const json_reader& input_json)
 
 void script::validate_members() const
 {
-    std::set<std::string> unique_ids;
+    std::set<std::string, std::less<>> unique_ids;
     check_repeated(unique_ids, vars);
     check_repeated(unique_ids, ranges);
 
@@ -48,7 +48,7 @@ void script::validate_members() const
         {
             if (m.headers.find(forbidden) != m.headers.end())
             {
-                throw std::logic_error(
+                throw std::invalid_argument(
                     forbidden + " is built automatically in headers. Cannot set custom values.");
             }
         }
@@ -66,7 +66,7 @@ void script::build(const std::string& input_json)
     validate_members();
 }
 
-const std::vector<std::string> script::get_message_names() const
+std::vector<std::string> script::get_message_names() const
 {
     std::vector<std::string> res;
     for (const auto& m : messages)
@@ -100,14 +100,15 @@ bool script::save_from_answer(const answer_type& answer, const msg_modifier& sfa
             }
         }
     }
-    catch (std::logic_error& le)
+    catch (const std::logic_error&)
     {
         return false;
     }
     return true;
 }
 
-bool script::add_to_request(const std::map<std::string, body_modifier>& atb, message& m)
+bool script::add_to_request(const std::map<std::string, body_modifier, std::less<>>& atb,
+                            message& m)
 {
     json_reader modified_body(m.body, "{}");
 
@@ -131,7 +132,7 @@ bool script::add_to_request(const std::map<std::string, body_modifier>& atb, mes
 
         m.body = modified_body.as_string();
     }
-    catch (std::out_of_range& oor)
+    catch (const std::out_of_range&)
     {
         return false;
     }
@@ -139,7 +140,7 @@ bool script::add_to_request(const std::map<std::string, body_modifier>& atb, mes
     return true;
 }
 
-void replace_in_message(const std::string& old_str, const std::string new_str, message& m)
+void replace_in_message(const std::string& old_str, const std::string& new_str, message& m)
 {
     std::string str_to_replace = "<" + old_str + ">";
     boost::replace_all(m.body, str_to_replace, new_str);
@@ -150,7 +151,7 @@ void replace_in_message(const std::string& old_str, const std::string new_str, m
     {
         boost::replace_all(p.first, str_to_replace, new_str);
         boost::replace_all(p.second, str_to_replace, new_str);
-        new_headers.emplace(p);
+        new_headers.insert(p);
     }
     m.headers = std::move(new_headers);
 }
@@ -158,8 +159,7 @@ void replace_in_message(const std::string& old_str, const std::string new_str, m
 bool script::process_next(const answer_type& last_answer)
 {
     // TODO: if this is an error, validation should fail. Rethink
-    const auto& last_msg = messages.front();
-    if (!save_from_answer(last_answer, last_msg.sfa))
+    if (!save_from_answer(last_answer, messages.front().sfa))
     {
         return false;
     }
@@ -198,11 +198,11 @@ void script::replace_in_messages(const std::string& old_str, const std::string& 
     }
 }
 
-void script::parse_ranges(const std::map<std::string, int64_t>& current)
+void script::parse_ranges(const std::map<std::string, int64_t, std::less<>>& current)
 {
-    for (const auto& c : current)
+    for (const auto& [k, v] : current)
     {
-        replace_in_messages(c.first, std::to_string(c.second));
+        replace_in_messages(k, std::to_string(v));
     }
 }
 

@@ -67,9 +67,9 @@ msg_headers script_reader::build_message_headers()
     return mh;
 }
 
-std::map<std::string, body_modifier> script_reader::build_atb()
+std::map<std::string, body_modifier, std::less<>> script_reader::build_atb()
 {
-    std::map<std::string, body_modifier> bms;
+    std::map<std::string, body_modifier, std::less<>> bms;
     for (const auto &attr : json_rdr.get_attributes())
     {
         script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
@@ -151,9 +151,9 @@ int script_reader::build_timeout()
     return json_rdr.get_value<int>("/timeout");
 }
 
-std::map<std::string, std::string> script_reader::build_variables()
+std::map<std::string, std::string, std::less<>> script_reader::build_variables()
 {
-    std::map<std::string, std::string> vars;
+    std::map<std::string, std::string, std::less<>> vars;
     if (json_rdr.is_present("/variables"))
     {
         json_reader jr_ranges{json_rdr.get_value<json_reader>("/variables")};

@@ -18,8 +18,8 @@ static inline bool operator==(const nghttp2::asio_http2::header_value& lhs,
 namespace traffic
 {
 // name_to_overwrite(min, max)
-using range_type = std::map<std::string, std::pair<int, int>>;
-using msg_headers = std::map<std::string, std::string>;
+using range_type = std::map<std::string, std::pair<int, int>, std::less<>>;
+using msg_headers = std::map<std::string, std::string, std::less<>>;
 
 struct answer_type
 {
@@ -46,9 +46,9 @@ struct body_modifier
 struct msg_modifier
 {
     // id, header_field
-    std::map<std::string, std::string> headers;
+    std::map<std::string, std::string, std::less<>> headers;
     // id, path
-    std::map<std::string, body_modifier> body_fields;
+    std::map<std::string, body_modifier, std::less<>> body_fields;
     bool operator==(const msg_modifier& other) const
     {
         return headers == other.headers && body_fields == other.body_fields;
@@ -65,7 +65,7 @@ struct message
     msg_headers headers;
 
     msg_modifier sfa;
-    std::map<std::string, body_modifier> atb;
+    std::map<std::string, body_modifier, std::less<>> atb;
 };
 
 struct server_info

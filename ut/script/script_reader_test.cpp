@@ -143,8 +143,8 @@ TEST_F(script_reader_test, MessageWithHeadersInSFA)
     const auto msgs = sr.build_messages();
 
     ASSERT_EQ(msgs.size(), 1);
-    std::map<std::string, std::string> expected_headers{{"header_id_1", "x-my-header"},
-                                                        {"header_id_2", "x-my-other-header"}};
+    std::map<std::string, std::string, std::less<>> expected_headers{
+        {"header_id_1", "x-my-header"}, {"header_id_2", "x-my-other-header"}};
     ASSERT_EQ(msgs.front().sfa.headers, expected_headers);
 
     ASSERT_TRUE(msgs.front().sfa.body_fields.empty());
@@ -169,7 +169,7 @@ TEST_F(script_reader_test, MessageWithoutHeadersInSFA)
     ASSERT_EQ(msgs.size(), 1);
     ASSERT_TRUE(msgs.front().sfa.headers.empty());
 
-    std::map<std::string, body_modifier> expected_body_fields{
+    std::map<std::string, body_modifier, std::less<>> expected_body_fields{
         {"my_string", {"/some/path", "string"}},
         {"my_object", {"/some/other/path", "object"}},
         {"my_int", {"/yet/another/path", "int"}}};
@@ -197,11 +197,11 @@ TEST_F(script_reader_test, MessageWithFullSFA)
     const auto msgs = sr.build_messages();
 
     ASSERT_EQ(msgs.size(), 1);
-    std::map<std::string, std::string> expected_headers{{"header_id_1", "x-my-header"},
-                                                        {"header_id_2", "x-my-other-header"}};
+    std::map<std::string, std::string, std::less<>> expected_headers{
+        {"header_id_1", "x-my-header"}, {"header_id_2", "x-my-other-header"}};
     ASSERT_EQ(msgs.front().sfa.headers, expected_headers);
 
-    std::map<std::string, body_modifier> expected_body_fields{
+    std::map<std::string, body_modifier, std::less<>> expected_body_fields{
         {"my_string", {"/some/path", "string"}},
         {"my_object", {"/some/other/path", "object"}},
         {"my_int", {"/yet/another/path", "int"}}};
@@ -259,9 +259,10 @@ TEST_F(script_reader_test, MessageWithAFSTBTypes)
 
     ASSERT_EQ(msgs.size(), 1);
 
-    std::map<std::string, body_modifier> expected_atb{{"my_string", {"/some/path", "string"}},
-                                                      {"my_object", {"/some/other/path", "object"}},
-                                                      {"my_int", {"/yet/another/path", "int"}}};
+    std::map<std::string, body_modifier, std::less<>> expected_atb{
+        {"my_string", {"/some/path", "string"}},
+        {"my_object", {"/some/other/path", "object"}},
+        {"my_int", {"/yet/another/path", "int"}}};
 
     ASSERT_EQ(msgs.front().atb, expected_atb);
 }
@@ -355,7 +356,8 @@ TEST_F(script_reader_test, BuildVariablesOk)
     auto sr = script_reader(json.as_string());
     auto vars = sr.build_variables();
 
-    std::map<std::string, std::string> expected_vars{{"my_var", "hello"}, {"my_other_var", "5"}};
+    std::map<std::string, std::string, std::less<>> expected_vars{{"my_var", "hello"},
+                                                                  {"my_other_var", "5"}};
 
     ASSERT_EQ(vars, expected_vars);
 }

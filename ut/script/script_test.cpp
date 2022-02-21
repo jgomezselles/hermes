@@ -304,7 +304,7 @@ TEST_F(script_test, ParseRangesInRangeValue)
     json.set<std::string>("/messages/test1/headers/x-header-2", "h2-<my_range>-end");
 
     traffic::script script{json};
-    script.parse_ranges(std::map<std::string, int64_t>{{"my_range", 55}});
+    script.parse_ranges({{"my_range", 55}});
     ASSERT_EQ("/my/url/55", script.get_next_url());
     ASSERT_EQ("{\"data\":\"in-range-55\"}", script.get_next_body());
 

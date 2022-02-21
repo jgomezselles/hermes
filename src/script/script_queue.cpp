@@ -6,18 +6,16 @@ namespace traffic
 {
 void script_queue::update_currents_in_range(const range_type& ranges)
 {
-    for (const auto& range : ranges)
+    for (const auto& [k, v] : ranges)
     {
-        const auto& current = current_in_range.find(range.first);
+        const auto& current = current_in_range.find(k);
         if (current == current_in_range.end())
         {
-            current_in_range.emplace(range.first, range.second.first);
+            current_in_range.try_emplace(k, v.first);
         }
         else
         {
-            current_in_range[range.first] = current->second + 1 <= range.second.second
-                                                ? current->second + 1
-                                                : range.second.first;
+            current_in_range[k] = current->second + 1 <= v.second ? current->second + 1 : v.first;
         }
     }
 }

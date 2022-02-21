@@ -33,10 +33,10 @@ public:
     bool post_process(const answer_type& last_answer);
     bool validate_answer(const answer_type& last_answer) const;
 
-    void parse_ranges(const std::map<std::string, int64_t>& current);
+    void parse_ranges(const std::map<std::string, int64_t, std::less<>>& current);
     void parse_variables();
 
-    const std::vector<std::string> get_message_names() const;
+    std::vector<std::string> get_message_names() const;
 
 private:
     void validate_members() const;
@@ -44,7 +44,7 @@ private:
 
     bool process_next(const answer_type& last_answer);
     bool save_from_answer(const answer_type& answer, const msg_modifier& sfa);
-    bool add_to_request(const std::map<std::string, body_modifier>& atb, message& m);
+    bool add_to_request(const std::map<std::string, body_modifier, std::less<>>& atb, message& m);
 
     const bool is_last() const { return messages.size() == 1; };
     void replace_in_messages(const std::string& old_str, const std::string& new_str);
@@ -54,9 +54,9 @@ private:
     server_info server;
     int timeout_ms;
 
-    std::map<std::string, std::string> vars;
-    std::map<std::string, std::string> saved_strs;
-    std::map<std::string, int> saved_ints;
-    std::map<std::string, json_reader> saved_jsons;
+    std::map<std::string, std::string, std::less<>> vars;
+    std::map<std::string, std::string, std::less<>> saved_strs;
+    std::map<std::string, int, std::less<>> saved_ints;
+    std::map<std::string, json_reader, std::less<>> saved_jsons;
 };
 }  // namespace traffic

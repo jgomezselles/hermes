@@ -6,13 +6,13 @@
 
 namespace traffic
 {
-using str_map = std::map<std::string, std::string>;
+using str_map = std::map<std::string, std::string, std::less<>>;
 
 TEST(script_functions_test, CheckRepeated)
 {
-    std::set<std::string> unique_ids{"exists"};
-    std::map<std::string, int> no_throw{{"does not exist", 9}};
-    std::map<std::string, int> throws{{"exists", 9}};
+    std::set<std::string, std::less<>> unique_ids{"exists"};
+    std::map<std::string, int, std::less<>> no_throw{{"does not exist", 9}};
+    std::map<std::string, int, std::less<>> throws{{"exists", 9}};
 
     ASSERT_NO_THROW(check_repeated(unique_ids, no_throw));
 

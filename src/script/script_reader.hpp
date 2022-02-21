@@ -19,8 +19,8 @@ public:
     msg_headers build_message_headers();
     body_modifier build_body_modifier();
     msg_modifier build_sfa();
-    std::map<std::string, body_modifier> build_atb();
-    std::map<std::string, std::string> build_variables();
+    std::map<std::string, body_modifier, std::less<>> build_atb();
+    std::map<std::string, std::string, std::less<>> build_variables();
 
 private:
     script_reader(json_reader &&mgr);
