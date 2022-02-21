@@ -246,7 +246,7 @@ void json_reader::set<std::vector<std::string>>(const std::string& path,
         return;
     }
 
-    throw std::logic_error("Error setting object under " + path);
+    throw std::out_of_range("Error setting object under " + path);
 }
 
 bool json_reader::is_present(const std::string& path)

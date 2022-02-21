@@ -24,12 +24,12 @@ range_type script_reader::build_ranges()
 
             if (range_pair.first > range_pair.second)
             {
-                throw std::logic_error(
+                throw std::invalid_argument(
                     "Script: This is not gonna work!"
                     "min cannot be greater than max!");
             }
 
-            ranges_to_build.emplace(r_name, range_pair);
+            ranges_to_build.try_emplace(r_name, range_pair);
         }
     }
 
@@ -46,7 +46,7 @@ std::deque<message> script_reader::build_messages()
     {
         if (message == "Total")
         {
-            throw std::logic_error(
+            throw std::invalid_argument(
                 "Error in script!"
                 "Message name 'Total' is reserved. "
                 "Please, choose another name for your message.");
@@ -62,7 +62,7 @@ msg_headers script_reader::build_message_headers()
     msg_headers mh;
     for (const auto &attr : json_rdr.get_attributes())
     {
-        mh.emplace(attr, json_rdr.get_value<std::string>("/" + attr));
+        mh.try_emplace(attr, json_rdr.get_value<std::string>("/" + attr));
     }
     return mh;
 }
@@ -73,7 +73,7 @@ std::map<std::string, body_modifier, std::less<>> script_reader::build_atb()
     for (const auto &attr : json_rdr.get_attributes())
     {
         script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
-        bms.insert({attr, sr_body_fields.build_body_modifier()});
+        bms.try_emplace(attr, sr_body_fields.build_body_modifier());
     }
     return bms;
 }
@@ -91,13 +91,13 @@ msg_modifier script_reader::build_sfa()
         else
         {
             script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
-            mms.body_fields.insert({attr, sr_body_fields.build_body_modifier()});
+            mms.body_fields.try_emplace(attr, sr_body_fields.build_body_modifier());
         }
     }
     return mms;
 }
 
-message script_reader::build_message(const std::string &m)
+message script_reader::build_message(std::string_view m)
 {
     message parsed_message;
     parsed_message.id = m;
@@ -163,11 +163,11 @@ std::map<std::string, std::string, std::less<>> script_reader::build_variables()
             const std::string full_key{"/variables/" + key};
             if (json_rdr.is_string(full_key))
             {
-                vars.emplace(key, json_rdr.get_value<std::string>(full_key));
+                vars.try_emplace(key, json_rdr.get_value<std::string>(full_key));
             }
             else if (json_rdr.is_number(full_key))
             {
-                vars.emplace(key, std::to_string(json_rdr.get_value<int>(full_key)));
+                vars.try_emplace(key, std::to_string(json_rdr.get_value<int>(full_key)));
             }
         }
     }

@@ -46,7 +46,7 @@ private:
     bool save_from_answer(const answer_type& answer, const msg_modifier& sfa);
     bool add_to_request(const std::map<std::string, body_modifier, std::less<>>& atb, message& m);
 
-    const bool is_last() const { return messages.size() == 1; };
+    bool is_last() const { return messages.size() == 1; };
     void replace_in_messages(const std::string& old_str, const std::string& new_str);
 
     std::deque<message> messages;
