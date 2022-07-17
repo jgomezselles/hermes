@@ -68,7 +68,6 @@ data:
         "wrong_path": {
           "method": "GET",
           "url": "url/example/wrong_path/id-<range_1>",
-          "body": {},
           "response": {
             "code": 400
           }

@@ -110,7 +110,8 @@ bool script::save_from_answer(const answer_type& answer, const msg_modifier& sfa
 bool script::add_to_request(const std::map<std::string, body_modifier, std::less<>>& atb,
                             message& m)
 {
-    json_reader modified_body(m.body, "{}");
+    std::string str_modif_body = m.body.empty() ? "{}" : m.body;
+    json_reader modified_body(str_modif_body, "{}");
 
     try
     {
@@ -130,7 +131,10 @@ bool script::add_to_request(const std::map<std::string, body_modifier, std::less
             }
         }
 
-        m.body = modified_body.as_string();
+        if (str_modif_body = modified_body.as_string(); str_modif_body != "{}")
+        {
+            m.body = str_modif_body;
+        }
     }
     catch (const std::out_of_range&)
     {
