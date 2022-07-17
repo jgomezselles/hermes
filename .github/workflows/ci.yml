@@ -40,6 +40,7 @@ jobs:
     -
       name: Install and setup lcov base
       run: |
+          apk upgrade
           apk add lcov --update-cache --repository  http://dl-3.alpinelinux.org/alpine/edge/testing/
           lcov -i --capture --directory "./build/src/" --output-file base-coverage.info --no-external --directory "./" --exclude "*/ut/*" --exclude "*/main*"
     -
