@@ -17,7 +17,6 @@ public:
         json.set<int>("/timeout", 2000);
         json.set<std::vector<std::string>>("/flow", {"test1"});
         json.set<std::string>("/messages/test1/url", "v1/test");
-        json.set<traffic::json_reader>("/messages/test1/body", {"{}", ""});
         json.set<std::string>("/messages/test1/method", "GET");
         json.set<int>("/messages/test1/response/code", 200);
         return json;

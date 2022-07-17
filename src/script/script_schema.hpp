@@ -72,7 +72,6 @@ const std::string schema = R"(
         "type": "object",
         "required": [
           "url",
-          "body",
           "method",
           "response"
         ],

@@ -43,7 +43,6 @@ data:
         "get1": {
           "method": "GET",
           "url": "url/example/path?id=id-<range_1>",
-          "body": {},
           "response": {
             "code": 200
           }

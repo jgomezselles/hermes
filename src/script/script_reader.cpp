@@ -101,11 +101,14 @@ message script_reader::build_message(std::string_view m)
 {
     message parsed_message;
     parsed_message.id = m;
-
     parsed_message.url = json_rdr.get_value<std::string>("/url");
-    parsed_message.body = json_rdr.get_json_as_string("/body");
     parsed_message.method = json_rdr.get_value<std::string>("/method");
     parsed_message.pass_code = json_rdr.get_value<int>("/response/code");
+
+    if (json_rdr.is_present("/body"))
+    {
+        parsed_message.body = json_rdr.get_json_as_string("/body");
+    }
 
     if (json_rdr.is_present("/headers"))
     {

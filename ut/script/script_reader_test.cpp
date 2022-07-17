@@ -84,13 +84,6 @@ TEST_F(script_reader_test, ValidationErrorNoUrlInMessage)
     ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
 }
 
-TEST_F(script_reader_test, ValidationErrorNoBodyInMessage)
-{
-    auto json = build_script();
-    json.erase("/messages/test1/body");
-    ASSERT_THROW(script_reader(json.as_string()), std::logic_error);
-}
-
 TEST_F(script_reader_test, ValidationErrorNoResponseInMessage)
 {
     auto json = build_script();
