@@ -5,7 +5,7 @@ mkdir -p /usr/local/share/ca-certificates
 if test -f "/usr/local/share/ca-certificates/localhost.crt"; then
     if test -f "/usr/local/share/ca-certificates/localhost.key"; then
         echo "Certificates found for tests. Skipping their generation."
-        return 0
+        exit 0
     fi
 fi
 
