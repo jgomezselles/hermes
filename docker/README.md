@@ -2,8 +2,8 @@
 
 This folder contains the dockerfiles used in this project to generate the images.
 
-* `base/Dockerfile`: base alpine docker image with dependencies
-* `Dockerfile`: alpine image with hermes inside
+* `base/Dockerfile`: base fedora docker image with dependencies
+* `Dockerfile`: fedora image with hermes inside
 * `server-mock/Dockerfile`: golang alpine image with an http/2 (h2c) server
 
 ## Building
