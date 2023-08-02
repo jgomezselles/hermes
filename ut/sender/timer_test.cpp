@@ -40,12 +40,15 @@ TEST_F(timer_test, TimerOnlyExecutesActionAfterExpiryTime)
     engine::timer_impl t(io_ctx);
     t.expires_after(150ms);
 
-    t.async_wait([&cv, &executed](const boost::system::error_code&) {
-        executed.store(true);
-        cv.notify_one();
-    });
+    t.async_wait(
+        [&cv, &executed](const boost::system::error_code&)
+        {
+            executed.store(true);
+            cv.notify_one();
+        });
 
-    auto wait_execution = [&cv, &mtx, &executed](std::chrono::milliseconds d) {
+    auto wait_execution = [&cv, &mtx, &executed](std::chrono::milliseconds d)
+    {
         std::unique_lock lock(mtx);
         return cv.wait_for(lock, d, [&executed] { return executed.load(); });
     };

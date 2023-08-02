@@ -102,10 +102,12 @@ TEST_P(stats_test, increase_sent_existent_id)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.increase_sent("msg1");
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.increase_sent("msg1");
+            }});
     }
     for (auto& thread : threads)
     {
@@ -154,10 +156,12 @@ TEST_P(stats_test, add_measurement_responded_ok_zero_min_rt_zero_max_rt_lower_th
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_measurement("msg1", elapsed_time, code);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_measurement("msg1", elapsed_time, code);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -201,10 +205,12 @@ TEST_P(stats_test, add_measurement_min_rt_and_max_rt_greater_than_elapsed_time)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_measurement("msg1", elapsed_time, code);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_measurement("msg1", elapsed_time, code);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -248,11 +254,13 @@ TEST_P(stats_test, add_measurement_updates_response_codes_ok_and_responded_ok_gr
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_measurement("msg1", elapsed_time, code);
-            sut.add_measurement("msg1", elapsed_time, code);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_measurement("msg1", elapsed_time, code);
+                sut.add_measurement("msg1", elapsed_time, code);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -293,10 +301,12 @@ TEST_P(stats_test, add_timeout_ok)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_timeout("msg1");
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_timeout("msg1");
+            }});
     }
     for (auto& thread : threads)
     {
@@ -344,10 +354,12 @@ TEST_P(stats_test, add_error_ok)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_error("msg1", error);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_error("msg1", error);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -390,11 +402,13 @@ TEST_P(stats_test, add_error_updates_existent_error)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_error("msg1", error);
-            sut.add_error("msg1", error);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_error("msg1", error);
+                sut.add_error("msg1", error);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -442,10 +456,12 @@ TEST_P(stats_test, add_client_error_ok)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_client_error("msg1", error);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_client_error("msg1", error);
+            }});
     }
     for (auto& thread : threads)
     {
@@ -488,11 +504,13 @@ TEST_P(stats_test, add_client_error_updates_existent_error)
     // EXEC
     for (int i = 0; i < thread_number; ++i)
     {
-        threads.push_back(std::thread{[&, this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
-            sut.add_client_error("msg1", error);
-            sut.add_client_error("msg1", error);
-        }});
+        threads.push_back(std::thread{
+            [&, this]
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(thread_number > 1 ? 50 : 0));
+                sut.add_client_error("msg1", error);
+                sut.add_client_error("msg1", error);
+            }});
     }
     for (auto& thread : threads)
     {

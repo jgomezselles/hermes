@@ -31,17 +31,21 @@ connection::connection(const std::string& h, const std::string& p, bool secure_s
     : svc_work(boost::asio::io_service::work(io_service)),
       session(create_session(io_service, h, p, secure_session))
 {
-    session.on_connect([this, h, p](tcp::resolver::iterator) {
-        std::cerr << "Connected to " << h << ":" << p << std::endl;
-        connection_status = status::OPEN;
-        status_change_cond_var.notify_one();
-    });
+    session.on_connect(
+        [this, h, p](tcp::resolver::iterator)
+        {
+            std::cerr << "Connected to " << h << ":" << p << std::endl;
+            connection_status = status::OPEN;
+            status_change_cond_var.notify_one();
+        });
 
-    session.on_error([this, h, p](const boost::system::error_code& ec) {
-        std::cerr << "Error in connection to " << h << ":" << p
-                  << " Message: " << ec.message().c_str() << std::endl;
-        notify_close();
-    });
+    session.on_error(
+        [this, h, p](const boost::system::error_code& ec)
+        {
+            std::cerr << "Error in connection to " << h << ":" << p
+                      << " Message: " << ec.message().c_str() << std::endl;
+            notify_close();
+        });
 
     worker = std::thread([this] { io_service.run(); });
 }
