@@ -192,4 +192,4 @@ jobs:
       name: Run hermes
       run: |
         HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}")
-        kubectl exec $HERMES_POD -- hermes/hermes -p1 -t10 -r1000
+        kubectl exec $HERMES_POD -- hermes -p1 -t10 -r1000
