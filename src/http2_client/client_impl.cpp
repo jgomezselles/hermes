@@ -130,70 +130,79 @@ void client_impl::send()
     }
 
     const auto& session = conn->get_session();
-    session.io_service().post([this, script, &session, req] {
-        boost::system::error_code ec;
-        auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
-        auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
-        if (!nghttp_req)
+    session.io_service().post(
+        [this, script, &session, req]
         {
-            std::cerr << "Error submitting. Closing connection:" << ec.message() << std::endl;
-            conn->close();
-            stats->add_client_error(req.name, 468);
-            queue->cancel_script();
-            return;
-        }
-        stats->increase_sent(req.name);
+            boost::system::error_code ec;
+            auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
+            auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
+            if (!nghttp_req)
+            {
+                std::cerr << "Error submitting. Closing connection:" << ec.message() << std::endl;
+                conn->close();
+                stats->add_client_error(req.name, 468);
+                queue->cancel_script();
+                return;
+            }
+            stats->increase_sent(req.name);
 
-        auto ctrl = std::make_shared<race_control>();
-        auto timer = std::make_shared<boost::asio::steady_timer>(io_ctx);
-        timer->expires_after(milliseconds(script.get_timeout_ms()));
-        timer->async_wait(boost::bind(&client_impl::on_timeout, this,
-                                      boost::asio::placeholders::error, ctrl, req.name));
+            auto ctrl = std::make_shared<race_control>();
+            auto timer = std::make_shared<boost::asio::steady_timer>(io_ctx);
+            timer->expires_after(milliseconds(script.get_timeout_ms()));
+            timer->async_wait(boost::bind(&client_impl::on_timeout, this,
+                                          boost::asio::placeholders::error, ctrl, req.name));
 
-        nghttp_req->on_response(
-            [this, timer, init_time, script, ctrl, req](const ng::client::response& res) {
-                auto elapsed_time =
-                    duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
-
-                std::lock_guard guard(ctrl->mtx);
-                if (ctrl->timed_out)
+            nghttp_req->on_response(
+                [this, timer, init_time, script, ctrl, req](const ng::client::response& res)
                 {
-                    return;
-                }
-                ctrl->answered = true;
-                timer->cancel();
+                    auto elapsed_time =
+                        duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
 
-                auto answer = std::make_shared<std::string>();
-                res.on_data([this, &res, script, answer, elapsed_time, req](const uint8_t* data,
-                                                                            std::size_t len) {
-                    if (len > 0)
+                    std::lock_guard guard(ctrl->mtx);
+                    if (ctrl->timed_out)
                     {
-                        std::string json(reinterpret_cast<const char*>(data), len);
-                        *answer += json;
+                        return;
                     }
-                    else
-                    {
-                        traffic::answer_type ans = {res.status_code(), *answer, res.header()};
-                        bool valid_answer = script.validate_answer(ans);
-                        if (valid_answer)
+                    ctrl->answered = true;
+                    timer->cancel();
+
+                    auto answer = std::make_shared<std::string>();
+                    res.on_data(
+                        [this, &res, script, answer, elapsed_time, req](const uint8_t* data,
+                                                                        std::size_t len)
                         {
-                            stats->add_measurement(req.name, elapsed_time, res.status_code());
-                            queue->enqueue_script(script, ans);
-                        }
-                        else
-                        {
-                            stats->add_error(req.name, res.status_code());
-                            queue->cancel_script();
-                        }
-                    }
+                            if (len > 0)
+                            {
+                                std::string json(reinterpret_cast<const char*>(data), len);
+                                *answer += json;
+                            }
+                            else
+                            {
+                                traffic::answer_type ans = {res.status_code(), *answer,
+                                                            res.header()};
+                                bool valid_answer = script.validate_answer(ans);
+                                if (valid_answer)
+                                {
+                                    stats->add_measurement(req.name, elapsed_time,
+                                                           res.status_code());
+                                    queue->enqueue_script(script, ans);
+                                }
+                                else
+                                {
+                                    stats->add_error(req.name, res.status_code());
+                                    queue->cancel_script();
+                                }
+                            }
+                        });
                 });
-            });
 
-        nghttp_req->on_close([]([[maybe_unused]] uint32_t error_code) {
-            // on_close is registered here for the sake of completion and
-            // because it helps debugging cometimes, but no implementation needed.
+            nghttp_req->on_close(
+                []([[maybe_unused]] uint32_t error_code)
+                {
+                    // on_close is registered here for the sake of completion and
+                    // because it helps debugging cometimes, but no implementation needed.
+                });
         });
-    });
     mtx.unlock_shared();
 }
 

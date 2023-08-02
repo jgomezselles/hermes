@@ -59,13 +59,15 @@ public:
         boost::system::error_code server_error_code;
         server = std::make_unique<ng::server::http2>();
         server->handle("/v1/test",
-                       [this](const ng::server::request &req, const ng::server::response &res) {
+                       [this](const ng::server::request &req, const ng::server::response &res)
+                       {
                            res.write_head(200);
                            res.end(response_body);
                        });
 
         server->handle("/v1/test_timeout",
-                       [](const ng::server::request &req, const ng::server::response &res) {
+                       [](const ng::server::request &req, const ng::server::response &res)
+                       {
                            std::this_thread::sleep_for(750ms);
                            res.write_head(200);
                            res.end();
@@ -347,7 +349,8 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
     std::condition_variable cv;
     std::mutex mtx;
 
-    auto wait_for_connection = [&cv, &mtx](client_impl &c) {
+    auto wait_for_connection = [&cv, &mtx](client_impl &c)
+    {
         std::unique_lock lock(mtx);
         return cv.wait_for(lock, 2s, [&c] { return c.is_connected(); });
     };
