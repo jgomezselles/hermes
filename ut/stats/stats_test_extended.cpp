@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <filesystem>
 #include <fstream>
+#include <thread>
 
 #include "stats.hpp"
 

@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <map>
 #include <sstream>
+#include <thread>
 
 namespace stats
 {
