@@ -8,7 +8,6 @@ add_executable(hermes main.cpp)
 
 target_link_libraries(hermes
 PRIVATE
--static
     # Keep the list of files sorted from down to top.
     hermes-sender
     hermes-config
