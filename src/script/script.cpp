@@ -44,7 +44,7 @@ void script::validate_members() const
 
     for (const auto& m : messages)
     {
-        for (const std::string& forbidden : {"content_type", "content_length"})
+        for (const std::string forbidden : {"content_type", "content_length"})
         {
             if (m.headers.find(forbidden) != m.headers.end())
             {
