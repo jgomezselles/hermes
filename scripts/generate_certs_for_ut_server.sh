@@ -1,13 +1,13 @@
 #!/bin/sh
 
+mkdir -p /usr/local/share/ca-certificates
+
 if test -f "/usr/local/share/ca-certificates/localhost.crt"; then
     if test -f "/usr/local/share/ca-certificates/localhost.key"; then
         echo "Certificates found for tests. Skipping their generation."
         return 0
     fi
 fi
-
-apk add openssl ca-certificates
 
 # Create the CA
 openssl genrsa -out rootCA.key 4096
