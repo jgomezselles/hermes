@@ -16,3 +16,6 @@ RUN set -x && wget https://github.com/Tencent/rapidjson/archive/4b3d7c2.tar.gz -
     cmake -DRAPIDJSON_BUILD_DOC=OFF -DRAPIDJSON_BUILD_EXAMPLES=OFF -DRAPIDJSON_BUILD_TESTS=OFF \
                 -DRAPIDJSON_SCHEMA_USE_INTERNALREGEX=0 -DRAPIDJSON_SCHEMA_USE_STDREGEX=1 . && \
     make install && cd .. && rm -rf * && set +x
+
+RUN set -x && wget https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz -O otel.tar.gz && \
+    tar xvf otel.tar.gz && cd opentelemetry* && cmake -DBUILD_TESTING=OFF . && make -j4 install && cd .. && rm -r * && set +x
