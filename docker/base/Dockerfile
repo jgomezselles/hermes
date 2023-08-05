@@ -1,6 +1,7 @@
 FROM quay.io/fedora/fedora:38
 
-RUN dnf -y install cmake gcc-c++ libcurl-devel wget boost-devel bzip2 openssl-devel openssl ca-certificates
+RUN dnf -y install cmake gcc-c++ libcurl-devel wget boost-devel bzip2 \
+        openssl-devel openssl ca-certificates protobuf-devel git
 
 WORKDIR /code/build
 
@@ -18,4 +19,5 @@ RUN set -x && wget https://github.com/Tencent/rapidjson/archive/4b3d7c2.tar.gz -
     make install && cd .. && rm -rf * && set +x
 
 RUN set -x && wget https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz -O otel.tar.gz && \
-    tar xvf otel.tar.gz && cd opentelemetry* && cmake -DBUILD_TESTING=OFF . && make -j4 install && cd .. && rm -r * && set +x
+    tar xvf otel.tar.gz && cd opentelemetry* && cmake -DBUILD_TESTING=OFF -DWITH_OTLP_HTTP=ON . && \
+    make -j4 install && cp /usr/local/lib64/libopentelemetry_proto.so /lib64/ && cd .. && rm -r * && set +x
