@@ -11,19 +11,26 @@
 #include <memory>
 
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/context/context.h"
+
+// #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
+//
+// #include "opentelemetry/sdk/metrics/meter.h"
+//
+//
 
 using namespace std::chrono;
 
 namespace stats
 {
 
-void InitMetrics()
+void InitMetricsOStream()
 {
     auto exporter = opentelemetry::exporter::metrics::OStreamMetricExporterFactory::Create();
 
@@ -32,8 +39,34 @@ void InitMetrics()
     options.export_interval_millis = std::chrono::milliseconds(1000);
     options.export_timeout_millis = std::chrono::milliseconds(500);
 
-    auto reader =
-        opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
+    auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
+        std::move(exporter), options);
+
+    auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+    auto* p = static_cast<opentelemetry::sdk::metrics::MeterProvider*>(u_provider.get());
+    p->AddMetricReader(std::move(reader));
+
+    std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
+    opentelemetry::metrics::Provider::SetMeterProvider(provider);
+}
+
+void InitMetricsOtlpHttp()
+{
+    opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions otlpOptions;
+    otlpOptions.url =
+        "http://vmsingle-victoria-metrics-single-server:8428/opentelemetry/api/v1/push";
+    otlpOptions.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+    otlpOptions.console_debug = true;
+    auto exporter =
+        opentelemetry::exporter::otlp::OtlpHttpMetricExporterFactory::Create(otlpOptions);
+
+    // Initialize and set the periodic metrics reader
+    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
+    options.export_interval_millis = std::chrono::milliseconds(1000);
+    options.export_timeout_millis = std::chrono::milliseconds(500);
+
+    auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
+        std::move(exporter), options);
 
     auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
     auto* p = static_cast<opentelemetry::sdk::metrics::MeterProvider*>(u_provider.get());
@@ -48,7 +81,6 @@ void CleanupMetrics()
     std::shared_ptr<opentelemetry::metrics::MeterProvider> none;
     opentelemetry::metrics::Provider::SetMeterProvider(none);
 }
-
 
 std::string stats::create_headers_str()
 {
@@ -111,12 +143,33 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
     timer.expires_after(milliseconds(print_period));
     timer.async_wait(boost::bind(&stats::print, this));
 
-    InitMetrics();
+    InitMetricsOStream();
+    InitMetricsOtlpHttp();
 
     auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
     auto meter = provider->GetMeter("this_will_fail");
-    auto dc = meter->CreateDoubleCounter("hermes_requests_sent");
-    double_counter = std::move(dc);
+
+    auto sent = meter->CreateUInt64Counter("hermes_requests_sent", "Requests sent by hermes");
+    requests_sent = std::move(sent);
+    auto resp = meter->CreateUInt64Counter("hermes_responses_rcv", "Responses received by hermes");
+    responses = std::move(resp);
+    auto to =
+        meter->CreateUInt64Counter("hermes_requests_sent", "Timeouts in requests sent by hermes");
+    timeouts = std::move(to);
+
+    auto rtok = meter->CreateDoubleHistogram(
+        "hermes_response_time_ok_ms",
+        "Response Time of requests with response codes expected by hermes", "ms");
+    histo_rtok_ms = std::move(rtok);
+    /*auto rtnok = meter->CreateDoubleHistogram(
+        "hermes_response_time_nok_ms",
+        "Response Time of requests with response codes not expected by hermes", "ms");
+    histo_rtnok_ms = std::move(rtnok);*/
+}
+
+stats::~stats()
+{
+    CleanupMetrics();
 }
 
 void stats::write_headers(std::fstream& fs)
@@ -180,6 +233,13 @@ void stats::add_measurement(const std::string& id, const int64_t elapsed_time, c
     add_measurement(total_snap, elapsed_time, code);
     add_measurement(partial_snap, elapsed_time, code);
     add_measurement(msg_snaps.at(id), elapsed_time, code);
+
+    std::map<std::string, std::string> labels1{{"id", id}, {"response_code", std::to_string(code)}};
+    auto labelkv1 = opentelemetry::common::KeyValueIterableView<decltype(labels1)>{labels1};
+
+    auto context = opentelemetry::context::Context{};
+    responses->Add(1, labelkv1);
+    histo_rtok_ms->Record(double(elapsed_time)/1000.0, labelkv1, context);
 }
 
 void stats::increase_sent(const std::string& id)
@@ -192,7 +252,7 @@ void stats::increase_sent(const std::string& id)
     // Create a label set which annotates metric values
     std::map<std::string, std::string> labels = {{"id", id}};
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
-    double_counter->Add(1, labelkv);
+    requests_sent->Add(1, labelkv);
 }
 
 void stats::add_timeout(const std::string& id)
@@ -201,6 +261,10 @@ void stats::add_timeout(const std::string& id)
     ++total_snap.timed_out;
     ++partial_snap.timed_out;
     ++msg_snaps.at(id).timed_out;
+
+    std::map<std::string, std::string> labels = {{"id", id}};
+    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+    timeouts->Add(1, labelkv);
 }
 
 void stats::add_error(const std::string& id, const int e)
@@ -209,6 +273,10 @@ void stats::add_error(const std::string& id, const int e)
     update_rcs(total_snap, e, true);
     update_rcs(partial_snap, e, true);
     update_rcs(msg_snaps.at(id), e, true);
+
+    std::map<std::string, std::string> labels{{"id", id}, {"response_code", std::to_string(e)}};
+    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+    responses->Add(1, labelkv);
 }
 
 void stats::add_client_error(const std::string& id, const int e)

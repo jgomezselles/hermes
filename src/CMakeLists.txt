@@ -17,8 +17,19 @@ PRIVATE
     hermes-stats
 
     ## OTel libs
+
+    ###OTLP HTTP metrics
+    opentelemetry_exporter_otlp_http_metric
+    opentelemetry_exporter_otlp_http_client
+    opentelemetry_http_client_curl
+    opentelemetry_otlp_recordable
+    opentelemetry_proto
+
+    ###OSTREAM METRICS
     opentelemetry_exporter_ostream_metrics
+
     opentelemetry_metrics
+
     opentelemetry_resources
     opentelemetry_version
     opentelemetry_common
@@ -33,6 +44,8 @@ PRIVATE
     boost_system
 
     ## others
+    curl
+    protobuf
     ssl
     crypto
     dl
