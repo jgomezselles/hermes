@@ -1,3 +1,5 @@
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
+
 #include <atomic>
 #include <boost/asio.hpp>
 #include <chrono>
@@ -14,6 +16,7 @@ namespace config
 {
 class params;
 }
+
 using namespace std::chrono;
 
 namespace stats
@@ -32,6 +35,8 @@ struct snapshot
                lhs.response_codes_ok == rhs.response_codes_ok &&
                lhs.response_codes_nok == rhs.response_codes_nok;
     }
+
+    //Histo (id, code, timestamp)
 
     int64_t sent = 0;
     int64_t responded_ok = 0;
@@ -94,5 +99,8 @@ protected:
     mutable mutex_type rw_mutex;
 
     const std::string stats_headers;
+
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<double>> double_counter;
+
 };
 }  // namespace stats
