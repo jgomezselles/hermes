@@ -17,8 +17,8 @@ PRIVATE
     hermes-stats
 
     ## OTel libs
-    opentelemetry_exporter_ostream_span
-    opentelemetry_trace
+    opentelemetry_exporter_ostream_metrics
+    opentelemetry_metrics
     opentelemetry_resources
     opentelemetry_version
     opentelemetry_common
