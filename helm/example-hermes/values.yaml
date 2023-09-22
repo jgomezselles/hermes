@@ -17,4 +17,41 @@ hermes:
     cm: traffic-script-cm
   image:
     repository: ghcr.io/jgomezselles/hermes
-    tag: 0.0.2
+    tag: 0.0.4
+
+victoria-metrics-single:
+  server:
+    fullnameOverride: "victoria-svc"
+    persistentVolume:
+      enabled: false
+
+grafana:
+  adminPassword: admin
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://victoria-svc:8428
+        access: proxy
+        isDefault: true
+        uid: hermes-prometheus-datasource
+      deleteDatasources:
+      - name: Prometheus
+
+  dashboardProviders:
+   dashboardproviders.yaml:
+     apiVersion: 1
+     providers:
+     - name: 'default'
+       orgId: 1
+       folder: ''
+       type: file
+       disableDeletion: false
+       editable: true
+       options:
+         path: /var/lib/grafana/dashboards/default
+
+  dashboardsConfigMaps:
+    default: "hermes-dashboard"
