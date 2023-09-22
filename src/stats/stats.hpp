@@ -101,7 +101,8 @@ protected:
     const std::string stats_headers;
 
     opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> requests_sent;
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> responses;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> responses_ok;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> responses_err;
     opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> timeouts;
     opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>> histo_rtok_ms;
     opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>> histo_rtnok_ms;

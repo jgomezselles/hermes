@@ -19,12 +19,6 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/context/context.h"
 
-// #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
-//
-// #include "opentelemetry/sdk/metrics/meter.h"
-//
-//
-
 using namespace std::chrono;
 
 namespace stats
@@ -54,7 +48,7 @@ void InitMetricsOtlpHttp()
 {
     opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions otlpOptions;
     otlpOptions.url =
-        "http://vmsingle-victoria-metrics-single-server:8428/opentelemetry/api/v1/push";
+        "http://victoria-svc:8428/opentelemetry/api/v1/push";
     otlpOptions.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
     otlpOptions.console_debug = true;
     auto exporter =
@@ -151,10 +145,12 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
 
     auto sent = meter->CreateUInt64Counter("hermes_requests_sent", "Requests sent by hermes");
     requests_sent = std::move(sent);
-    auto resp = meter->CreateUInt64Counter("hermes_responses_rcv", "Responses received by hermes");
-    responses = std::move(resp);
+    auto resp_ok = meter->CreateUInt64Counter("hermes_responses_rcv_ok", "Expected responses received by hermes");
+    responses_ok = std::move(resp_ok);
+    auto resp_nok = meter->CreateUInt64Counter("hermes_responses_rcv_err", "Unsuccessful responses received by hermes");
+    responses_err = std::move(resp_nok);
     auto to =
-        meter->CreateUInt64Counter("hermes_requests_sent", "Timeouts in requests sent by hermes");
+        meter->CreateUInt64Counter("hermes_timeouts", "Timeouts in requests sent by hermes");
     timeouts = std::move(to);
 
     auto rtok = meter->CreateDoubleHistogram(
@@ -238,7 +234,7 @@ void stats::add_measurement(const std::string& id, const int64_t elapsed_time, c
     auto labelkv1 = opentelemetry::common::KeyValueIterableView<decltype(labels1)>{labels1};
 
     auto context = opentelemetry::context::Context{};
-    responses->Add(1, labelkv1);
+    responses_ok->Add(1, labelkv1);
     histo_rtok_ms->Record(double(elapsed_time)/1000.0, labelkv1, context);
 }
 
@@ -276,7 +272,7 @@ void stats::add_error(const std::string& id, const int e)
 
     std::map<std::string, std::string> labels{{"id", id}, {"response_code", std::to_string(e)}};
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
-    responses->Add(1, labelkv);
+    responses_err->Add(1, labelkv);
 }
 
 void stats::add_client_error(const std::string& id, const int e)
