@@ -10,7 +10,7 @@ data:
     {
       "dns": "server-mock",
       "port": "8080",
-      "timeout": 5000,
+      "timeout": 2000,
       "ranges": {
         "range_1": {
           "min": 0,
@@ -22,7 +22,9 @@ data:
         "get1",
         "put1",
         "delete1",
-        "wrong_path"
+        "wrong_path",
+        "timeout_example",
+        "error1"
       ],
       "messages": {
         "post1": {
@@ -70,6 +72,20 @@ data:
           "url": "url/example/wrong_path/id-<range_1>",
           "response": {
             "code": 400
+          }
+        },
+        "timeout_example": {
+          "method": "GET",
+          "url": "url/timeout/id-<range_1>",
+          "response": {
+            "code": 200
+          }
+        },
+        "error1": {
+          "method": "GET",
+          "url": "url/error/id-<range_1>",
+          "response": {
+            "code": 200
           }
         }
       }
