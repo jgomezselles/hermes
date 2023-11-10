@@ -25,3 +25,4 @@ service:
 
 o11y:
   metrics_endpoint:
+  traces_endpoint:

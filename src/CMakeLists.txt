@@ -20,17 +20,15 @@ PRIVATE
 
     ## OTel libs
 
-    ###OTLP HTTP metrics
     opentelemetry_exporter_otlp_http_metric
     opentelemetry_exporter_otlp_http_client
+    opentelemetry_exporter_otlp_http
     opentelemetry_http_client_curl
     opentelemetry_otlp_recordable
     opentelemetry_proto
 
-    ###OSTREAM METRICS
-    opentelemetry_exporter_ostream_metrics
-
     opentelemetry_metrics
+    opentelemetry_trace
 
     opentelemetry_resources
     opentelemetry_version

@@ -15,3 +15,6 @@ dependencies:
   - name: grafana
     version: 6.58.8
     repository: https://grafana.github.io/helm-charts
+  - name: tempo
+    version: 1.7.0
+    repository: https://grafana.github.io/helm-charts

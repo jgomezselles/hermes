@@ -1,6 +1,7 @@
 add_library(hermes-o11y
 STATIC
     metrics.cpp
+    tracer.cpp
 )
 
 target_include_directories(hermes-o11y
