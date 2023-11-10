@@ -18,6 +18,8 @@ hermes:
   image:
     repository: ghcr.io/jgomezselles/hermes
     tag: 0.0.4
+  o11y:
+    metrics_endpoint: http://victoria-svc:8428/opentelemetry/api/v1/push
 
 victoria-metrics-single:
   server:

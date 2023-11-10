@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <cstdlib>
 
 #include "metrics.hpp"
 
@@ -119,7 +120,16 @@ int main(int argc, char* argv[])
     * OBSERVABILITY
     ******************************************************************/
 
-    o11y::init_metrics_otlp_http("http://victoria-svc:8428/opentelemetry/api/v1/push");
+   if(const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT"))
+   {
+        std::cerr << "Starting OTLP metrics exporter towards: " << otlp_metrics_endpoint << std::endl;
+        //http://victoria-svc:8428/opentelemetry/api/v1/push
+        o11y::init_metrics_otlp_http(otlp_metrics_endpoint);
+   }
+   else
+   {
+        std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won'r be pushed." << std::endl;
+   }
 
 
     /******************************************************************
