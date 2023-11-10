@@ -58,7 +58,7 @@ public:
 
     stats(const stats& s) = delete;
 
-    ~stats();
+    ~stats() = default;
 
     void print();
     void end();
