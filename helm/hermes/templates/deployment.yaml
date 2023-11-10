@@ -38,3 +38,6 @@ spec:
             - name: {{ .Values.script.cm }}-volume
               mountPath: "/etc/scripts/"
               readOnly: true
+          env:          
+            - name: "OTLP_METRICS_ENDPOINT"
+              value: {{ .Values.o11y.metrics_endpoint }}

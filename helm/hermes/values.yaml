@@ -13,8 +13,8 @@ hermes:
 
 image:
   repository: ghcr.io/jgomezselles/hermes
-  tag: 0.0.2
-  pullPolicy: IfNotPresent
+  tag: 0.0.4
+  pullPolicy: Never
 
 script:
   cm: traffic-script-cm
@@ -22,3 +22,6 @@ script:
 service:
   type: ClusterIP
   port: 80
+
+o11y:
+  metrics_endpoint:
