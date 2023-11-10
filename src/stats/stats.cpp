@@ -10,71 +10,14 @@
 #include <iostream>
 #include <memory>
 
-#include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
-#include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 using namespace std::chrono;
 
 namespace stats
 {
-
-void InitMetricsOStream()
-{
-    auto exporter = opentelemetry::exporter::metrics::OStreamMetricExporterFactory::Create();
-
-    // Initialize and set the global MeterProvider
-    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-    options.export_interval_millis = std::chrono::milliseconds(1000);
-    options.export_timeout_millis = std::chrono::milliseconds(500);
-
-    auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
-        std::move(exporter), options);
-
-    auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-    auto* p = static_cast<opentelemetry::sdk::metrics::MeterProvider*>(u_provider.get());
-    p->AddMetricReader(std::move(reader));
-
-    std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-    opentelemetry::metrics::Provider::SetMeterProvider(provider);
-}
-
-void InitMetricsOtlpHttp()
-{
-    opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions otlpOptions;
-    otlpOptions.url =
-        "http://victoria-svc:8428/opentelemetry/api/v1/push";
-    otlpOptions.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
-    otlpOptions.console_debug = true;
-    auto exporter =
-        opentelemetry::exporter::otlp::OtlpHttpMetricExporterFactory::Create(otlpOptions);
-
-    // Initialize and set the periodic metrics reader
-    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-    options.export_interval_millis = std::chrono::milliseconds(1000);
-    options.export_timeout_millis = std::chrono::milliseconds(500);
-
-    auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
-        std::move(exporter), options);
-
-    auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-    auto* p = static_cast<opentelemetry::sdk::metrics::MeterProvider*>(u_provider.get());
-    p->AddMetricReader(std::move(reader));
-
-    std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-    opentelemetry::metrics::Provider::SetMeterProvider(provider);
-}
-
-void CleanupMetrics()
-{
-    std::shared_ptr<opentelemetry::metrics::MeterProvider> none;
-    opentelemetry::metrics::Provider::SetMeterProvider(none);
-}
 
 std::string stats::create_headers_str()
 {
@@ -137,11 +80,8 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
     timer.expires_after(milliseconds(print_period));
     timer.async_wait(boost::bind(&stats::print, this));
 
-    InitMetricsOStream();
-    InitMetricsOtlpHttp();
-
     auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
-    auto meter = provider->GetMeter("this_will_fail");
+    auto meter = provider->GetMeter("");
 
     auto sent = meter->CreateUInt64Counter("hermes_requests_sent", "Requests sent by hermes");
     requests_sent = std::move(sent);
@@ -161,11 +101,6 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
         "hermes_response_time_nok_ms",
         "Response Time of requests with response codes not expected by hermes", "ms");
     histo_rtnok_ms = std::move(rtnok);*/
-}
-
-stats::~stats()
-{
-    CleanupMetrics();
 }
 
 void stats::write_headers(std::fstream& fs)

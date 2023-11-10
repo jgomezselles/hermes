@@ -10,6 +10,8 @@
 #include <iostream>
 #include <thread>
 
+#include "metrics.hpp"
+
 #include "client_impl.hpp"
 #include "connection.hpp"
 #include "params.hpp"
@@ -37,6 +39,7 @@ const int default_stats_print_period{10};
 
 const std::string default_traffic_path{"/etc/scripts/traffic.json"};
 const std::string default_output_file{"hermes.out"};
+
 
 [[noreturn]] static void usage(int rc)
 {
@@ -111,6 +114,14 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+
+    /******************************************************************
+    * OBSERVABILITY
+    ******************************************************************/
+
+    o11y::init_metrics_otlp_http("http://victoria-svc:8428/opentelemetry/api/v1/push");
+
+
     /******************************************************************
      * IO_CTX
      ******************************************************************/
@@ -174,6 +185,8 @@ int main(int argc, char* argv[])
     fut.wait();
 
     stats->end();
+
+    o11y::cleanup_metrics();
 
     io_ctx_grd.reset();
     for (auto& thread : workers)

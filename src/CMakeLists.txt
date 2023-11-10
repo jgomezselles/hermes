@@ -3,6 +3,7 @@ add_subdirectory(config)
 add_subdirectory(sender)
 add_subdirectory(stats)
 add_subdirectory(script)
+add_subdirectory(o11y)
 
 add_executable(hermes main.cpp)
 
@@ -15,6 +16,7 @@ PRIVATE
     hermes-http2-client
     hermes-script
     hermes-stats
+    hermes-o11y
 
     ## OTel libs
 
