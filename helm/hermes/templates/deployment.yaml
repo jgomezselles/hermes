@@ -41,3 +41,5 @@ spec:
           env:          
             - name: "OTLP_METRICS_ENDPOINT"
               value: {{ .Values.o11y.metrics_endpoint }}
+            - name: "OTLP_TRACES_ENDPOINT"
+              value: {{ .Values.o11y.traces_endpoint }}
