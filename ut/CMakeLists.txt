@@ -19,12 +19,6 @@ PRIVATE
         hermes-script
         hermes-stats
 
-        ## OTel libs
-        opentelemetry_exporter_ostream_span
-        opentelemetry_trace
-        opentelemetry_resources
-        opentelemetry_version
-        opentelemetry_common
 
         ## nghttp
         nghttp2_asio
