@@ -85,12 +85,13 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
 
     auto sent = meter->CreateUInt64Counter("hermes_requests_sent", "Requests sent by hermes");
     requests_sent = std::move(sent);
-    auto resp_ok = meter->CreateUInt64Counter("hermes_responses_rcv_ok", "Expected responses received by hermes");
+    auto resp_ok = meter->CreateUInt64Counter("hermes_responses_rcv_ok",
+                                              "Expected responses received by hermes");
     responses_ok = std::move(resp_ok);
-    auto resp_nok = meter->CreateUInt64Counter("hermes_responses_rcv_err", "Unsuccessful responses received by hermes");
+    auto resp_nok = meter->CreateUInt64Counter("hermes_responses_rcv_err",
+                                               "Unsuccessful responses received by hermes");
     responses_err = std::move(resp_nok);
-    auto to =
-        meter->CreateUInt64Counter("hermes_timeouts", "Timeouts in requests sent by hermes");
+    auto to = meter->CreateUInt64Counter("hermes_timeouts", "Timeouts in requests sent by hermes");
     timeouts = std::move(to);
 
     auto rtok = meter->CreateDoubleHistogram(
@@ -170,7 +171,7 @@ void stats::add_measurement(const std::string& id, const int64_t elapsed_time, c
 
     auto context = opentelemetry::context::Context{};
     responses_ok->Add(1, labelkv1);
-    histo_rtok_ms->Record(double(elapsed_time)/1000.0, labelkv1, context);
+    histo_rtok_ms->Record(double(elapsed_time) / 1000.0, labelkv1, context);
 }
 
 void stats::increase_sent(const std::string& id)

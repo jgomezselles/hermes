@@ -38,7 +38,8 @@ void init_metrics_otlp_http(const std::string& url)
     context->AddMetricReader(std::move(reader));
 
     auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(context));
-    opentelemetry::v1::nostd::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
+    opentelemetry::v1::nostd::shared_ptr<opentelemetry::metrics::MeterProvider> provider(
+        std::move(u_provider));
     opentelemetry::metrics::Provider::SetMeterProvider(provider);
 }
 
