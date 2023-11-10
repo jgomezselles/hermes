@@ -5,16 +5,15 @@
 #include <boost/asio/steady_timer.hpp>
 #include <boost/bind/bind.hpp>
 #include <chrono>
+#include <cstdlib>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <thread>
-#include <cstdlib>
-
-#include "metrics.hpp"
 
 #include "client_impl.hpp"
 #include "connection.hpp"
+#include "metrics.hpp"
 #include "params.hpp"
 #include "script.hpp"
 #include "script_queue.hpp"
@@ -40,7 +39,6 @@ const int default_stats_print_period{10};
 
 const std::string default_traffic_path{"/etc/scripts/traffic.json"};
 const std::string default_output_file{"hermes.out"};
-
 
 [[noreturn]] static void usage(int rc)
 {
@@ -115,22 +113,21 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-
     /******************************************************************
-    * OBSERVABILITY
-    ******************************************************************/
+     * OBSERVABILITY
+     ******************************************************************/
 
-   if(const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT"))
-   {
-        std::cerr << "Starting OTLP metrics exporter towards: " << otlp_metrics_endpoint << std::endl;
-        //http://victoria-svc:8428/opentelemetry/api/v1/push
+    if (const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT"))
+    {
+        std::cerr << "Starting OTLP metrics exporter towards: " << otlp_metrics_endpoint
+                  << std::endl;
+        // http://victoria-svc:8428/opentelemetry/api/v1/push
         o11y::init_metrics_otlp_http(otlp_metrics_endpoint);
-   }
-   else
-   {
+    }
+    else
+    {
         std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won'r be pushed." << std::endl;
-   }
-
+    }
 
     /******************************************************************
      * IO_CTX

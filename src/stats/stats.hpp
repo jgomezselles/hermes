@@ -1,5 +1,3 @@
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
-
 #include <atomic>
 #include <boost/asio.hpp>
 #include <chrono>
@@ -8,6 +6,7 @@
 #include <mutex>
 #include <shared_mutex>
 
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 #include "stats_if.hpp"
 
 #pragma once
@@ -36,7 +35,7 @@ struct snapshot
                lhs.response_codes_nok == rhs.response_codes_nok;
     }
 
-    //Histo (id, code, timestamp)
+    // Histo (id, code, timestamp)
 
     int64_t sent = 0;
     int64_t responded_ok = 0;
@@ -100,11 +99,16 @@ protected:
 
     const std::string stats_headers;
 
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> requests_sent;
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> responses_ok;
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> responses_err;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>>
+        requests_sent;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>>
+        responses_ok;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>>
+        responses_err;
     opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Counter<uint64_t>> timeouts;
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>> histo_rtok_ms;
-    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>> histo_rtnok_ms;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>>
+        histo_rtok_ms;
+    opentelemetry::v1::nostd::unique_ptr<opentelemetry::v1::metrics::Histogram<double>>
+        histo_rtnok_ms;
 };
 }  // namespace stats
