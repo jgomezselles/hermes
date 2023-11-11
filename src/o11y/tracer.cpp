@@ -18,8 +18,8 @@ namespace ot_trace = opentelemetry::trace;
 
 void init_tracer(const std::string& url)
 {
-    auto resource_attributes = opentelemetry::sdk::resource::ResourceAttributes{
-        {"service.name", "hermes"}};
+    auto resource_attributes =
+        opentelemetry::sdk::resource::ResourceAttributes{{"service.name", "hermes"}};
     auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
 
     opentelemetry::exporter::otlp::OtlpHttpExporterOptions http_opts;
@@ -32,7 +32,8 @@ void init_tracer(const std::string& url)
     auto processor =
         opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(std::move(exporter), opts);
 
-    auto provider = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor), resource);
+    auto provider =
+        opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor), resource);
     opentelemetry::trace::Provider::SetTracerProvider(std::move(provider));
 }
 

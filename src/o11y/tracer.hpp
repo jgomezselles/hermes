@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/tracer.h"
 
