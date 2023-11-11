@@ -16,12 +16,15 @@
 #include <utility>
 
 #include "connection.hpp"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "script.hpp"
 #include "script_queue.hpp"
 #include "stats.hpp"
+#include "tracer.hpp"
 
 namespace ng = nghttp2::asio_http2;
 using namespace std::chrono;
+namespace ot_trace = opentelemetry::trace;
 
 namespace http2_client
 {
@@ -54,7 +57,7 @@ void client_impl::handle_timeout(const std::shared_ptr<race_control>& control,
     stats->add_timeout(msg_name);
     queue->cancel_script();
 }
-
+// TODO: Add timeout handling in spans
 void client_impl::handle_timeout_cancelled(const std::shared_ptr<race_control>& control,
                                            const std::string& msg_name) const
 {
@@ -135,6 +138,11 @@ void client_impl::send()
         {
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
+
+            auto span = o11y::create_span(req.name);
+            span->SetAttribute(ot_trace::SemanticConventions::kHttpUrl, req.url);
+            span->SetAttribute(ot_trace::SemanticConventions::kHttpMethod, req.method);
+
             auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
             if (!nghttp_req)
             {
@@ -144,7 +152,9 @@ void client_impl::send()
                 queue->cancel_script();
                 return;
             }
+
             stats->increase_sent(req.name);
+            span->AddEvent("Request sent");
 
             auto ctrl = std::make_shared<race_control>();
             auto timer = std::make_shared<boost::asio::steady_timer>(io_ctx);
@@ -153,7 +163,7 @@ void client_impl::send()
                                           boost::asio::placeholders::error, ctrl, req.name));
 
             nghttp_req->on_response(
-                [this, timer, init_time, script, ctrl, req](const ng::client::response& res)
+                [this, timer, init_time, script, ctrl, req, span](const ng::client::response& res)
                 {
                     auto elapsed_time =
                         duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
@@ -166,10 +176,11 @@ void client_impl::send()
                     ctrl->answered = true;
                     timer->cancel();
 
+                    span->AddEvent("Response received");
                     auto answer = std::make_shared<std::string>();
                     res.on_data(
-                        [this, &res, script, answer, elapsed_time, req](const uint8_t* data,
-                                                                        std::size_t len)
+                        [this, &res, script, answer, elapsed_time, req, span](const uint8_t* data,
+                                                                              std::size_t len)
                         {
                             if (len > 0)
                             {
@@ -178,18 +189,26 @@ void client_impl::send()
                             }
                             else
                             {
+                                span->AddEvent("Body received");
                                 traffic::answer_type ans = {res.status_code(), *answer,
                                                             res.header()};
+                                span->SetAttribute(ot_trace::SemanticConventions::kHttpStatusCode,
+                                                   res.status_code());
+
                                 bool valid_answer = script.validate_answer(ans);
                                 if (valid_answer)
                                 {
                                     stats->add_measurement(req.name, elapsed_time,
                                                            res.status_code());
+                                    span->SetStatus(ot_trace::StatusCode::kOk);
+                                    span->End();
                                     queue->enqueue_script(script, ans);
                                 }
                                 else
                                 {
                                     stats->add_error(req.name, res.status_code());
+                                    span->SetStatus(opentelemetry::trace::StatusCode::kError);
+                                    span->End();
                                     queue->cancel_script();
                                 }
                             }
@@ -200,7 +219,7 @@ void client_impl::send()
                 []([[maybe_unused]] uint32_t error_code)
                 {
                     // on_close is registered here for the sake of completion and
-                    // because it helps debugging cometimes, but no implementation needed.
+                    // because it helps debugging sometimes, but no implementation needed.
                 });
         });
     mtx.unlock_shared();
