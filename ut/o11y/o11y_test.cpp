@@ -27,3 +27,8 @@ TEST_F(o11y_test, InitAndShutDownObservabilityWithEnvVariables)
     o11y::init_observability();
     o11y::shutdown_observability();
 }
+
+TEST_F(o11y_test, ShutDownObservabilityWithoutStarting)
+{
+    o11y::shutdown_observability();
+}
