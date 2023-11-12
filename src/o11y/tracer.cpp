@@ -39,7 +39,7 @@ void init_tracer(const std::string& url)
 
 void cleanup_tracer()
 {
-    // We call ForceFlush to prevent to cancel running exportings, It's optional.
+    // To prevent cancelling ongoing exports.
     opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
         opentelemetry::trace::Provider::GetTracerProvider();
 
@@ -62,6 +62,17 @@ ot_std::shared_ptr<ot_trace::Span> create_span(const std::string& name)
 {
     ot_trace::StartSpanOptions opts;
     opts.kind = ot_trace::SpanKind::kClient;
+
+    auto span = get_tracer("hermes_client")->StartSpan(name, opts);
+    return span;
+}
+
+ot_std::shared_ptr<ot_trace::Span> create_child_span(
+    const std::string& name, const ot_std::shared_ptr<ot_trace::Span>& parent)
+{
+    ot_trace::StartSpanOptions opts;
+    opts.kind = ot_trace::SpanKind::kClient;
+    opts.parent = parent->GetContext();
 
     auto span = get_tracer("hermes_client")->StartSpan(name, opts);
     return span;
