@@ -81,7 +81,8 @@ stats::stats(boost::asio::io_context& io_ctx, const int p, const std::string& ou
     timer.async_wait(boost::bind(&stats::print, this));
 
     auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
-    auto meter = provider->GetMeter("");
+    // TODO: Meter name should be meaningful
+    auto meter = provider->GetMeter("dummy name");
 
     auto sent = meter->CreateUInt64Counter("hermes_requests_sent", "Requests sent by hermes");
     requests_sent = std::move(sent);
