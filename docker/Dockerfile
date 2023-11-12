@@ -3,7 +3,7 @@ FROM ghcr.io/jgomezselles/hermes_base:0.0.4 as builder
 COPY . /code
 
 WORKDIR /code/build
-RUN  cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4 hermes && install src/hermes /usr/local/bin
+RUN  cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4 hermes
 RUN mkdir libs && cp /lib64/libopentelemetry_proto.so /lib64/libboost_thread.so.1.78.0 /lib64/libboost_system.so.1.78.0 \
     /lib64/libboost_filesystem.so.1.78.0 /lib64/libcurl.so.4 /lib64/libprotobuf.so.30 /lib64/libssl.so.3 \
     /lib64/libcrypto.so.3 /lib64/libstdc++.so.6 /lib64/libm.so.6 /lib64/libgcc_s.so.1 \
