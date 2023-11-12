@@ -18,7 +18,22 @@ PRIVATE
         hermes-http2-client
         hermes-script
         hermes-stats
+        hermes-o11y
 
+        ## OTel libs
+        opentelemetry_exporter_otlp_http_metric
+        opentelemetry_exporter_otlp_http
+        opentelemetry_exporter_otlp_http_client
+        opentelemetry_http_client_curl
+        opentelemetry_otlp_recordable
+        opentelemetry_proto
+
+        opentelemetry_metrics
+        opentelemetry_trace
+
+        opentelemetry_resources
+        opentelemetry_version
+        opentelemetry_common
 
         ## nghttp
         nghttp2_asio
@@ -35,6 +50,8 @@ PRIVATE
         gtest_main
 
         ## others
+        curl
+        protobuf
         ssl
         crypto
         dl
