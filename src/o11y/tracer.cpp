@@ -72,7 +72,10 @@ ot_std::shared_ptr<ot_trace::Span> create_child_span(
 {
     ot_trace::StartSpanOptions opts;
     opts.kind = ot_trace::SpanKind::kClient;
-    opts.parent = parent->GetContext();
+    if (parent)
+    {
+        opts.parent = parent->GetContext();
+    }
 
     auto span = get_tracer("hermes_client")->StartSpan(name, opts);
     return span;
