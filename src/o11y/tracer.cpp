@@ -15,6 +15,7 @@ namespace o11y
 
 namespace ot_std = opentelemetry::nostd;
 namespace ot_trace = opentelemetry::trace;
+namespace sdk_trace = opentelemetry::sdk::trace;
 
 void init_tracer(const std::string& url)
 {
@@ -26,30 +27,30 @@ void init_tracer(const std::string& url)
     http_opts.url = url;
     auto exporter = opentelemetry::exporter::otlp::OtlpHttpExporterFactory::Create(http_opts);
 
-    opentelemetry::sdk::trace::BatchSpanProcessorOptions opts;
+    sdk_trace::BatchSpanProcessorOptions opts;
     opts.max_queue_size = 2048;
     opts.max_export_batch_size = 512;
-    auto processor =
-        opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(std::move(exporter), opts);
+    auto processor = sdk_trace::BatchSpanProcessorFactory::Create(std::move(exporter), opts);
 
-    auto provider =
-        opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor), resource);
-    opentelemetry::trace::Provider::SetTracerProvider(std::move(provider));
+    auto provider = sdk_trace::TracerProviderFactory::Create(std::move(processor), resource);
+    ot_trace::Provider::SetTracerProvider(std::move(provider));
 }
 
 void cleanup_tracer()
 {
     // To prevent cancelling ongoing exports.
-    opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
-        opentelemetry::trace::Provider::GetTracerProvider();
+    ot_std::shared_ptr<ot_trace::TracerProvider> provider = ot_trace::Provider::GetTracerProvider();
 
     if (provider)
     {
-        static_cast<opentelemetry::sdk::trace::TracerProvider*>(provider.get())->ForceFlush();
+        if (sdk_trace::TracerProvider* d = dynamic_cast<sdk_trace::TracerProvider*>(provider.get());
+            d)
+        {
+            d->ForceFlush();
+        }
     }
-
-    std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-    opentelemetry::trace::Provider::SetTracerProvider(none);
+    std::shared_ptr<ot_trace::TracerProvider> none;
+    ot_trace::Provider::SetTracerProvider(none);
 }
 
 ot_std::shared_ptr<ot_trace::Tracer> get_tracer(const std::string& tracer_name)

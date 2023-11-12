@@ -13,7 +13,6 @@
 
 #include "client_impl.hpp"
 #include "connection.hpp"
-#include "metrics.hpp"
 #include "params.hpp"
 #include "script.hpp"
 #include "script_queue.hpp"
@@ -21,7 +20,7 @@
 #include "sender.hpp"
 #include "stats.hpp"
 #include "timer_impl.hpp"
-#include "tracer.hpp"
+#include "observability.hpp"
 
 using nghttp2::asio_http2::header_map;
 using nghttp2::asio_http2::header_value;
@@ -117,29 +116,7 @@ int main(int argc, char* argv[])
     /******************************************************************
      * OBSERVABILITY
      ******************************************************************/
-    if (const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT");
-        otlp_metrics_endpoint && !std::string(otlp_metrics_endpoint).empty())
-    {
-        std::cerr << "Starting OTLP metrics exporter towards: " << otlp_metrics_endpoint
-                  << std::endl;
-        o11y::init_metrics_otlp_http(otlp_metrics_endpoint);
-    }
-    else
-    {
-        std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won't be pushed." << std::endl;
-    }
-
-    if (const char* otlp_traces_endpoint = std::getenv("OTLP_TRACES_ENDPOINT");
-        otlp_traces_endpoint && !std::string(otlp_traces_endpoint).empty())
-    {
-        std::cerr << "Starting OTLP tracing exporter towards: " << otlp_traces_endpoint
-                  << std::endl;
-        o11y::init_tracer(otlp_traces_endpoint);
-    }
-    else
-    {
-        std::cerr << "OTLP_TRACES_ENDPOINT not found. Traces won't be pushed." << std::endl;
-    }
+    o11y::init_observability();
 
     /******************************************************************
      * IO_CTX
@@ -205,8 +182,7 @@ int main(int argc, char* argv[])
 
     stats->end();
 
-    o11y::cleanup_metrics();
-    o11y::cleanup_tracer();
+    o11y::shutdown_observability();
 
     io_ctx_grd.reset();
     for (auto& thread : workers)
