@@ -25,7 +25,7 @@ jobs:
     name: Compile and run unit tests
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/jgomezselles/hermes_base:0.0.3
+      image: ghcr.io/jgomezselles/hermes_base:0.0.4
       options: "--entrypoint sh"
     steps:
     -
