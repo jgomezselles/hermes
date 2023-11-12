@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "observability.hpp"
 
 using namespace std::chrono_literals;
@@ -21,9 +22,8 @@ TEST_F(o11y_test, InitAndShutDownObservabilityWithoutEnvVariables)
 
 TEST_F(o11y_test, InitAndShutDownObservabilityWithEnvVariables)
 {
-    setenv("OTLP_METRICS_ENDPOINT", "http://dummy-service:8080/v1/metrics",0);
-    setenv("OTLP_TRACES_ENDPOINT", "http://dummy-service:8080/v1/traces",0);
+    setenv("OTLP_METRICS_ENDPOINT", "http://dummy-service:8080/v1/metrics", 0);
+    setenv("OTLP_TRACES_ENDPOINT", "http://dummy-service:8080/v1/traces", 0);
     o11y::init_observability();
     o11y::shutdown_observability();
 }
-

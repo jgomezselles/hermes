@@ -13,6 +13,7 @@
 
 #include "client_impl.hpp"
 #include "connection.hpp"
+#include "observability.hpp"
 #include "params.hpp"
 #include "script.hpp"
 #include "script_queue.hpp"
@@ -20,7 +21,6 @@
 #include "sender.hpp"
 #include "stats.hpp"
 #include "timer_impl.hpp"
-#include "observability.hpp"
 
 using nghttp2::asio_http2::header_map;
 using nghttp2::asio_http2::header_value;
