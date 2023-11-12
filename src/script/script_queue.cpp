@@ -37,6 +37,7 @@ std::optional<script> script_queue::get_next_script()
         script_to_start.parse_ranges(current_in_range);
         script_to_start.parse_variables();
         ++in_flight;
+        script_to_start.start_span();
         return script_to_start;
     }
 

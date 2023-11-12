@@ -11,8 +11,10 @@
 #include <vector>
 
 #include "json_reader.hpp"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "script_functions.hpp"
 #include "script_reader.hpp"
+#include "tracer.hpp"
 
 namespace traffic
 {
@@ -34,6 +36,14 @@ script::script(const std::string& path)
 script::script(const json_reader& input_json)
 {
     build(input_json.as_string());
+}
+
+script::~script()
+{
+    if (span)
+    {
+        span->End();
+    }
 }
 
 void script::validate_members() const
@@ -217,4 +227,10 @@ void script::parse_variables()
         replace_in_messages(k, v);
     }
 }
+
+void script::start_span()
+{
+    span = o11y::create_span("script");
+}
+
 }  // namespace traffic

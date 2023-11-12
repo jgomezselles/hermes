@@ -139,7 +139,7 @@ void client_impl::send()
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
 
-            auto span = o11y::create_span(req.name);
+            auto span = o11y::create_child_span(req.name, script.get_span());
             span->SetAttribute(ot_trace::SemanticConventions::kHttpUrl, req.url);
             span->SetAttribute(ot_trace::SemanticConventions::kHttpMethod, req.method);
 

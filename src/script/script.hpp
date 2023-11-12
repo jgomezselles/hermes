@@ -5,7 +5,13 @@
 #include "json_reader.hpp"
 #include "script_structs.hpp"
 
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/trace/tracer.h"
+
 #pragma once
+
+namespace otel_std = opentelemetry::nostd;
+namespace otel_trace = opentelemetry::trace;
 
 namespace traffic
 {
@@ -16,7 +22,7 @@ public:
     explicit script(const std::string& path);
     explicit script(const json_reader& input_json);
 
-    ~script() = default;
+    ~script();
 
     const std::string& get_next_url() const { return messages.front().url; };
     const std::string& get_next_body() const { return messages.front().body; };
@@ -38,6 +44,10 @@ public:
 
     std::vector<std::string> get_message_names() const;
 
+    void start_span();
+
+    const otel_std::shared_ptr<otel_trace::Span>& get_span() const {return span;};
+
 private:
     void validate_members() const;
     void build(const std::string& input_json);
@@ -58,5 +68,7 @@ private:
     std::map<std::string, std::string, std::less<>> saved_strs;
     std::map<std::string, int, std::less<>> saved_ints;
     std::map<std::string, json_reader, std::less<>> saved_jsons;
+
+    otel_std::shared_ptr<otel_trace::Span> span;
 };
 }  // namespace traffic

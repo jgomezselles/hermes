@@ -18,4 +18,7 @@ ot_std::shared_ptr<ot_trace::Tracer> get_tracer(const std::string& tracer_name);
 
 ot_std::shared_ptr<ot_trace::Span> create_span(const std::string& name);
 
+ot_std::shared_ptr<ot_trace::Span> create_child_span(
+    const std::string& name, const ot_std::shared_ptr<ot_trace::Span>& parent);
+
 }  // namespace o11y
