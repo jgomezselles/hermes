@@ -3,10 +3,9 @@
 #include <vector>
 
 #include "json_reader.hpp"
-#include "script_structs.hpp"
-
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/tracer.h"
+#include "script_structs.hpp"
 
 #pragma once
 
@@ -46,7 +45,7 @@ public:
 
     void start_span();
 
-    const otel_std::shared_ptr<otel_trace::Span>& get_span() const {return span;};
+    const otel_std::shared_ptr<otel_trace::Span>& get_span() const { return span; };
 
 private:
     void validate_members() const;
