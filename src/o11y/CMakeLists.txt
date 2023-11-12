@@ -1,5 +1,6 @@
 add_library(hermes-o11y
 STATIC
+    observability.cpp
     metrics.cpp
     tracer.cpp
 )
