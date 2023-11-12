@@ -14,7 +14,7 @@ To do so, execute, from the root directory of your local repository, the
 following commands:
 
 ```bash
-docker build -f docker/base/Dockerfile . -t ghcr.io/jgomezselles/hermes_base:0.0.3 # You may want to skip this one, and just pull it!
+docker build -f docker/base/Dockerfile . -t ghcr.io/jgomezselles/hermes_base:0.0.4 # You may want to skip this one, and just pull it!
 docker build -f docker/Dockerfile . -t ghcr.io/jgomezselles/hermes:<your_favorite_tag>
 ```
 
