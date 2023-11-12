@@ -117,20 +117,20 @@ int main(int argc, char* argv[])
     /******************************************************************
      * OBSERVABILITY
      ******************************************************************/
-
-    if (const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT"))
+    if (const char* otlp_metrics_endpoint = std::getenv("OTLP_METRICS_ENDPOINT");
+        otlp_metrics_endpoint && !std::string(otlp_metrics_endpoint).empty())
     {
         std::cerr << "Starting OTLP metrics exporter towards: " << otlp_metrics_endpoint
                   << std::endl;
-        // http://victoria-svc:8428/opentelemetry/api/v1/push
         o11y::init_metrics_otlp_http(otlp_metrics_endpoint);
     }
     else
     {
-        std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won'r be pushed." << std::endl;
+        std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won't be pushed." << std::endl;
     }
 
-    if (const char* otlp_traces_endpoint = std::getenv("OTLP_TRACES_ENDPOINT"))
+    if (const char* otlp_traces_endpoint = std::getenv("OTLP_TRACES_ENDPOINT");
+        otlp_traces_endpoint && !std::string(otlp_traces_endpoint).empty())
     {
         std::cerr << "Starting OTLP tracing exporter towards: " << otlp_traces_endpoint
                   << std::endl;
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::cerr << "OTLP_METRICS_ENDPOINT not found. Metrics won'r be pushed." << std::endl;
+        std::cerr << "OTLP_TRACES_ENDPOINT not found. Traces won't be pushed." << std::endl;
     }
 
     /******************************************************************
