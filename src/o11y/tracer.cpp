@@ -1,5 +1,7 @@
 #include "tracer.hpp"
 
+#include <iostream>
+
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
@@ -33,6 +35,7 @@ void init_tracer(const std::string& url)
     auto processor = sdk_trace::BatchSpanProcessorFactory::Create(std::move(exporter), opts);
 
     auto provider = sdk_trace::TracerProviderFactory::Create(std::move(processor), resource);
+
     ot_trace::Provider::SetTracerProvider(std::move(provider));
 }
 
@@ -49,8 +52,8 @@ void cleanup_tracer()
             d->ForceFlush();
         }
     }
-    std::shared_ptr<ot_trace::TracerProvider> none;
-    ot_trace::Provider::SetTracerProvider(none);
+    ot_std::shared_ptr<ot_trace::TracerProvider> noop(new ot_trace::NoopTracerProvider());
+    ot_trace::Provider::SetTracerProvider(noop);
 }
 
 ot_std::shared_ptr<ot_trace::Tracer> get_tracer(const std::string& tracer_name)
