@@ -30,6 +30,7 @@ PRIVATE
 
         opentelemetry_metrics
         opentelemetry_trace
+        opentelemetry_logs
 
         opentelemetry_resources
         opentelemetry_version
