@@ -192,8 +192,9 @@ void client_impl::send()
                                 span->AddEvent("Body received");
                                 traffic::answer_type ans = {res.status_code(), *answer,
                                                             res.header()};
-                                span->SetAttribute(ot_trace::SemanticConventions::kHttpResponseStatusCode,
-                                                   res.status_code());
+                                span->SetAttribute(
+                                    ot_trace::SemanticConventions::kHttpResponseStatusCode,
+                                    res.status_code());
 
                                 bool valid_answer = script.validate_answer(ans);
                                 if (valid_answer)
