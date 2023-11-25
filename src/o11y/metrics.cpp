@@ -15,6 +15,9 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 using namespace std::chrono;
+namespace ot_std = opentelemetry::nostd;
+namespace ot_metrics = opentelemetry::metrics;
+namespace sdk_metrics = opentelemetry::sdk::metrics;
 
 namespace o11y
 {
@@ -28,25 +31,25 @@ void init_metrics_otlp_http(const std::string& url)
     auto exporter =
         opentelemetry::exporter::otlp::OtlpHttpMetricExporterFactory::Create(otlpOptions);
 
-    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions reader_options;
+    sdk_metrics::PeriodicExportingMetricReaderOptions reader_options;
     reader_options.export_interval_millis = std::chrono::milliseconds(1000);
     reader_options.export_timeout_millis = std::chrono::milliseconds(500);
 
-    auto reader = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
+    auto reader = sdk_metrics::PeriodicExportingMetricReaderFactory::Create(
         std::move(exporter), reader_options);
-    auto context = opentelemetry::sdk::metrics::MeterContextFactory::Create();
+    auto context = sdk_metrics::MeterContextFactory::Create();
     context->AddMetricReader(std::move(reader));
 
-    auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(context));
-    opentelemetry::v1::nostd::shared_ptr<opentelemetry::metrics::MeterProvider> provider(
+    auto u_provider = sdk_metrics::MeterProviderFactory::Create(std::move(context));
+    ot_std::shared_ptr<ot_metrics::MeterProvider> provider(
         std::move(u_provider));
-    opentelemetry::metrics::Provider::SetMeterProvider(provider);
+    ot_metrics::Provider::SetMeterProvider(provider);
 }
 
 void cleanup_metrics()
 {
-    opentelemetry::v1::nostd::shared_ptr<opentelemetry::metrics::MeterProvider> none;
-    opentelemetry::metrics::Provider::SetMeterProvider(none);
+    ot_std::shared_ptr<ot_metrics::MeterProvider> noop(new ot_metrics::NoopMeterProvider());
+    ot_metrics::Provider::SetMeterProvider(noop);
 }
 
 }  // namespace o11y
