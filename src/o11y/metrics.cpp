@@ -47,6 +47,19 @@ void init_metrics_otlp_http(const std::string& url)
 
 void cleanup_metrics()
 {
+    // To prevent cancelling ongoing exports.
+    ot_std::shared_ptr<ot_metrics::MeterProvider> provider =
+        ot_metrics::Provider::GetMeterProvider();
+
+    if (provider)
+    {
+        if (sdk_metrics::MeterProvider* d =
+                dynamic_cast<sdk_metrics::MeterProvider*>(provider.get());
+            d)
+        {
+            d->ForceFlush();
+        }
+    }
     ot_std::shared_ptr<ot_metrics::MeterProvider> noop(new ot_metrics::NoopMeterProvider());
     ot_metrics::Provider::SetMeterProvider(noop);
 }
