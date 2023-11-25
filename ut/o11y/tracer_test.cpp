@@ -19,6 +19,7 @@ TEST_F(tracer_test, GetTracerWhenCannotConnect)
 {
     o11y::init_tracer("http://holis:9090");
     o11y::get_tracer("hermes_client");
+    o11y::cleanup_tracer();
 }
 
 TEST_F(tracer_test, CreateOrphanChildSpanDoesNotDump)
