@@ -35,14 +35,13 @@ void init_metrics_otlp_http(const std::string& url)
     reader_options.export_interval_millis = std::chrono::milliseconds(1000);
     reader_options.export_timeout_millis = std::chrono::milliseconds(500);
 
-    auto reader = sdk_metrics::PeriodicExportingMetricReaderFactory::Create(
-        std::move(exporter), reader_options);
+    auto reader = sdk_metrics::PeriodicExportingMetricReaderFactory::Create(std::move(exporter),
+                                                                            reader_options);
     auto context = sdk_metrics::MeterContextFactory::Create();
     context->AddMetricReader(std::move(reader));
 
     auto u_provider = sdk_metrics::MeterProviderFactory::Create(std::move(context));
-    ot_std::shared_ptr<ot_metrics::MeterProvider> provider(
-        std::move(u_provider));
+    ot_std::shared_ptr<ot_metrics::MeterProvider> provider(std::move(u_provider));
     ot_metrics::Provider::SetMeterProvider(provider);
 }
 
