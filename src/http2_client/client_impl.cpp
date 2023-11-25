@@ -140,8 +140,8 @@ void client_impl::send()
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
 
             auto span = o11y::create_child_span(req.name, script.get_span());
-            span->SetAttribute(ot_trace::SemanticConventions::kHttpUrl, req.url);
-            span->SetAttribute(ot_trace::SemanticConventions::kHttpMethod, req.method);
+            span->SetAttribute(ot_trace::SemanticConventions::kUrlFull, req.url);
+            span->SetAttribute(ot_trace::SemanticConventions::kHttpRequestMethod, req.method);
 
             auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
             if (!nghttp_req)
@@ -192,7 +192,7 @@ void client_impl::send()
                                 span->AddEvent("Body received");
                                 traffic::answer_type ans = {res.status_code(), *answer,
                                                             res.header()};
-                                span->SetAttribute(ot_trace::SemanticConventions::kHttpStatusCode,
+                                span->SetAttribute(ot_trace::SemanticConventions::kHttpResponseStatusCode,
                                                    res.status_code());
 
                                 bool valid_answer = script.validate_answer(ans);
