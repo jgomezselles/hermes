@@ -20,7 +20,7 @@ hermes:
     tag: 0.0.4
   o11y:
     metrics_endpoint: http://victoria-svc:8428/opentelemetry/api/v1/push
-    traces_endpoint: http://example-hermes-tempo:4318/v1/traces
+    traces_endpoint: http://hermes-tempo:4318/v1/traces
 
 victoria-metrics-single:
   server:
@@ -43,7 +43,7 @@ grafana:
       - name: Tempo
         uid: tempo
         type: tempo
-        url: http://example-hermes-tempo:3100
+        url: http://hermes-tempo:3100
         isDefault: false
       deleteDatasources:
       - name: Prometheus
