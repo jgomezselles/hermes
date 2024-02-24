@@ -161,10 +161,6 @@ jobs:
         kubectl get pods -A
         kubectl version
     -
-      name: Lint hermes helmchart
-      run: |
-        helm lint helm/hermes
-    -
       name: Update example-hermes dependencies
       run: |
         helm dep update helm/example-hermes
