@@ -139,13 +139,13 @@ jobs:
         kubectl_version: "v1.22.1"
     -
       name: Download server-mock
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: server-mock-image-${{ env.COMMIT_ID }}
         path: /tmp
     -
       name: Download hermes image
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: hermes-image-${{ env.COMMIT_ID }}
         path: /tmp
