@@ -82,7 +82,7 @@ jobs:
           outputs: type=docker,dest=/tmp/hermes-image-${{ env.COMMIT_ID }}.tar
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: hermes-image-${{ env.COMMIT_ID }}
           path: /tmp/hermes-image-${{ env.COMMIT_ID }}.tar
@@ -113,7 +113,7 @@ jobs:
           outputs: type=docker,dest=/tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: server-mock-image-${{ env.COMMIT_ID }}
           path: /tmp/server-mock-image-${{ env.COMMIT_ID }}.tar
