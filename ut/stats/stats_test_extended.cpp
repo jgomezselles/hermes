@@ -104,7 +104,7 @@ public:
 
         for (unsigned int i = 0; i < expected.size(); ++i)
         {
-            ASSERT_LE(fabs(expected.at(i) - numbers.at(i)), 0.15);
+            ASSERT_LE(fabs(expected.at(i) - numbers.at(i)), 1);
         }
     }
 

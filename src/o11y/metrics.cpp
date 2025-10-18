@@ -41,7 +41,7 @@ void init_metrics_otlp_http(const std::string& url)
     context->AddMetricReader(std::move(reader));
 
     auto u_provider = sdk_metrics::MeterProviderFactory::Create(std::move(context));
-    ot_std::shared_ptr<ot_metrics::MeterProvider> provider(std::move(u_provider));
+    std::shared_ptr<ot_metrics::MeterProvider> provider(std::move(u_provider));
     ot_metrics::Provider::SetMeterProvider(provider);
 }
 

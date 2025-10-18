@@ -6,11 +6,11 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 
 namespace o11y
 {
@@ -34,9 +34,9 @@ void init_tracer(const std::string& url)
     opts.max_export_batch_size = 512;
     auto processor = sdk_trace::BatchSpanProcessorFactory::Create(std::move(exporter), opts);
 
-    auto provider = sdk_trace::TracerProviderFactory::Create(std::move(processor), resource);
+    std::shared_ptr<opentelemetry::trace::TracerProvider> provider = sdk_trace::TracerProviderFactory::Create(std::move(processor), resource);
 
-    ot_trace::Provider::SetTracerProvider(std::move(provider));
+    sdk_trace::Provider::SetTracerProvider(provider);
 }
 
 void cleanup_tracer()

@@ -18,6 +18,6 @@ RUN set -x && wget https://github.com/Tencent/rapidjson/archive/4b3d7c2.tar.gz -
                 -DRAPIDJSON_SCHEMA_USE_INTERNALREGEX=0 -DRAPIDJSON_SCHEMA_USE_STDREGEX=1 . && \
     make install && cd .. && rm -rf * && set +x
 
-RUN set -x && wget https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.12.0.tar.gz -O otel.tar.gz && \
+RUN set -x && wget https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.23.0.tar.gz -O otel.tar.gz && \
     tar xvf otel.tar.gz && cd opentelemetry* && cmake -DBUILD_TESTING=OFF -DWITH_OTLP_HTTP=ON . && \
     make -j4 install && cp /usr/local/lib64/libopentelemetry_proto.so /lib64/ && cd .. && rm -r * && set +x
