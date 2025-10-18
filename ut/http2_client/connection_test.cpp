@@ -13,7 +13,7 @@ class connection_test : public ::testing::Test
 {
 public:
     connection_test()
-        : server_host("localhost"), server_port("8080"), server_started(false), is_secure(false){};
+        : server_host("localhost"), server_port("8080"), server_started(false), is_secure(false) {};
 
     void start_server()
     {

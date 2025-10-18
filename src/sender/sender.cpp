@@ -10,8 +10,8 @@ using namespace std::chrono;
 
 namespace engine
 {
-sender::sender(std::unique_ptr<engine::timer> &&t, std::unique_ptr<http2_client::client> &&c,
-               std::shared_ptr<config::params> params, std::promise<void> &&p)
+sender::sender(std::unique_ptr<engine::timer>&& t, std::unique_ptr<http2_client::client>&& c,
+               std::shared_ptr<config::params> params, std::promise<void>&& p)
     : timer(std::move(t)), counter(0), client(std::move(c)), params(params), prom(std::move(p))
 {
     timer->async_wait(boost::bind(&sender::send, this));

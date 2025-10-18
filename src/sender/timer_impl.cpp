@@ -2,9 +2,9 @@
 
 namespace engine
 {
-timer_impl::timer_impl(boost::asio::io_context &io_ctx) : timer(io_ctx) {}
+timer_impl::timer_impl(boost::asio::io_context& io_ctx) : timer(io_ctx) {}
 
-void timer_impl::async_wait(engine::timer::wait_handler &&handler)
+void timer_impl::async_wait(engine::timer::wait_handler&& handler)
 {
     timer.async_wait(handler);
 }

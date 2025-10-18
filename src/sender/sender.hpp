@@ -20,8 +20,8 @@ class sender
 {
 public:
     sender() = delete;
-    sender(std::unique_ptr<engine::timer> &&t, std::unique_ptr<http2_client::client> &&c,
-           std::shared_ptr<config::params> params, std::promise<void> &&p);
+    sender(std::unique_ptr<engine::timer>&& t, std::unique_ptr<http2_client::client>&& c,
+           std::shared_ptr<config::params> params, std::promise<void>&& p);
 
     ~sender() = default;
 

@@ -9,7 +9,7 @@ namespace traffic
 class script_reader
 {
 public:
-    explicit script_reader(const std::string &json);
+    explicit script_reader(const std::string& json);
 
     server_info build_server_info();
     int build_timeout();
@@ -23,7 +23,7 @@ public:
     std::map<std::string, std::string, std::less<>> build_variables();
 
 private:
-    explicit script_reader(json_reader &&mgr);
+    explicit script_reader(json_reader&& mgr);
     json_reader json_rdr;
 };
 

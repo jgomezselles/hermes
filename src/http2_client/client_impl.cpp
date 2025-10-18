@@ -16,8 +16,8 @@
 #include <utility>
 
 #include "connection.hpp"
-#include "opentelemetry/semconv/url_attributes.h"
 #include "opentelemetry/semconv/incubating/http_attributes.h"
+#include "opentelemetry/semconv/url_attributes.h"
 #include "script.hpp"
 #include "script_queue.hpp"
 #include "stats.hpp"
@@ -27,7 +27,6 @@ namespace ng = nghttp2::asio_http2;
 using namespace std::chrono;
 namespace ot_trace = opentelemetry::trace;
 namespace ot_conv = opentelemetry::semconv;
-
 
 namespace http2_client
 {
@@ -195,9 +194,8 @@ void client_impl::send()
                                 span->AddEvent("Body received");
                                 traffic::answer_type ans = {res.status_code(), *answer,
                                                             res.header()};
-                                span->SetAttribute(
-                                    ot_conv::http::kHttpResponseStatusCode,
-                                    res.status_code());
+                                span->SetAttribute(ot_conv::http::kHttpResponseStatusCode,
+                                                   res.status_code());
 
                                 bool valid_answer = script.validate_answer(ans);
                                 if (valid_answer)
