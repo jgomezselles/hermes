@@ -1,15 +1,24 @@
 #include "tracer.hpp"
 
-#include <iostream>
+#include <nghttp2/asio_http2.h>
 
+#include <iostream>
+#include <map>
+#include <string>
+
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 
 namespace o11y
@@ -38,6 +47,11 @@ void init_tracer(const std::string& url)
         sdk_trace::TracerProviderFactory::Create(std::move(processor), resource);
 
     sdk_trace::Provider::SetTracerProvider(provider);
+
+    // set global propagator
+    opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+        opentelemetry::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+            new opentelemetry::trace::propagation::HttpTraceContext()));
 }
 
 void cleanup_tracer()
@@ -84,6 +98,23 @@ ot_std::shared_ptr<ot_trace::Span> create_child_span(
 
     auto span = get_tracer("hermes_client")->StartSpan(name, opts);
     return span;
+}
+
+// TODO: compare currentContext (GetValue) with span context; Maybe it's just the traceparent?
+void inject_trace_context(ot_std::shared_ptr<ot_trace::Span>& span,
+                          nghttp2::asio_http2::header_map& headers)
+{
+    if (!span)
+    {
+        return;
+    }
+
+    auto scope = get_tracer("hermes_client")->WithActiveSpan(span);
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    HttpTextMapCarrier carrier(headers);
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    prop->Inject(carrier, current_ctx);
+
 }
 
 }  // namespace o11y

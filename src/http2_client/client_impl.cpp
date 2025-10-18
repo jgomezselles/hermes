@@ -16,6 +16,8 @@
 #include <utility>
 
 #include "connection.hpp"
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/semconv/incubating/http_attributes.h"
 #include "opentelemetry/semconv/url_attributes.h"
 #include "script.hpp"
@@ -136,7 +138,7 @@ void client_impl::send()
 
     const auto& session = conn->get_session();
     session.io_service().post(
-        [this, script, &session, req]
+        [this, script, &session, req] () mutable
         {
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
@@ -144,6 +146,7 @@ void client_impl::send()
             auto span = o11y::create_child_span(req.name, script.get_span());
             span->SetAttribute(ot_conv::url::kUrlFull, req.url);
             span->SetAttribute(ot_conv::http::kHttpRequestMethod, req.method);
+            o11y::inject_trace_context(span, req.headers);
 
             auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
             if (!nghttp_req)
