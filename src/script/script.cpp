@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "json_reader.hpp"
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "script_functions.hpp"
 #include "script_reader.hpp"
 #include "tracer.hpp"

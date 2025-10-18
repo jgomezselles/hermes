@@ -13,7 +13,7 @@ public:
 
     virtual ~timer() {}
 
-    virtual void async_wait(wait_handler &&handler) = 0;
+    virtual void async_wait(wait_handler&& handler) = 0;
 
     virtual std::size_t expires_after(const duration_us expiry_time) = 0;
 };

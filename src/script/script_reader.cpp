@@ -4,9 +4,9 @@
 
 namespace traffic
 {
-script_reader::script_reader(const std::string &json) : json_rdr(json, ::script::schema) {}
+script_reader::script_reader(const std::string& json) : json_rdr(json, ::script::schema) {}
 
-script_reader::script_reader(json_reader &&other) : json_rdr(std::move(other)) {}
+script_reader::script_reader(json_reader&& other) : json_rdr(std::move(other)) {}
 
 range_type script_reader::build_ranges()
 {
@@ -16,7 +16,7 @@ range_type script_reader::build_ranges()
     {
         json_reader jr_ranges{json_rdr.get_value<json_reader>("/ranges")};
         const auto read_ranges = jr_ranges.get_attributes();
-        for (const auto &r_name : read_ranges)
+        for (const auto& r_name : read_ranges)
         {
             std::pair<int, int> range_pair = {
                 json_rdr.get_value<int>("/ranges/" + r_name + "/min"),
@@ -42,7 +42,7 @@ std::deque<message> script_reader::build_messages()
 
     const auto read_messages = json_rdr.get_value<std::vector<std::string>>("/flow");
 
-    for (const auto &message : read_messages)
+    for (const auto& message : read_messages)
     {
         if (message == "Total")
         {
@@ -60,7 +60,7 @@ std::deque<message> script_reader::build_messages()
 msg_headers script_reader::build_message_headers()
 {
     msg_headers mh;
-    for (const auto &attr : json_rdr.get_attributes())
+    for (const auto& attr : json_rdr.get_attributes())
     {
         mh.try_emplace(attr, json_rdr.get_value<std::string>("/" + attr));
     }
@@ -70,7 +70,7 @@ msg_headers script_reader::build_message_headers()
 std::map<std::string, body_modifier, std::less<>> script_reader::build_atb()
 {
     std::map<std::string, body_modifier, std::less<>> bms;
-    for (const auto &attr : json_rdr.get_attributes())
+    for (const auto& attr : json_rdr.get_attributes())
     {
         script_reader sr_body_fields{json_rdr.get_value<json_reader>("/" + attr)};
         bms.try_emplace(attr, sr_body_fields.build_body_modifier());
@@ -81,7 +81,7 @@ std::map<std::string, body_modifier, std::less<>> script_reader::build_atb()
 msg_modifier script_reader::build_sfa()
 {
     msg_modifier mms;
-    for (const auto &attr : json_rdr.get_attributes())
+    for (const auto& attr : json_rdr.get_attributes())
     {
         if (attr == "headers")
         {
@@ -161,7 +161,7 @@ std::map<std::string, std::string, std::less<>> script_reader::build_variables()
     {
         json_reader jr_ranges{json_rdr.get_value<json_reader>("/variables")};
         const auto var_names = jr_ranges.get_attributes();
-        for (const auto &key : var_names)
+        for (const auto& key : var_names)
         {
             const std::string full_key{"/variables/" + key};
             if (json_rdr.is_string(full_key))

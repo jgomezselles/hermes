@@ -34,7 +34,7 @@ public:
           msg_names({"msg1", "msg2"}),
           sut(io_ctx, print_period, output_file_name, msg_names){};
 
-    void SetUp(){};
+    void SetUp() {};
 
     void TearDown()
     {

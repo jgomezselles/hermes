@@ -12,7 +12,7 @@ namespace otel_trace = opentelemetry::trace;
 class tracer_test : public testing::Test
 {
 public:
-    void TearDown() override{};
+    void TearDown() override {};
 };
 
 TEST_F(tracer_test, GetTracerWhenCannotConnect)

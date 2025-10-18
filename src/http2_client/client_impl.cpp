@@ -16,7 +16,8 @@
 #include <utility>
 
 #include "connection.hpp"
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/incubating/http_attributes.h"
+#include "opentelemetry/semconv/url_attributes.h"
 #include "script.hpp"
 #include "script_queue.hpp"
 #include "stats.hpp"
@@ -25,6 +26,7 @@
 namespace ng = nghttp2::asio_http2;
 using namespace std::chrono;
 namespace ot_trace = opentelemetry::trace;
+namespace ot_conv = opentelemetry::semconv;
 
 namespace http2_client
 {
@@ -140,8 +142,8 @@ void client_impl::send()
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
 
             auto span = o11y::create_child_span(req.name, script.get_span());
-            span->SetAttribute(ot_trace::SemanticConventions::kUrlFull, req.url);
-            span->SetAttribute(ot_trace::SemanticConventions::kHttpRequestMethod, req.method);
+            span->SetAttribute(ot_conv::url::kUrlFull, req.url);
+            span->SetAttribute(ot_conv::http::kHttpRequestMethod, req.method);
 
             auto nghttp_req = session.submit(ec, req.method, req.url, req.body, req.headers);
             if (!nghttp_req)
@@ -192,9 +194,8 @@ void client_impl::send()
                                 span->AddEvent("Body received");
                                 traffic::answer_type ans = {res.status_code(), *answer,
                                                             res.header()};
-                                span->SetAttribute(
-                                    ot_trace::SemanticConventions::kHttpResponseStatusCode,
-                                    res.status_code());
+                                span->SetAttribute(ot_conv::http::kHttpResponseStatusCode,
+                                                   res.status_code());
 
                                 bool valid_answer = script.validate_answer(ans);
                                 if (valid_answer)
