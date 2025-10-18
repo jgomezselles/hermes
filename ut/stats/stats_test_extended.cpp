@@ -17,7 +17,7 @@ public:
     stats_extended_sut(boost::asio::io_context& io_ctx, const int print_period,
                        const std::string& output_file_name,
                        const std::vector<std::string>& msg_names)
-        : stats(io_ctx, print_period, output_file_name, msg_names) {};
+        : stats(io_ctx, print_period, output_file_name, msg_names){};
 
     void trigger_print_headers() const { print_headers(); };
 };

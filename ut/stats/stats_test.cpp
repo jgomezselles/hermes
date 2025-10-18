@@ -16,7 +16,7 @@ class stats_sut : public stats
 public:
     stats_sut(boost::asio::io_context& io_ctx, const int print_period,
               const std::string& output_file_name, const std::vector<std::string>& msg_names)
-        : stats(io_ctx, print_period, output_file_name, msg_names) {};
+        : stats(io_ctx, print_period, output_file_name, msg_names){};
 
     const snapshot& get_total_snap() const { return total_snap; }
 
@@ -32,7 +32,7 @@ public:
         : print_period(1),
           output_file_name("stats_test_output"),
           msg_names({"msg1", "msg2"}),
-          sut(io_ctx, print_period, output_file_name, msg_names) {};
+          sut(io_ctx, print_period, output_file_name, msg_names){};
 
     void SetUp() {};
 
