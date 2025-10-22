@@ -114,7 +114,6 @@ void inject_trace_context(ot_std::shared_ptr<ot_trace::Span>& span,
     HttpTextMapCarrier carrier(headers);
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     prop->Inject(carrier, current_ctx);
-
 }
 
 }  // namespace o11y

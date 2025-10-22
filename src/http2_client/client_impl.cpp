@@ -138,7 +138,7 @@ void client_impl::send()
 
     const auto& session = conn->get_session();
     session.io_service().post(
-        [this, script, &session, req] () mutable
+        [this, script, &session, req]() mutable
         {
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
