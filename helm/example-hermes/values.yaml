@@ -17,7 +17,7 @@ hermes:
     cm: traffic-script-cm
   image:
     repository: ghcr.io/jgomezselles/hermes
-    tag: 0.0.5
+    tag: 0.0.6
   o11y:
     metrics_endpoint: http://victoria-svc:8428/opentelemetry/api/v1/push
     traces_endpoint: http://hermes-tempo:4318/v1/traces
