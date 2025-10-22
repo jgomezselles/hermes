@@ -1,4 +1,4 @@
-FROM ghcr.io/jgomezselles/hermes_base:0.0.5 as builder
+FROM ghcr.io/jgomezselles/hermes_base:0.0.5 AS builder
 
 COPY . /code
 
