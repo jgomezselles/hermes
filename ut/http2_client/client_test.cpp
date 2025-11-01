@@ -31,8 +31,9 @@ public:
 class script_queue_mock : public traffic::script_queue_if
 {
 public:
-    MOCK_METHOD0(get_next_script, std::optional<traffic::script>());
-    MOCK_METHOD2(enqueue_script, void(traffic::script, const traffic::answer_type&));
+    MOCK_METHOD0(get_next_script, std::shared_ptr<traffic::script>());
+    MOCK_METHOD2(enqueue_script,
+                 void(std::shared_ptr<traffic::script>&&, const traffic::answer_type&));
     MOCK_METHOD0(cancel_script, void());
     MOCK_CONST_METHOD0(has_pending_scripts, bool());
     MOCK_METHOD0(close_window, void());
@@ -234,7 +235,7 @@ TEST_P(client_test_p, SendMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    std::optional<traffic::script> script(build_script());
+    auto script = std::make_shared<traffic::script>(build_script());
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(1).WillOnce(Return(script));
@@ -262,7 +263,7 @@ TEST_P(client_test_p, TimeoutInAnswer)
     json.set<int>("/timeout", 500);
     json.set<std::string>("/messages/test1/url", "v1/test_timeout");
 
-    std::optional<traffic::script> script(json);
+    auto script = std::make_shared<traffic::script>(json);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -291,7 +292,7 @@ TEST_P(client_test_p, WrongCodeInAnswer)
     json.set<int>("/timeout", 500);
     json.set<std::string>("/messages/test1/url", "v1/wrong_url");
 
-    std::optional<traffic::script> script(json);
+    auto script = std::make_shared<traffic::script>(json);
 
     std::promise<void> prom;
     std::future<void> fut = prom.get_future();
@@ -323,7 +324,7 @@ TEST_P(client_test_p, ServerDisconnectionTriggersReconnectionInNextMessage)
 
     auto queue = std::make_unique<script_queue_mock>();
 
-    std::optional<traffic::script> script(build_script());
+    auto script = std::make_shared<traffic::script>(build_script());
     std::promise<void> prom1, prom2;
     std::future<void> fut1 = prom1.get_future(), fut2 = prom2.get_future();
     EXPECT_CALL(*queue, get_next_script()).Times(3).WillRepeatedly(Return(script));

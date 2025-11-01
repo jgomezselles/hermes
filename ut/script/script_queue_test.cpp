@@ -37,19 +37,19 @@ public:
 TEST_F(script_queue_test, EnqueueSimpleScriptJustRunOnce)
 {
     setup_queue(build_script());
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
-    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
+    script_queue->enqueue_script(std::move(script), {200, R"("OK")"});
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
     script_queue->close_window();
     ASSERT_TRUE(script_queue->is_window_closed());
 
-    script_opt = script_queue->get_next_script();
-    ASSERT_FALSE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_FALSE(script);
 }
 
 TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
@@ -57,61 +57,61 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptRunTwice)
     auto json = build_script();
     json.set<std::vector<std::string>>("/flow", {"test1", "test1"});
     setup_queue(json);
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
-    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
+    script_queue->enqueue_script(std::move(script), {200, R"("OK")"});
     ASSERT_TRUE(script_queue->has_pending_scripts());
-    script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
-    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
+    script_queue->enqueue_script(std::move(script), {200, R"("OK")"});
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
     script_queue->close_window();
     ASSERT_TRUE(script_queue->is_window_closed());
 
-    script_opt = script_queue->get_next_script();
-    ASSERT_FALSE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_FALSE(script);
 }
 
 TEST_F(script_queue_test, CancelScriptReturnsNoMorePending)
 {
     setup_queue(build_script());
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
 
     script_queue->cancel_script();
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
-    script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
 }
 
 TEST_F(script_queue_test, CloseWindowReturnsNone)
 {
     setup_queue(build_script());
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
     script_queue->close_window();
-    script_opt = script_queue->get_next_script();
+    script = script_queue->get_next_script();
     ASSERT_TRUE(script_queue->has_pending_scripts());
-    ASSERT_FALSE(script_opt);
+    ASSERT_FALSE(script);
     ASSERT_TRUE(script_queue->is_window_closed());
 }
 
 TEST_F(script_queue_test, CloseWindowAndCancelCurrentReturnsNoneAndNoMorePending)
 {
     setup_queue(build_script());
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_TRUE(script_queue->has_pending_scripts());
     ASSERT_FALSE(script_queue->is_window_closed());
 
@@ -120,8 +120,8 @@ TEST_F(script_queue_test, CloseWindowAndCancelCurrentReturnsNoneAndNoMorePending
 
     ASSERT_FALSE(script_queue->has_pending_scripts());
 
-    script_opt = script_queue->get_next_script();
-    ASSERT_FALSE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_FALSE(script);
     ASSERT_TRUE(script_queue->is_window_closed());
 }
 
@@ -133,27 +133,27 @@ TEST_F(script_queue_test, EnqueueMultipleMessageScriptAndRangesRunTwice)
     json.set<int>("/ranges/range1/max", 6);
     setup_queue(json);
 
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_EQ(5, script_queue->get_current("range1"));
 
     // Here you will get a new one, because you did not enqueue the answer!
-    auto script_opt2 = script_queue->get_next_script();
+    auto script2 = script_queue->get_next_script();
     ASSERT_EQ(6, script_queue->get_current("range1"));
 
     // Now let's answer the first one, so get_next_script will return
     // the first one back to us, keeping the "5"
-    script_queue->enqueue_script(script_opt.value(), {200, R"("OK")"});
-    script_opt = script_queue->get_next_script();
+    script_queue->enqueue_script(std::move(script), {200, R"("OK")"});
+    script = script_queue->get_next_script();
     ASSERT_EQ(6, script_queue->get_current("range1"));
 
     // The same for script 2
-    script_queue->enqueue_script(script_opt2.value(), {200, R"("OK")"});
-    script_opt = script_queue->get_next_script();
+    script_queue->enqueue_script(std::move(script2), {200, R"("OK")"});
+    script = script_queue->get_next_script();
     ASSERT_EQ(6, script_queue->get_current("range1"));
 
-    script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
+    script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
     ASSERT_EQ(5, script_queue->get_current("range1"));
 }
 
@@ -166,9 +166,9 @@ TEST_F(script_queue_test, ParseVariables)
     json.set<std::string>("/messages/test1/url", "v1/url/<my_str>");
     setup_queue(json);
 
-    auto script_opt = script_queue->get_next_script();
-    ASSERT_TRUE(script_opt);
-    traffic::json_reader next_body(script_opt->get_next_body(), "{}");
+    auto script = script_queue->get_next_script();
+    ASSERT_TRUE(script);
+    traffic::json_reader next_body(script->get_next_body(), "{}");
     ASSERT_EQ(next_body.get_value<std::string>("/entry"), "1");
-    ASSERT_EQ(script_opt->get_next_url(), "v1/url/lol");
+    ASSERT_EQ(script->get_next_url(), "v1/url/lol");
 }
