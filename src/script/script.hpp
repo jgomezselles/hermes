@@ -44,6 +44,8 @@ public:
     std::vector<std::string> get_message_names() const;
 
     void start_span();
+    void start_sleep_span();
+    void stop_sleep_span();
 
     const otel_std::shared_ptr<otel_trace::Span>& get_span() const { return span; };
 
@@ -69,5 +71,7 @@ private:
     std::map<std::string, json_reader, std::less<>> saved_jsons;
 
     otel_std::shared_ptr<otel_trace::Span> span;
+    otel_std::shared_ptr<otel_trace::Span> sleep_span;
+
 };
 }  // namespace traffic

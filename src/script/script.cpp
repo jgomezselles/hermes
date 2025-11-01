@@ -41,6 +41,7 @@ script::~script()
 {
     if (span)
     {
+        span->SetStatus(ot_trace::StatusCode::kOk);
         span->End();
     }
 }
@@ -174,6 +175,7 @@ bool script::process_next(const answer_type& last_answer)
     // TODO: if this is an error, validation should fail. Rethink
     if (!save_from_answer(last_answer, messages.front().sfa))
     {
+        span->SetStatus(ot_trace::StatusCode::kError);
         return false;
     }
 
@@ -230,6 +232,19 @@ void script::parse_variables()
 void script::start_span()
 {
     span = o11y::create_span("script");
+}
+
+void script::start_sleep_span()
+{
+    sleep_span = o11y::create_child_span("sleep", span);
+    sleep_span->AddEvent("Script enqueued for later. Going to sleep...");
+}
+
+void script::stop_sleep_span()
+{
+    sleep_span->AddEvent("Script extracted from queue. Woke up.");
+    sleep_span->SetStatus(ot_trace::StatusCode::kOk);
+    sleep_span->End();
 }
 
 }  // namespace traffic

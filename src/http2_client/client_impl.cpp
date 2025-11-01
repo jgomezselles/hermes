@@ -113,13 +113,12 @@ void client_impl::open_new_connection()
 
 void client_impl::send()
 {
-    auto script_opt = queue->get_next_script();
-    if (!script_opt.has_value())
+    auto script = queue->get_next_script();
+    if (!script)
     {
         return;
     }
-    const auto& script = *script_opt;
-    request req = get_next_request(host, port, script);
+    request req = get_next_request(host, port, *script);
 
     if (!is_connected())
     {
@@ -138,12 +137,12 @@ void client_impl::send()
 
     const auto& session = conn->get_session();
     session.io_service().post(
-        [this, script, &session, req]() mutable
+        [this, script=std::move(script), &session, req]() mutable
         {
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
 
-            auto span = o11y::create_child_span(req.name, script.get_span());
+            auto span = o11y::create_child_span(req.name, script->get_span());
             span->SetAttribute(ot_conv::url::kUrlFull, req.url);
             span->SetAttribute(ot_conv::http::kHttpRequestMethod, req.method);
             o11y::inject_trace_context(span, req.headers);
@@ -163,12 +162,12 @@ void client_impl::send()
 
             auto ctrl = std::make_shared<race_control>();
             auto timer = std::make_shared<boost::asio::steady_timer>(io_ctx);
-            timer->expires_after(milliseconds(script.get_timeout_ms()));
+            timer->expires_after(milliseconds(script->get_timeout_ms()));
             timer->async_wait(boost::bind(&client_impl::on_timeout, this,
                                           boost::asio::placeholders::error, ctrl, req.name));
 
             nghttp_req->on_response(
-                [this, timer, init_time, script, ctrl, req, span](const ng::client::response& res)
+                [this, timer, init_time, script = std::move(script), ctrl, req, span](const ng::client::response& res) mutable
                 {
                     auto elapsed_time =
                         duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
@@ -184,8 +183,8 @@ void client_impl::send()
                     span->AddEvent("Response received");
                     auto answer = std::make_shared<std::string>();
                     res.on_data(
-                        [this, &res, script, answer, elapsed_time, req, span](const uint8_t* data,
-                                                                              std::size_t len)
+                        [this, &res, script = std::move(script), answer, elapsed_time, req, span](const uint8_t* data,
+                                                                              std::size_t len) mutable
                         {
                             if (len > 0)
                             {
@@ -200,14 +199,14 @@ void client_impl::send()
                                 span->SetAttribute(ot_conv::http::kHttpResponseStatusCode,
                                                    res.status_code());
 
-                                bool valid_answer = script.validate_answer(ans);
+                                bool valid_answer = script->validate_answer(ans);
                                 if (valid_answer)
                                 {
                                     stats->add_measurement(req.name, elapsed_time,
                                                            res.status_code());
                                     span->SetStatus(ot_trace::StatusCode::kOk);
                                     span->End();
-                                    queue->enqueue_script(script, ans);
+                                    queue->enqueue_script(std::move(script), ans);
                                 }
                                 else
                                 {
