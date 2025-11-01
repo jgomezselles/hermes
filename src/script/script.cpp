@@ -175,7 +175,10 @@ bool script::process_next(const answer_type& last_answer)
     // TODO: if this is an error, validation should fail. Rethink
     if (!save_from_answer(last_answer, messages.front().sfa))
     {
-        span->SetStatus(ot_trace::StatusCode::kError);
+        if (span)
+        {
+            span->SetStatus(ot_trace::StatusCode::kError);
+        }
         return false;
     }
 
@@ -242,9 +245,12 @@ void script::start_sleep_span()
 
 void script::stop_sleep_span()
 {
-    sleep_span->AddEvent("Script extracted from queue. Woke up.");
-    sleep_span->SetStatus(ot_trace::StatusCode::kOk);
-    sleep_span->End();
+    if (sleep_span)
+    {
+        sleep_span->AddEvent("Script extracted from queue. Woke up.");
+        sleep_span->SetStatus(ot_trace::StatusCode::kOk);
+        sleep_span->End();
+    }
 }
 
 }  // namespace traffic
