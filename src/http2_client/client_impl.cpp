@@ -137,7 +137,7 @@ void client_impl::send()
 
     const auto& session = conn->get_session();
     session.io_service().post(
-        [this, script=std::move(script), &session, req]() mutable
+        [this, script = std::move(script), &session, req]() mutable
         {
             boost::system::error_code ec;
             auto init_time = std::make_shared<time_point<steady_clock>>(steady_clock::now());
@@ -167,7 +167,8 @@ void client_impl::send()
                                           boost::asio::placeholders::error, ctrl, req.name));
 
             nghttp_req->on_response(
-                [this, timer, init_time, script = std::move(script), ctrl, req, span](const ng::client::response& res) mutable
+                [this, timer, init_time, script = std::move(script), ctrl, req,
+                 span](const ng::client::response& res) mutable
                 {
                     auto elapsed_time =
                         duration_cast<microseconds>(steady_clock::now() - (*init_time)).count();
@@ -183,8 +184,8 @@ void client_impl::send()
                     span->AddEvent("Response received");
                     auto answer = std::make_shared<std::string>();
                     res.on_data(
-                        [this, &res, script = std::move(script), answer, elapsed_time, req, span](const uint8_t* data,
-                                                                              std::size_t len) mutable
+                        [this, &res, script = std::move(script), answer, elapsed_time, req, span](
+                            const uint8_t* data, std::size_t len) mutable
                         {
                             if (len > 0)
                             {

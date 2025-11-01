@@ -72,6 +72,5 @@ private:
 
     otel_std::shared_ptr<otel_trace::Span> span;
     otel_std::shared_ptr<otel_trace::Span> sleep_span;
-
 };
 }  // namespace traffic
