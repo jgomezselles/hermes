@@ -3,6 +3,7 @@
 #include <nghttp2/asio_http2.h>
 
 #include <string>
+#include <iostream>
 
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
@@ -27,19 +28,7 @@ public:
 
     virtual ot_std::string_view Get(opentelemetry::nostd::string_view key) const noexcept override
     {
-        std::string key_to_compare = key.data();
-        // OTel repo's header's first letter seems to be  automatically capitaliazed by their test
-        // http-server
-        if (key == opentelemetry::trace::propagation::kTraceParent)
-        {
-            key_to_compare = "Traceparent";
-        }
-        else if (key == opentelemetry::trace::propagation::kTraceState)
-        {
-            key_to_compare = "Tracestate";
-        }
-
-        if (const auto it = headers_.find(key_to_compare); it != headers_.end())
+        if (const auto it = headers_.find(key.data()); it != headers_.end())
         {
             return it->second.value;
         }
@@ -64,7 +53,11 @@ ot_std::shared_ptr<ot_trace::Span> create_span(const std::string& name);
 ot_std::shared_ptr<ot_trace::Span> create_child_span(
     const std::string& name, const ot_std::shared_ptr<ot_trace::Span>& parent);
 
-void inject_trace_context(ot_std::shared_ptr<ot_trace::Span>& span,
+void inject_trace_context(const ot_std::shared_ptr<ot_trace::Span>& span,
                           nghttp2::asio_http2::header_map& headers);
+
+ot_std::shared_ptr<ot_trace::Span> create_child_span_from_remote(
+    nghttp2::asio_http2::header_map& headers,
+    const std::string& name);
 
 }  // namespace o11y

@@ -100,8 +100,7 @@ ot_std::shared_ptr<ot_trace::Span> create_child_span(
     return span;
 }
 
-// TODO: compare currentContext (GetValue) with span context; Maybe it's just the traceparent?
-void inject_trace_context(ot_std::shared_ptr<ot_trace::Span>& span,
+void inject_trace_context(const ot_std::shared_ptr<ot_trace::Span>& span,
                           nghttp2::asio_http2::header_map& headers)
 {
     if (!span)
@@ -109,11 +108,27 @@ void inject_trace_context(ot_std::shared_ptr<ot_trace::Span>& span,
         return;
     }
 
-    auto scope = get_tracer("hermes_client")->WithActiveSpan(span);
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto ctx_with_span = opentelemetry::trace::SetSpan(current_ctx, span); //This is the trick
     HttpTextMapCarrier carrier(headers);
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    prop->Inject(carrier, current_ctx);
+    prop->Inject(carrier, ctx_with_span);
+}
+
+ot_std::shared_ptr<ot_trace::Span> create_child_span_from_remote(
+    nghttp2::asio_http2::header_map& headers, const std::string& name)
+{
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+
+    HttpTextMapCarrier carrier(headers);
+
+    //Extract headers to context
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto new_context = prop->Extract(carrier, current_ctx);
+    auto remote_span = opentelemetry::trace::GetSpan(new_context);
+
+    return create_child_span(name, std::move(remote_span));
+
 }
 
 }  // namespace o11y
