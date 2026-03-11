@@ -2,8 +2,8 @@
 
 #include <nghttp2/asio_http2.h>
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
@@ -57,7 +57,6 @@ void inject_trace_context(const ot_std::shared_ptr<ot_trace::Span>& span,
                           nghttp2::asio_http2::header_map& headers);
 
 ot_std::shared_ptr<ot_trace::Span> create_child_span_from_remote(
-    nghttp2::asio_http2::header_map& headers,
-    const std::string& name);
+    nghttp2::asio_http2::header_map& headers, const std::string& name);
 
 }  // namespace o11y

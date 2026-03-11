@@ -109,7 +109,7 @@ void inject_trace_context(const ot_std::shared_ptr<ot_trace::Span>& span,
     }
 
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    auto ctx_with_span = opentelemetry::trace::SetSpan(current_ctx, span); //This is the trick
+    auto ctx_with_span = opentelemetry::trace::SetSpan(current_ctx, span);  // This is the trick
     HttpTextMapCarrier carrier(headers);
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     prop->Inject(carrier, ctx_with_span);
@@ -122,13 +122,12 @@ ot_std::shared_ptr<ot_trace::Span> create_child_span_from_remote(
 
     HttpTextMapCarrier carrier(headers);
 
-    //Extract headers to context
+    // Extract headers to context
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
     auto remote_span = opentelemetry::trace::GetSpan(new_context);
 
     return create_child_span(name, std::move(remote_span));
-
 }
 
 }  // namespace o11y
