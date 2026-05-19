@@ -8,7 +8,7 @@ using nghttp2::asio_http2::client::session;
 
 namespace
 {
-nghttp2::asio_http2::client::session create_session(boost::asio::io_service& io_service,
+nghttp2::asio_http2::client::session create_session(boost::asio::io_context& io_ctx,
                                                     const std::string& h, const std::string& p,
                                                     const bool secure_session)
 {
@@ -18,18 +18,18 @@ nghttp2::asio_http2::client::session create_session(boost::asio::io_service& io_
         boost::asio::ssl::context tls_ctx(boost::asio::ssl::context::sslv23);
         tls_ctx.set_default_verify_paths();
         nghttp2::asio_http2::client::configure_tls_context(ec, tls_ctx);
-        return nghttp2::asio_http2::client::session(io_service, tls_ctx, h, p);
+        return nghttp2::asio_http2::client::session(io_ctx, tls_ctx, h, p);
     }
 
-    return nghttp2::asio_http2::client::session(io_service, h, p);
+    return nghttp2::asio_http2::client::session(io_ctx, h, p);
 }
 }  // namespace
 
 namespace http2_client
 {
 connection::connection(const std::string& h, const std::string& p, bool secure_session)
-    : svc_work(boost::asio::io_service::work(io_service)),
-      session(create_session(io_service, h, p, secure_session))
+    : svc_work(boost::asio::make_work_guard(io_context)),
+      session(create_session(io_context, h, p, secure_session))
 {
     session.on_connect(
         [this, h, p](tcp::resolver::iterator)
@@ -47,12 +47,12 @@ connection::connection(const std::string& h, const std::string& p, bool secure_s
             notify_close();
         });
 
-    worker = std::thread([this] { io_service.run(); });
+    worker = std::thread([this] { io_context.run(); });
 }
 
 connection::~connection()
 {
-    io_service.stop();
+    io_context.stop();
 
     if (worker.joinable())
     {
