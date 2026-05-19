@@ -7,3 +7,5 @@ build
 .DS_Store
 cmake-build-*
 **/*.info
+result
+

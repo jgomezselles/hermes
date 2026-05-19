@@ -52,8 +52,8 @@ private:
     void notify_close();
 
     /// ASIO attributes
-    boost::asio::io_service io_service;
-    boost::asio::io_service::work svc_work;
+    boost::asio::io_context io_context;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> svc_work;
     nghttp2::asio_http2::client::session session;
 
     /// Class attributes
