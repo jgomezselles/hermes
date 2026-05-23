@@ -55,7 +55,7 @@ jobs:
           lcov -a base-coverage.info  -a test-coverage.info  -o total-coverage.info
     -
       name: Upload coverage to Coveralls
-      uses: coverallsapp/github-action@v2
+      uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2 - update: gh api repos/coverallsapp/github-action/git/ref/tags/v2 --jq '.object.sha'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: total-coverage.info
@@ -74,10 +74,10 @@ jobs:
         uses: actions/checkout@v4
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3 - update: gh api repos/docker/setup-buildx-action/git/ref/tags/v3 --jq '.object.sha'
       -
         name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6 - update: gh api repos/docker/build-push-action/git/ref/tags/v6 --jq '.object.sha'
         with:
           context: .
           file: ./docker/Dockerfile
@@ -105,10 +105,10 @@ jobs:
         uses: actions/checkout@v4
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3 - update: gh api repos/docker/setup-buildx-action/git/ref/tags/v3 --jq '.object.sha'
       -
         name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6 - update: gh api repos/docker/build-push-action/git/ref/tags/v6 --jq '.object.sha'
         with:
           context: .
           file: ./docker/server-mock/Dockerfile
