@@ -19,47 +19,5 @@ hermes:
     repository: ghcr.io/jgomezselles/hermes
     tag: 0.0.7
   o11y:
-    metrics_endpoint: http://victoria-svc:8428/opentelemetry/api/v1/push
-    traces_endpoint: http://hermes-tempo:4318/v1/traces
-
-victoria-metrics-single:
-  server:
-    fullnameOverride: "victoria-svc"
-    persistentVolume:
-      enabled: false
-
-grafana:
-  adminPassword: admin
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-      - name: Prometheus
-        type: prometheus
-        url: http://victoria-svc:8428
-        access: proxy
-        isDefault: true
-        uid: hermes-prometheus-datasource
-      - name: Tempo
-        uid: tempo
-        type: tempo
-        url: http://hermes-tempo:3100
-        isDefault: false
-      deleteDatasources:
-      - name: Prometheus
-
-  dashboardProviders:
-   dashboardproviders.yaml:
-     apiVersion: 1
-     providers:
-     - name: 'default'
-       orgId: 1
-       folder: ''
-       type: file
-       disableDeletion: false
-       editable: true
-       options:
-         path: /var/lib/grafana/dashboards/default
-
-  dashboardsConfigMaps:
-    default: "hermes-dashboard"
+    metrics_endpoint: ""
+    traces_endpoint: ""
