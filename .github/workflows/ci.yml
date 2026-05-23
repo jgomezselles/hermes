@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
 
   formatting-check:
@@ -136,7 +139,6 @@ jobs:
       uses: helm/kind-action@2a525709fd0874b75d7ae842d257981b0e0f557d
       with:
         cluster_name: "kind"
-        kubectl_version: "v1.22.1"
     -
       name: Download server-mock
       uses: actions/download-artifact@v4.1.7
@@ -189,3 +191,18 @@ jobs:
       run: |
         HERMES_POD=$(kubectl get pod -l app.kubernetes.io/name=hermes -o jsonpath="{.items[0].metadata.name}")
         kubectl exec $HERMES_POD -- hermes -p1 -t10 -r1000
+    -
+      name: Dump debug info
+      if: failure()
+      run: |
+        echo "=== Pods ==="
+        kubectl get pods -A
+        echo "=== Events ==="
+        kubectl get events -A --sort-by='.lastTimestamp'
+        echo "=== Pod descriptions ==="
+        kubectl describe pods -A
+        echo "=== Logs ==="
+        for pod in $(kubectl get pods -o name); do
+          echo "--- $pod ---"
+          kubectl logs $pod --all-containers --tail=50 || true
+        done
