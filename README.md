@@ -29,63 +29,6 @@ Hermes may be used standalone (check the [releases](https://github.com/jgomezsel
 from a [docker container](#container-to-container-example), or as part of a kubernetes
 [deployment](#hermes-in-kubernetes-example).
 
-## Building & running with Nix
-
-If you have [Nix](https://nixos.org/) with flakes enabled:
-
-```bash
-# Run directly (builds and executes)
-nix run . -- -f traffic.json -r 100 -t 30
-
-# Build the binary
-nix build
-
-# Enter a dev shell with all dependencies
-nix develop
-```
-
-To install hermes into your system via `nix profile`:
-
-```bash
-nix profile install .
-```
-
-Or as a NixOS module input in your system flake:
-
-```nix
-{
-  inputs.hermes.url = "github:jgomezselles/hermes";
-
-  outputs = { hermes, ... }: {
-    nixosConfigurations.my-machine = {
-      environment.systemPackages = [ hermes.packages.x86_64-linux.default ];
-    };
-  };
-}
-```
-
-### Nix container image
-
-Build a container image (OCI tarball) and load it into Docker:
-
-```bash
-nix build .#container
-docker load < result
-docker run --rm localhost/hermes:latest -f /path/to/traffic.json
-```
-
-Compared to the [Dockerfile](docker/Dockerfile) approach:
-
-| Aspect | Dockerfile | Nix |
-|---|---|---|
-| Base image | Fedora 38 (~200 MB) | None — only the binary + runtime deps |
-| Final size | ~360 MB+ | **160 MB** |
-| Dependencies | Manually listed 30+ `.so` files (brittle) | Automatically resolved by Nix |
-| Reproducibility | Non-deterministic (dnf updates, network fetches) | Fully hermetic & cacheable |
-| Build time | Must build base + hermes sequentially | Fully cached by Nix store |
-| Boost version | 1.78.0 (Fedora 38) | 1.86.0 |
-| Build isolation | None — depends on host toolchain | Sandboxed build
-
 ## Executing hermes
 
 You may take a look to Hermes help by just typing `./hermes -h`:

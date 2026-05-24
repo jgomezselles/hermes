@@ -33,6 +33,55 @@ make -j<N>
 
 Tests will be located under `/code/build/ut/unit-tests`, which is an executable you can run.
 
+### Building & running with Nix
+
+If you have [Nix](https://nixos.org/) with flakes enabled:
+
+```bash
+# Run directly (builds and executes)
+nix run . -- -f traffic.json -r 100 -t 30
+
+# Build the binary
+nix build
+
+# Enter a dev shell with all dependencies
+nix develop
+```
+
+To install hermes into your system via `nix profile`:
+
+```bash
+nix profile install .
+```
+
+Or as a NixOS module input in your system flake:
+
+```nix
+{
+  inputs.hermes.url = "github:jgomezselles/hermes";
+
+  outputs = { hermes, ... }: {
+    nixosConfigurations.my-machine = {
+      environment.systemPackages = [ hermes.packages.x86_64-linux.default ];
+    };
+  };
+}
+```
+
+#### Nix container image
+
+Build a container image (OCI tarball) and load it into Docker:
+
+```bash
+nix build .#container
+docker load < result
+docker run --rm localhost/hermes:latest -f /path/to/traffic.json
+```
+
+This execution uses [nixpkgs dockerTools](https://ryantm.github.io/nixpkgs/builders/images/dockertools)
+and the output should be equivalent to a "FROM scratch" image, without any
+other binary rather than `hermes`.
+
 ## Format
 
 To format the code, `clang-format` is used (currently version 7), to run `clang-format`you can either install it in
